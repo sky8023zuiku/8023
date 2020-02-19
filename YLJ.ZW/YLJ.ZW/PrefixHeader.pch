@@ -1,0 +1,29 @@
+//
+//  PrefixHeader.pch
+//  YLJ.ZW
+//
+//  Created by CHY on 2019/8/7.
+//  Copyright © 2019年 CHY. All rights reserved.
+//
+
+#ifndef PrefixHeader_pch
+#define PrefixHeader_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+
+#import "ZWConst.h"
+#import "UIView+FFVoluation.h"
+#import "FFToolsUtils.h"
+#import "Masonry.h"
+#import "FFProgressHUD.h"
+#import "ZWModelHeader.h"
+#import "UIImageView+WebCache.h"
+
+//import by GG
+#import "YPchAction.h"
+
+#import "ZWScanHearder.h"
+
+
+#endif /* PrefixHeader_pch */

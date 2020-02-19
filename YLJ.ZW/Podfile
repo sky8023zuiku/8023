@@ -1,0 +1,47 @@
+platform :ios, '9.0'
+
+  # Uncomment the next line if you're using Swift or would like to use dynamic frameworks
+#use_frameworks!
+
+target 'YLJ.ZW' do
+ #use_frameworks!
+
+pod "AFNetworking",     "~> 3.1.0"
+pod "Masonry",          "~> 1.0.1"
+pod 'TextInputLimit', '~> 1.0.2'
+pod "MBProgressHUD"
+pod "MJRefresh"
+pod 'DNSPageView-ObjC'
+pod 'YYCache', '1.0.3’
+pod 'YYModel', '1.0.4’
+#pod 'YYKit'
+pod 'YYText'
+pod 'SDWebImage', '~> 4.0'
+#pod 'IQKeyboardManager'
+pod 'TPKeyboardAvoiding'
+pod 'XHWebImageAutoSize'
+pod 'DZNEmptyDataSet'
+pod 'CYLTabBarController'
+pod 'SAMKeychain'
+pod 'FMDB'  #'~> 2.6.2'
+pod 'ReactiveCocoa','~>2.1.8'
+pod 'TZImagePickerController'
+pod 'AliyunOSSiOS'
+pod 'IQActionSheetPickerView'
+pod 'mob_sharesdk/ShareSDKUI'
+pod 'mob_sharesdk/ShareSDKPlatforms/QQ'
+pod 'mob_sharesdk/ShareSDKPlatforms/SinaWeibo'
+pod 'mob_sharesdk/ShareSDKPlatforms/WeChat'
+
+pod 'MJExtension'
+pod 'SDCycleScrollView'
+pod 'YHPhotoBrowser'
+pod 'AMap3DMap'
+
+#扫码
+pod 'LBXScan/LBXNative','~> 2.3'
+pod 'LBXScan/LBXZXing','~> 2.3'
+pod 'LBXScan/LBXZBar','~> 2.3'
+pod 'LBXScan/UI','~> 2.3'
+
+end

@@ -1,0 +1,192 @@
+PODS:
+  - AFNetworking (3.1.0):
+    - AFNetworking/NSURLSession (= 3.1.0)
+    - AFNetworking/Reachability (= 3.1.0)
+    - AFNetworking/Security (= 3.1.0)
+    - AFNetworking/Serialization (= 3.1.0)
+    - AFNetworking/UIKit (= 3.1.0)
+  - AFNetworking/NSURLSession (3.1.0):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/Reachability (3.1.0)
+  - AFNetworking/Security (3.1.0)
+  - AFNetworking/Serialization (3.1.0)
+  - AFNetworking/UIKit (3.1.0):
+    - AFNetworking/NSURLSession
+  - AliyunOSSiOS (2.10.7)
+  - AMap3DMap (7.2.0):
+    - AMapFoundation (~> 1.5)
+  - AMapFoundation (1.6.2)
+  - CYLTabBarController (1.28.3):
+    - CYLTabBarController/Core (= 1.28.3)
+  - CYLTabBarController/Core (1.28.3)
+  - DNSPageView-ObjC (1.0.8)
+  - DZNEmptyDataSet (1.8.1)
+  - FMDB (2.7.5):
+    - FMDB/standard (= 2.7.5)
+  - FMDB/standard (2.7.5)
+  - IQActionSheetPickerView (2.0.0)
+  - LBXScan/LBXNative (2.3):
+    - LBXScan/Types (~> 2.2)
+  - LBXScan/LBXZBar (2.3):
+    - LBXScan/Types (~> 2.2)
+    - ZBarSDK (~> 1.3.1)
+  - LBXScan/LBXZXing (2.3):
+    - LBXScan/Types (~> 2.2)
+  - LBXScan/Types (2.3)
+  - LBXScan/UI (2.3):
+    - LBXScan/Types (~> 2.2)
+  - Masonry (1.0.2)
+  - MBProgressHUD (1.1.0)
+  - MJExtension (3.2.1)
+  - MJRefresh (3.2.0)
+  - mob_sharesdk/ShareSDK (4.3.1):
+    - MOBFoundation
+  - mob_sharesdk/ShareSDKPlatforms/QQ (4.3.1):
+    - mob_sharesdk/ShareSDK
+    - MOBFoundation
+  - mob_sharesdk/ShareSDKPlatforms/SinaWeibo (4.3.1):
+    - mob_sharesdk/ShareSDK
+    - MOBFoundation
+  - mob_sharesdk/ShareSDKPlatforms/WeChat (4.3.1):
+    - mob_sharesdk/ShareSDK
+    - MOBFoundation
+  - mob_sharesdk/ShareSDKUI (4.3.1):
+    - mob_sharesdk/ShareSDK
+    - MOBFoundation
+  - MOBFoundation (3.2.5)
+  - ReactiveCocoa (2.1.8):
+    - ReactiveCocoa/Core (= 2.1.8)
+    - ReactiveCocoa/no-arc (= 2.1.8)
+  - ReactiveCocoa/Core (2.1.8):
+    - ReactiveCocoa/no-arc
+  - ReactiveCocoa/no-arc (2.1.8)
+  - SAMKeychain (1.5.3)
+  - SDCycleScrollView (1.75):
+    - SDWebImage (>= 4.0.0)
+  - SDWebImage (4.4.7):
+    - SDWebImage/Core (= 4.4.7)
+  - SDWebImage/Core (4.4.7)
+  - TextInputLimit (1.0.2)
+  - TPKeyboardAvoiding (1.3.3)
+  - TZImagePickerController (3.2.3)
+  - XHWebImageAutoSize (1.1.2)
+  - YHPhotoBrowser (1.1.1):
+    - YYWebImage
+  - YYCache (1.0.3)
+  - YYImage (1.0.4):
+    - YYImage/Core (= 1.0.4)
+  - YYImage/Core (1.0.4)
+  - YYModel (1.0.4)
+  - YYText (1.0.7)
+  - YYWebImage (1.0.5):
+    - YYCache
+    - YYImage
+  - ZBarSDK (1.3.1)
+
+DEPENDENCIES:
+  - AFNetworking (~> 3.1.0)
+  - AliyunOSSiOS
+  - AMap3DMap
+  - CYLTabBarController
+  - DNSPageView-ObjC
+  - DZNEmptyDataSet
+  - FMDB
+  - IQActionSheetPickerView
+  - LBXScan/LBXNative (~> 2.3)
+  - LBXScan/LBXZBar (~> 2.3)
+  - LBXScan/LBXZXing (~> 2.3)
+  - LBXScan/UI (~> 2.3)
+  - Masonry (~> 1.0.1)
+  - MBProgressHUD
+  - MJExtension
+  - MJRefresh
+  - mob_sharesdk/ShareSDKPlatforms/QQ
+  - mob_sharesdk/ShareSDKPlatforms/SinaWeibo
+  - mob_sharesdk/ShareSDKPlatforms/WeChat
+  - mob_sharesdk/ShareSDKUI
+  - ReactiveCocoa (~> 2.1.8)
+  - SAMKeychain
+  - SDCycleScrollView
+  - SDWebImage (~> 4.0)
+  - TextInputLimit (~> 1.0.2)
+  - TPKeyboardAvoiding
+  - TZImagePickerController
+  - XHWebImageAutoSize
+  - YHPhotoBrowser
+  - YYCache (= 1.0.3)
+  - YYModel (= 1.0.4)
+  - YYText
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - AFNetworking
+    - AliyunOSSiOS
+    - CYLTabBarController
+    - DNSPageView-ObjC
+    - DZNEmptyDataSet
+    - FMDB
+    - IQActionSheetPickerView
+    - Masonry
+    - MBProgressHUD
+    - MJRefresh
+    - mob_sharesdk
+    - MOBFoundation
+    - ReactiveCocoa
+    - SAMKeychain
+    - SDWebImage
+    - TextInputLimit
+    - TZImagePickerController
+    - XHWebImageAutoSize
+  trunk:
+    - AMap3DMap
+    - AMapFoundation
+    - LBXScan
+    - MJExtension
+    - SDCycleScrollView
+    - TPKeyboardAvoiding
+    - YHPhotoBrowser
+    - YYCache
+    - YYImage
+    - YYModel
+    - YYText
+    - YYWebImage
+    - ZBarSDK
+
+SPEC CHECKSUMS:
+  AFNetworking: 5e0e199f73d8626b11e79750991f5d173d1f8b67
+  AliyunOSSiOS: 602b6a4e70e62a5f0a6431c20496343141d7e66f
+  AMap3DMap: be13191194c9aeb29a67d9d3e9a797588fb329aa
+  AMapFoundation: 672dc3a4759cb733f447c1e1b020f7ba2729f4ab
+  CYLTabBarController: cd14c6260a38337600737873a57b3114c7065a8e
+  DNSPageView-ObjC: 56027d90e3f6f4d8a7ff47315911bba36beea1eb
+  DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
+  FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
+  IQActionSheetPickerView: 7986373d485f144589eec2c7c3014645c885f38b
+  LBXScan: e51449f0832d1fe17da632af0d22adeb3cfa3543
+  Masonry: 7c429b56da9d4ee0bbb3ed77a5ea710d6a5df39e
+  MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
+  MJExtension: 635f2c663dcb1bf76fa4b715b2570a5710aec545
+  MJRefresh: ed450d6eb9d3346a2cb033ab7eb6de090aeef437
+  mob_sharesdk: 1d1951d219fa55021f5599f5295ee71c48178d95
+  MOBFoundation: 07f32af86af66ca46bef3ffcb1810835af53108e
+  ReactiveCocoa: f89f2e009a87951b50321bf9feb958823fcc617e
+  SAMKeychain: 483e1c9f32984d50ca961e26818a534283b4cd5c
+  SDCycleScrollView: 884b88f0266dd4708a0e1934975c69cb971707b1
+  SDWebImage: c10d14a8883ebd89664f02a422006f66a85c0c5d
+  TextInputLimit: 8ab7e524fee7c62334296e19e4c73acc9526ce65
+  TPKeyboardAvoiding: 6dd3fe3268b8f2627beb7ff3d82a3cacbdf66a36
+  TZImagePickerController: f321e8db6cd18dc6ac8e23694961c158a9345a87
+  XHWebImageAutoSize: 8e5d7bf036f960885769dbe3410579024d3ac1a1
+  YHPhotoBrowser: a53325f2f85aa3070069532a8ee3535576c83784
+  YYCache: 282f35b5b0990833d0b7a06d864a87141a021da2
+  YYImage: 1e1b62a9997399593e4b9c4ecfbbabbf1d3f3b54
+  YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
+  YYText: 5c461d709e24d55a182d1441c41dc639a18a4849
+  YYWebImage: 5f7f36aee2ae293f016d418c7d6ba05c4863e928
+  ZBarSDK: 4c1b5daeb7d6cc67dc9355e690af0230a661f6ec
+
+PODFILE CHECKSUM: 94079bee210708a7252bc5e041a81cb272d334e7
+
+COCOAPODS: 1.8.4
