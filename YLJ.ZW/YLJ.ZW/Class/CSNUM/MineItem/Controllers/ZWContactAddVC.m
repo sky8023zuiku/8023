@@ -171,7 +171,6 @@
 -(void)showOneAlertWithTitle:(NSString *)title {
     [[ZWAlertAction sharedAction]showOneAlertTitle:@"提示" message:title confirmTitle:@"我知道了" actionOne:^(UIAlertAction * _Nonnull actionOne) {
         
-        
     } showInView:self];
 }
 

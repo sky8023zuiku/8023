@@ -10,6 +10,14 @@
 #import "LBXScanVideoZoomView.h"
 #import "LBXPermission.h"
 #import "LBXPermissionSetting.h"
+#import "ZWScanErrorVC.h"
+#import "ZWScanResultVC.h"
+#import "ZWScanRecommendCoderVC.h"
+
+#import "UIViewController+YCPopover.h"
+
+#import "ZWMainTabBarController.h"
+#import "ZWMainLoginVC.h"
 
 @interface ZWScanVC ()
 
@@ -19,6 +27,11 @@
 @end
 
 @implementation ZWScanVC
+
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -33,12 +46,23 @@
     [self createNavigationBar];
     
     UIButton *popBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    popBtn.frame = CGRectMake(20, zwStatusBarHeight+6, 30, 30);
+    popBtn.frame = CGRectMake(20, zwStatusBarHeight+3.5, 35, 35);
     [popBtn setBackgroundImage:[UIImage imageNamed:@"zai_zxiang_icon_chanx"] forState:UIControlStateNormal];
     [popBtn addTarget:self action:@selector(backBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     self.popBtn = popBtn;
     [self.view addSubview:self.popBtn];
     
+    UIView *toolView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight)];
+    toolView.backgroundColor = [UIColor colorWithRed:0/255.0 green:0/255.0 blue:0/255.0 alpha:0.5];
+    [self.view addSubview:toolView];
+    
+    UILabel *noticeLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, kScreenHeight-180, kScreenWidth, 50)];
+    noticeLabel.text = @"扫描二维码";
+    noticeLabel.font = normalFont;
+    noticeLabel.textAlignment = NSTextAlignmentCenter;
+    noticeLabel.textColor = [UIColor grayColor];
+    [self.view addSubview:noticeLabel];
+
 }
 - (void)backBtnClick:(UIButton *)btn {
     [self.navigationController popViewControllerAnimated:YES];
@@ -192,6 +216,19 @@
     //经测试，可以同时识别2个二维码，不能同时识别二维码和条形码
     for (LBXScanResult *result in array) {
         NSLog(@"scanResult:%@",result.strScanned);
+        
+        
+        NSDictionary *myDic = [self dictionaryWithJsonString:result.strScanned];
+        if ([myDic[@"zw_status"] isEqualToString:@"0"]||[myDic[@"zw_status"] isEqualToString:@"1"]) {
+            ZWScanResultVC *resultVC = [[ZWScanResultVC alloc]init];
+            resultVC.QrCodeStr = result.strScanned;
+            [self.navigationController pushViewController:resultVC animated:YES];
+        }else {
+            ZWScanErrorVC *errorVC = [[ZWScanErrorVC alloc]init];
+            errorVC.QrCodeStr = result.strScanned;
+            [self.navigationController pushViewController:errorVC animated:YES];
+        }
+
     }
     LBXScanResult *scanResult = array[0];
     NSString*strResult = scanResult.strScanned;
@@ -201,13 +238,33 @@
         return;
     }
     //震动提醒
-   // [LBXScanWrapper systemVibrate];
+//    [LBXScanWrapper systemVibrate];
     //声音提醒
-    //[LBXScanWrapper systemSound];
+//    [LBXScanWrapper systemSound];
+    
+//    [self getChatMessageGoToSound];
     
     [self showNextVCWithScanResult:scanResult];
    
 }
+
+- (void)getChatMessageGoToSound
+{
+    //调用系统声音
+    NSString *path = [NSString stringWithFormat:@"/System/Library/Audio/UISounds/%@.%@",@"low_power",@"caf"];
+    if (path) {
+        SystemSoundID sd;
+        OSStatus error = AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:path],&sd);
+        //获取声音的时候出现错误
+        if (error != kAudioServicesNoError) {
+            NSLog(@"----调用系统声音出错----");
+            sd = 0;
+        }
+        AudioServicesPlaySystemSound(sd);
+    }
+}
+
+
 
 - (void)popAlertMsgWithScanResult:(NSString*)strResult
 {
@@ -264,10 +321,53 @@
 #pragma mark -底部功能项
 
 
-- (void)myQRCode
+- (void)myQRCode {
+
+    NSDictionary *userInfo = [[ZWSaveDataAction shareAction]takeUserInfoData];
+    if (userInfo) {
+        ZWScanRecommendCoderVC *VC = [[ZWScanRecommendCoderVC alloc]init];
+        VC.title = @"邀请码";
+        VC.userInfo = userInfo;
+        [self.navigationController pushViewController:VC animated:YES];
+    } else {
+        __weak typeof (self) weakSelf = self;
+        [[ZWAlertAction sharedAction]showTwoAlertTitle:@"提示" message:@"您还未登陆展网，是否前去登陆" cancelTitle:@"否" confirmTitle:@"是" actionOne:^(UIAlertAction * _Nonnull actionOne) {
+            __strong typeof (weakSelf) strongSelf = weakSelf;
+            UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:[[ZWMainLoginVC alloc] init]];
+            [strongSelf yc_bottomPresentController:nav presentedHeight:kScreenHeight completeHandle:^(BOOL presented) {
+                if (presented) {
+                    [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName : [UIColor whiteColor],
+                    NSFontAttributeName : [UIFont fontWithName:@"Helvetica-Bold" size:17]}];
+                }else {
+                    [[NSNotificationCenter defaultCenter]postNotificationName:@"changeTheStatusBarColor" object:nil];
+                }
+            }];
+        } actionCancel:^(UIAlertAction * _Nonnull actionCancel) {
+            
+        } showInView:self];
+    }
+}
+
+
+- (NSDictionary *)dictionaryWithJsonString:(NSString *)jsonString
 {
-//    CreateBarCodeViewController *vc = [CreateBarCodeViewController new];
-//    [self.navigationController pushViewController:vc animated:YES];
+    if (jsonString == nil) {
+        return nil;
+    }
+    NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *err;
+    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:&err];
+    if(err) {
+        NSLog(@"json解析失败：%@",err);
+        return nil;
+    }
+    return dic;
+}
+
+-(void)showOneAlertWithMessage:(NSString *)message {
+    [[ZWAlertAction sharedAction]showOneAlertTitle:@"提示" message:message confirmTitle:@"我知道了" actionOne:^(UIAlertAction * _Nonnull actionOne) {
+        
+    } showInView:self];
 }
 
 @end

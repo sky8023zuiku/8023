@@ -94,9 +94,7 @@
 //    UIImageView *image = [[UIImageView alloc]initWithFrame:CGRectMake(0, kHeight-0.2*kHeight, kScreenWidth, 0.2*kHeight)];
 //    image.image = [UIImage imageNamed:@"bottom_image"];
 //    [self.view addSubview:image];
-//
-    
-    
+
 }
 - (void)buyNowClick:(UIButton *)btn {
     
@@ -111,7 +109,7 @@
         } showInView:self];
     }else {
         
-        [[ZWDataAction sharedAction]getReqeustWithURL:zwTopUpList parametes:@{} successBlock:^(NSDictionary * _Nonnull data) {
+        [[ZWDataAction sharedAction]getReqeustWithURL:zwTopUpList parametes:@{@"type":@"0"} successBlock:^(NSDictionary * _Nonnull data) {
             if (zw_issuccess) {
                 
                 NSArray *myData = data[@"data"];

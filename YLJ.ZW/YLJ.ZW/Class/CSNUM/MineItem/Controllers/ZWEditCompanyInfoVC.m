@@ -24,6 +24,8 @@
 
 #import "ZWCPCitiesModel.h"
 
+#import "ZWExhibitionServerSelectIndustriesVC.h"
+
 @interface ZWEditCompanyInfoVC ()<UIImagePickerControllerDelegate, UINavigationControllerDelegate,IQActionSheetPickerViewDelegate>{
     UIImagePickerController *_imagePickerController;
 }
@@ -61,11 +63,11 @@
 
 @implementation ZWEditCompanyInfoVC
 
-
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController setNavigationBarHidden:NO animated:animated];
+    [[YNavigationBar sharedInstance]createSkinNavigationBar:self.navigationController.navigationBar withBackColor:skinColor withTintColor:[UIColor whiteColor]];
 }
+
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [[YNavigationBar sharedInstance]createNavigationBarWithStatusBarStyle:UIStatusBarStyleLightContent withType:0];
@@ -226,16 +228,17 @@
     if ([self.identityText.text isEqualToString:@"展商"]) {
         [self takeListOfIndustries];
     }else {
-        ZWEditCompanyIntroductionVC *introductionVC = [[ZWEditCompanyIntroductionVC alloc]init];
-        introductionVC.title = @"公司简介上传";
-        introductionVC.model = [self takeModel];
-        introductionVC.model.industryIdList = @[];
-        introductionVC.coverImage = self.imageBtn.imageView.image;
-        introductionVC.merchantStatus = self.merchantStatus;
-        if (self.merchantStatus == 3) {
-            introductionVC.parameter = self.parameter;
-        }
-        [self.navigationController pushViewController:introductionVC animated:YES];
+        [self takeExhibitionServerIndustries];
+//        ZWEditCompanyIntroductionVC *introductionVC = [[ZWEditCompanyIntroductionVC alloc]init];
+//        introductionVC.title = @"公司简介上传";
+//        introductionVC.model = [self takeModel];
+//        introductionVC.model.industryIdList = @[];
+//        introductionVC.coverImage = self.imageBtn.imageView.image;
+//        introductionVC.merchantStatus = self.merchantStatus;
+//        if (self.merchantStatus == 3) {
+//            introductionVC.parameter = self.parameter;
+//        }
+//        [self.navigationController pushViewController:introductionVC animated:YES];
     }
 }
 
@@ -264,6 +267,33 @@
 
     } showInView:self.view];
 
+}
+
+- (void)takeExhibitionServerIndustries {
+    
+    
+    __weak typeof (self) weakSelf = self;
+    [[ZWDataAction sharedAction]getReqeustWithURL:zwGetExhibitionServerIndustriesList parametes:@{} successBlock:^(NSDictionary * _Nonnull data) {
+        __strong typeof (weakSelf) strongSelf = weakSelf;
+        if (zw_issuccess) {
+            ZWExhibitionServerSelectIndustriesVC *industriesVC = [[ZWExhibitionServerSelectIndustriesVC alloc]init];
+            industriesVC.myIndustries = data[@"data"];
+            industriesVC.title = @"选择您所涉及的行业";
+            industriesVC.model = [strongSelf takeModel];
+            industriesVC.coverImage = strongSelf.imageBtn.imageView.image;
+            industriesVC.merchantStatus = strongSelf.merchantStatus;
+            industriesVC.industriesArr = strongSelf.industriesArray;
+            industriesVC.type = 1;
+            if (strongSelf.merchantStatus == 3) {
+                industriesVC.parameter = strongSelf.parameter;
+            }
+            [strongSelf.navigationController pushViewController:industriesVC animated:YES];
+        }
+    } failureBlock:^(NSError * _Nonnull error) {
+        
+    }];
+    
+    
 }
 
 - (ZWAuthenticationModel *)takeModel {

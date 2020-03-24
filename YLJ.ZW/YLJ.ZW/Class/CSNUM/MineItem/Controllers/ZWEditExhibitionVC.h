@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ZWEditExhibitionVC : UIViewController
 @property(nonatomic, strong)NSString *exhibitorId;
 @property(nonatomic, strong)NSString *merchantId;
-@property(nonatomic, assign)NSInteger enterType;//0为展示进入 1为编辑进入
+@property(nonatomic, strong)NSDictionary *shareData;
 @end
 
 NS_ASSUME_NONNULL_END

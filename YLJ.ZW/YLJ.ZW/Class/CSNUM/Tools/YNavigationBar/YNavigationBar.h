@@ -21,11 +21,14 @@ NS_ASSUME_NONNULL_BEGIN
 -(void)createLeftBarWithTitle:(NSString *)title barItem:(UINavigationItem *)item target:(id)target action:(SEL)action;
 //导航右边图片按钮
 -(void)createRightBarWithImage:(UIImage *)image barItem:(UINavigationItem *)item target:(id)target action:(SEL)action;
+-(void)createRightBarWithImage:(UIImage *)image barItem:(UINavigationItem *)item target:(id)target action:(SEL)action withColor:(UIColor *)color;
 //导航右边图片按钮自定义
 -(void)createCustomRightBarWithImage:(UIImage *)image barItem:(UINavigationItem *)item target:(id)target action:(SEL)action;
 //导航右边字体按钮
 -(void)createRightBarWithTitle:(NSString *)title barItem:(UINavigationItem *)item target:(id)target action:(SEL)action;
 
+//设置导航的皮肤颜色和标题颜色
+-(void)createSkinNavigationBar:(UINavigationBar *)navitionBar withBackColor:(UIColor *)backColor withTintColor:(UIColor *)tintColor;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -30,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy)NSString *price;//价格
 @property(nonatomic, copy)NSString *purchased;//0.为未购买 1.为购买
 @property(nonatomic, strong)NSDictionary *images;//图片数组
+@property(nonatomic, copy)NSNumber *startTime;//结束时间
+@property(nonatomic, copy)NSNumber *endTime;//结束时间
 + (id)parseJSON:(NSDictionary *)jsonDic;
 @end
 

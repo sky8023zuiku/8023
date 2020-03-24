@@ -21,6 +21,7 @@
 #import <TPKeyboardAvoidingCollectionView.h>
 #import <TPKeyboardAvoidingScrollView.h>
 #import "ZWPhotoBrowserAction.h"
+#import "ZWSearchBar.h"
 
 #define httpImageUrl @"http://zhanwang.oss-cn-shanghai.aliyuncs.com/"
 #define blankPagesImageName @"qita_img_wu"

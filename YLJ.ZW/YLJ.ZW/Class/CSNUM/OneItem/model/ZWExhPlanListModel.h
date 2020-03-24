@@ -22,6 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy)NSString *announcementImages;//公告图片
 @property(nonatomic, copy)NSString *myNewStartTime;//最新的开始时间
 @property(nonatomic, copy)NSString *myNewEndTime;//最新的结束时间
+@property(nonatomic, copy)NSString *exhibitionHallName;//展馆名称
+@property(nonatomic, copy)NSString *sponsor;//主办方
 
 + (id)parseJSON:(NSDictionary *)jsonDic;
 @end

@@ -41,6 +41,15 @@ NS_ASSUME_NONNULL_BEGIN
  * 转换不规则的网络链接
  */
 - (NSString *)transcodWithUrl:(NSString *)url;
+
+/**
+ * 时间戳转时间
+ */
+- (NSString *)getTimeFromTimestamp:(NSNumber *)stamp withDataStr:(NSString *)format;
+/**
+ *  设置两端对齐
+*/
+- (NSMutableAttributedString *)createBothEndsWithLabel:(UILabel *)label textAlignmentWith:(CGFloat)width;
 @end
 
 NS_ASSUME_NONNULL_END

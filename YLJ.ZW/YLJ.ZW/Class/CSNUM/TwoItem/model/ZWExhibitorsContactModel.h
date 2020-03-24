@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy)NSString *qq;//时间
 @property(nonatomic, copy)NSString *contacts;//标题图
 @property(nonatomic, copy)NSString *telephone;//公司id
-@property(nonatomic, copy)NSString *type;//结束时间
+@property(nonatomic, copy)NSString *type;//0为不公开 1为公开
 @property(nonatomic, copy)NSString *post;//结束时间
 + (id)parseJSON:(NSDictionary *)jsonDic;
 @end

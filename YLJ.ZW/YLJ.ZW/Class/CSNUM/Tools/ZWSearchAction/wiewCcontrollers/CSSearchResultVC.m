@@ -25,7 +25,7 @@
 #import "ZWPlanExhibitionSearchView.h"
 #import "ZWExhibitionHallSearchView.h"
 @interface CSSearchResultVC ()<UISearchBarDelegate>
-@property (nonatomic, strong) CSSearchBarStyle *searchBar;
+//@property (nonatomic, strong) CSSearchBarStyle *searchBar;
 @property (nonatomic, strong) UIView *titleView;
 @property (nonatomic, strong) UIView *backView;
 @property (nonatomic, strong) UITextField *textField;
@@ -46,6 +46,8 @@
 @property (nonatomic, strong) NSMutableArray<ZWMyCatalogueModel *> *dataSource;
 
 @property (nonatomic, assign) NSInteger page;//页面
+
+@property (nonatomic, strong) ZWSearchBar *searchBar;
 @end
 
 @implementation CSSearchResultVC
@@ -212,82 +214,76 @@
 - (void)createNavigationBar {
     [[YNavigationBar sharedInstance]createLeftBarWithImage:[UIImage imageNamed:@"zai_dao_icon_left"] barItem:self.navigationItem target:self action:@selector(presentVCFirstBackClick:)];
 }
-- (void)setBarButtonItem
-{
-    self.navigationController.interactivePopGestureRecognizer.delegate = (id)self;
-    
-    _titleView = [[UIView alloc] initWithFrame:CGRectMake(0, 7, self.view.frame.size.width - 44 - 25, 30)];
-    
-    _searchBar = [[CSSearchBarStyle alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(_titleView.frame), 30)];
-    _searchBar.text = _searchStr;
-    _searchBar.backgroundImage = [UIImage imageNamed:@"clearImage"];
-    _searchBar.delegate = self;
-    _searchBar.placeholder = @"请输入搜索内容";
-    _searchBar.tintColor = skinColor;
-
-    if ([[[UIDevice currentDevice]systemVersion] floatValue] >= 13.0) {
-        _searchBar.tintColor = [UIColor redColor];
-        _searchBar.searchTextField.backgroundColor = [UIColor whiteColor];
-        _searchBar.searchTextField.font = smallMediumFont;
-        _searchBar.layer.cornerRadius = 7.0f;
-        _searchBar.layer.masksToBounds = YES;
-    }else {
-        UITextField *searchField = [_searchBar valueForKey:@"_searchField"];
-        searchField.backgroundColor = [UIColor whiteColor];
-        searchField.font = smallMediumFont;
-        searchField.layer.cornerRadius = 7.0f;
-        searchField.layer.masksToBounds = YES;
-    }
-    
-    [_titleView addSubview:_searchBar];
-    CGFloat height = _searchBar.bounds.size.height;
-    CGFloat top = (height - 30.0) / 2.0;
-    CGFloat bottom = top;
-    _searchBar.contentInset = UIEdgeInsetsMake(top, 0, bottom, 0);
-    [self createCancelBtn:_searchBar];
-    self.navigationItem.titleView = _titleView;
-    self.navigationItem.rightBarButtonItem = _rightItem;
-    
+- (void)setBarButtonItem {
+    ZWSearchBar *searchBar = [[ZWSearchBar alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 44)];
+    searchBar.layer.masksToBounds = YES;
+    searchBar.backgroundColor = [UIColor redColor];
+    self.navigationItem.titleView = searchBar;
+    searchBar.backgroundColor = skinColor;
+    searchBar.isFirstResponser = NO;
+    searchBar.iconName = @"icon_search";
+    searchBar.iconSize = CGSizeMake(15, 15);
+    searchBar.placeHolder = @"请输入要搜索的内容";
+    searchBar.cusFontPlaceHolder = 20;
+    searchBar.colorSearchBg = [UIColor whiteColor];
+    searchBar.insetsIcon = UIEdgeInsetsMake(0, 13, 0, 0);
+    searchBar.raidus = 14;
+    searchBar.insetsSearchBg = UIEdgeInsetsMake(8, 0, 8, 0);
+    searchBar.txtField.text = _searchStr;
+    searchBar.cusFontTxt = 15;
+    searchBar.isShowRightBtn = YES;
+    searchBar.titleBtn = @"取消";
+    searchBar.colorTxtInput = [UIColor blackColor];
+    searchBar.colorTitleBtn = [UIColor whiteColor];
+    self.searchBar = searchBar;
+    __weak typeof (self) weakSelf = self;
+    [searchBar setTxtfieldEditingCallback:^(NSString *text) {
+        __strong typeof (weakSelf) strongSelf = weakSelf;
+        [strongSelf automaticResponseListWithText:text];
+    }];
+    [searchBar setClickSearchCallback:^(NSString *keyword) {
+        __strong typeof (weakSelf) strongSelf = weakSelf;
+        NSLog(@"%@",keyword);
+        [strongSelf.searchView removeFromSuperview];
+        [strongSelf setSearchResultWithStr:keyword];
+        [strongSelf createRequst:keyword];
+    }];
+    [searchBar setClickRightBtnCallback:^{
+        __strong typeof (weakSelf) strongSelf = weakSelf;
+        strongSelf.searchBar.insetsSearchBg = UIEdgeInsetsMake(6.5, 0, 6.5, 0);
+        [[[UIApplication sharedApplication] keyWindow] endEditing:YES];
+        strongSelf.searchBar.txtField.text = strongSelf.searchStr;
+        strongSelf.activity = NO;
+        strongSelf.searchSuggestVC.view.hidden = YES;
+    }];
+    [searchBar setTxtfieldShouldBeginEditingCallback:^(NSString * _Nonnull text) {
+        __strong typeof (weakSelf) strongSelf = weakSelf;
+        strongSelf.searchBar.insetsSearchBg = UIEdgeInsetsMake(6.5, 0, 6.5, 60);
+    }];
 }
 
-- (void)createCancelBtn:(UISearchBar *)searchBar {
-    if ([[[UIDevice currentDevice]systemVersion] floatValue] >= 13.0) {
-        for(id cc in [self.searchBar subviews]) {
-            for (id zz in [cc subviews]) {
-                for (id gg in [zz subviews]) {
-                    if([gg isKindOfClass:[UIButton class]]){
-                        UIButton *cancelButton = (UIButton *)gg;
-                        [cancelButton setTitle:@"取消" forState:UIControlStateNormal];
-                        [cancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-                    }
-                }
-            }
+- (void)automaticResponseListWithText:(NSString *)text {
+    if ([text length] > 0) {
+        
+        _searchSuggestVC.view.hidden = NO;
+        
+        [self.view bringSubviewToFront:_searchSuggestVC.view];
+        NSLog(@"我的type:%ld",(long)self.type);
+        if (self.type == 1||self.type == 2) {
+            _searchSuggestVC.type = self.type;
+            _searchSuggestVC.parameterType = self.parameterType;
+            _searchSuggestVC.city = self.city;
+        } else {
+            _searchSuggestVC.type = self.type;
         }
-    }else{
-        UIButton*cancelButton = (UIButton *)[_searchBar valueForKey:@"cancelButton"];
-        [cancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [cancelButton setTitle:@"取消" forState:UIControlStateNormal];
+        [self.view bringSubviewToFront:_searchSuggestVC.view];
+        [_searchSuggestVC searchTestChangeWithTest:text];
+    }else {
+        _searchSuggestVC.view.hidden = YES;
+        [self.view bringSubviewToFront:_searchView];
     }
+    
 }
-
-- (void)rightBtnItemAction:(UIButton *)sender
-{
-    sender.selected = !sender.selected;
-    if (sender.selected) {
-        [sender setImage:[UIImage imageNamed:@"nav_list_single"] forState:UIControlStateNormal];
-        [_catalogueResultView refreshResultViewWithIsDouble:NO];
-    } else {
-        [sender setImage:[UIImage imageNamed:@"icon_wangge"] forState:UIControlStateNormal];
-        [_catalogueResultView refreshResultViewWithIsDouble:YES];
-    }
-}
-
-
-- (void)cancelDidClick
-{
-    [_searchBar resignFirstResponder];
-}
-
 - (void)presentVCFirstBackClick:(UIButton *)sender
 {
     [_searchBar resignFirstResponder];
@@ -299,112 +295,12 @@
         [self.navigationController popToViewController:vc animated:YES];
     }
 }
-
-
-- (void)setSearchResultWithStr:(NSString *)str
-{
+- (void)setSearchResultWithStr:(NSString *)str {
     [self.searchBar resignFirstResponder];
-    _searchBar.text = str;
+    self.searchBar.txtField.text = str;
+    _searchStr = str;
     [_searchView removeFromSuperview];
     _searchSuggestVC.view.hidden = YES;
-}
-
-
-#pragma mark -  UISearchBarDelegate  -
-
-- (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar
-{
-    NSLog(@"searchBarShouldBeginEditing");
-    _activity = !_activity;
-    if (_activity) {
-        self.navigationItem.rightBarButtonItem = nil;
-        _titleView.frame = CGRectMake(0, 7, kScreenWidth - 44 - 16, 30);
-        _searchBar.frame = CGRectMake(0, 0, CGRectGetWidth(_titleView.frame), 30);
-        searchBar.showsCancelButton = YES;
-//        UIButton *cancleBtn = [_searchBar valueForKey:@"cancelButton"];
-//        //修改标题和标题颜色
-//        [cancleBtn setTitle:@"取消" forState:UIControlStateNormal];
-//        [cancleBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        
-        [self createCancelBtn:searchBar];
-    }
-    
-    return YES;
-}
-
-//***********************************************搜索传字段需要注意的地方***********************************************************************
-- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar
-{
-    
-    NSLog(@"searchBarTextDidBeginEditing-searchTest:%@",searchBar.text);
-    if ([searchBar.text length] > 0) {
-        _searchSuggestVC.view.hidden = NO;
-        [self.view bringSubviewToFront:_searchSuggestVC.view];
-        NSLog(@"我的type:%ld",(long)self.type);
-        if (self.type == 1||self.type == 2) {
-            _searchSuggestVC.type = self.type;
-            _searchSuggestVC.parameterType = self.parameterType;
-            _searchSuggestVC.city = self.city;
-        } else {
-            _searchSuggestVC.type = self.type;
-        }
-        [_searchSuggestVC searchTestChangeWithTest:searchBar.text];
-    }
-}
-
-- (BOOL)searchBarShouldEndEditing:(UISearchBar *)searchBar
-{
-    NSLog(@"searchBarShouldEndEditing");
-    self.navigationItem.rightBarButtonItem = _rightItem;
-    _titleView.frame = CGRectMake(0, 7, kScreenWidth - 44 - 16, 30);
-    _searchBar.frame = CGRectMake(0, 0, CGRectGetWidth(_titleView.frame), 30);
-    searchBar.showsCancelButton = NO;
-    _activity = NO;
-    if (![searchBar.text length]) {
-        _searchBar.text = _searchStr;
-        [_searchView removeFromSuperview];
-    };
-    
-    return YES;
-}
-
-- (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar
-{
-    NSLog(@"searchBarTextDidEndEditing");
-}
-
-- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
-{
-    NSLog(@"textDidChange");
-    
-    if (searchBar.text == nil || [searchBar.text length] <= 0) {
-        _searchSuggestVC.view.hidden = YES;
-        [self.view addSubview:self.searchView];
-        [self.view bringSubviewToFront:_searchView];
-    } else {
-        _searchSuggestVC.view.hidden = NO;
-        [self.view bringSubviewToFront:_searchSuggestVC.view];
-        [_searchSuggestVC searchTestChangeWithTest:searchBar.text];
-    }
-}
-- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
-{
-    [self.searchBar resignFirstResponder];
-    self.navigationItem.rightBarButtonItem = _rightItem;
-    _titleView.frame = CGRectMake(0, 7, kScreenWidth - 44 - 25, 30);
-    _searchBar.frame = CGRectMake(0, 0, CGRectGetWidth(_titleView.frame), 30);
-    searchBar.showsCancelButton = NO;
-    _activity = NO;
-    
-    _searchSuggestVC.view.hidden = YES;
-}
-
-- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
-{
-    NSLog(@"searchBarSearchButtonClicked");
-    [_searchView removeFromSuperview];
-    [self setSearchResultWithStr:searchBar.text];
-    [self createRequst:searchBar.text];
 }
 -(void)createData {
     [self createRequst:self.searchStr];

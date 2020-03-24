@@ -198,7 +198,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong)NSString *checkCode;//短信验证码
 @end
 /**
- * 修改密码
+ * 设置邀请人
  */
 @interface ZWInvitationCodeRequest : ZWMineRqust
 @property(nonatomic, strong)NSString *recommend;//邀请码

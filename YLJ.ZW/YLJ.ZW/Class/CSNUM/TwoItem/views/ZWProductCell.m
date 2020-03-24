@@ -17,6 +17,7 @@
         [self addSubview:self.titleImageView];
         
         self.titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(self.titleImageView.frame), frame.size.width, 0.08*kScreenWidth)];
+        self.titleLabel.textAlignment = NSTextAlignmentCenter;
         [self addSubview:self.titleLabel];
     }
     return self;

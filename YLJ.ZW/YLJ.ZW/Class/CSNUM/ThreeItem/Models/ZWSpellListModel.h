@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy)NSString * exhibitorCount;//材质
 @property(nonatomic, copy)NSString * dismanted;//撤展时间
 @property(nonatomic, copy)NSString * destination;//目的地
+@property(nonatomic, copy)NSString * type;//1.2.3 制作拼单 4.看馆拼单 5.保险拼单 6.货车拼单
 
 
 

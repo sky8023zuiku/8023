@@ -155,15 +155,8 @@
         [self addSubview:annBtn];
     }
     
-    
-    
-    
-    
-//    self.titleLabel.text = model.name;
-    
     [self.titleImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",httpImageUrl,model.url]] placeholderImage:[UIImage imageNamed:@"zw_zfzw_icon"]];
     self.areaLabel.text = [NSString stringWithFormat:@"地    点：%@  %@",model.country,model.city];
-    self.detailLabel.text = @"展    馆：上海市中国国际展馆";
     NSString *start = [model.startTime substringWithRange:NSMakeRange(0, 10)];
     NSString *end = [model.endTime substringWithRange:NSMakeRange(0, 10)];
     NSString *startTime = [start stringByReplacingOccurrencesOfString:@"-" withString:@"-"];
@@ -180,6 +173,9 @@
     }else {
         self.myNewDate.text = [NSString stringWithFormat:@"最    新：%@~%@",newStartTime,newEndTime];
     }
+    
+    self.hostLabel.text = [NSString stringWithFormat:@"主办方：%@",model.sponsor];
+    self.detailLabel.text =[NSString stringWithFormat:@"展    馆：%@",model.exhibitionHallName];
 }
 
 - (void)annBtnClick:(UIButton *)btn {

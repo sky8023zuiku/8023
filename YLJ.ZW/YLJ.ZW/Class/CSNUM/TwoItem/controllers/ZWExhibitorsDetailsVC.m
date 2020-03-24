@@ -85,8 +85,9 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController setNavigationBarHidden:NO animated:YES];
+    [[YNavigationBar sharedInstance]createSkinNavigationBar:self.navigationController.navigationBar withBackColor:skinColor withTintColor:[UIColor whiteColor]];
 }
+
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [[YNavigationBar sharedInstance]createNavigationBarWithStatusBarStyle:UIStatusBarStyleLightContent withType:0];
@@ -120,32 +121,26 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 5;
+    return 8;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    
-    if (section == 0) {
-        return 1;
-    }else if (section==1) {
-        return 2;
-    }else if (section == 2) {
-        return 1;
-    }else if (section == 3) {
-        
+    NSLog(@"---2222----%ld",(long)self.contactArray.count);
+    if (section == 6) {
         if (self.dynamicsArray.count == 0) {
             return 1;
         }else {
             return self.dynamicsArray.count;
         }
-    } else {
+    }else if (section == 7) {
         if (self.contactArray.count == 0) {
             return 1;
         }else {
             return self.contactArray.count;
         }
+    }else {
+        return 1;
     }
-    
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -168,8 +163,13 @@
         
         CGFloat itemWidth = 0.86*kScreenWidth/5;
         CGFloat itemMargin = 0.01*kScreenWidth;
-        
-        for (int i = 0; i<self.industries.count; i++) {
+        NSArray *cutArray;
+        if (self.industries.count > 5) {
+            cutArray = [self.industries subarrayWithRange:NSMakeRange(0, 5)];
+        }else {
+            cutArray = self.industries;
+        }
+        for (int i = 0; i<cutArray.count; i++) {
             ZWExbihitorsIndustriesModel *model = self.industries[i];
             ZWIndustriesItemView *industriesItemView = [[ZWIndustriesItemView alloc]initWithFrame:CGRectMake(5*itemMargin+(itemMargin+itemWidth)*i, 0, itemWidth, itemWidth)];
             industriesItemView.backgroundColor = zwGrayColor;
@@ -179,95 +179,82 @@
             [cell.contentView addSubview:industriesItemView];
         }
     }else if (indexPath.section == 1) {
-        if (indexPath.row == 0) {
-            
-            CGFloat unitH = 0.4*kScreenWidth/6;
-            UILabel *manualLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0, 0.2*kScreenWidth, unitH)];
-            manualLabel.text = @"产品手册：";
-            manualLabel.font = normalFont;
-            [cell.contentView addSubview:manualLabel];
-            
-            UIImageView *pdfImageView = [[UIImageView alloc]initWithFrame:CGRectMake(CGRectGetMaxX(manualLabel.frame), CGRectGetMidY(manualLabel.frame)-0.022*kScreenWidth, 1.2*unitH, 1.5*unitH)];
-            pdfImageView.image = [UIImage imageNamed:@"icon_pdf"];
-            [cell.contentView addSubview:pdfImageView];
-            
-            NSArray *array = [self.model.productUrl componentsSeparatedByString:@","];
-            
-            UILabel *gsLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(pdfImageView.frame)+5, CGRectGetMinY(pdfImageView.frame)+2, 0.95*kScreenWidth-CGRectGetMaxX(pdfImageView.frame)-5, 0.025*kScreenWidth)];
-            gsLabel.text = self.model.productUrl;
-            gsLabel.font = smallFont;
-            [cell.contentView addSubview:gsLabel];
-            if (array[0]) {
-                gsLabel.text = array[0];
-            }else {
-                gsLabel.text = @"暂无产品手册";
-            }
-            
-            UIButton *preBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-            preBtn.frame = CGRectMake(CGRectGetMinX(gsLabel.frame), CGRectGetMaxY(pdfImageView.frame)-0.75*unitH, 0.13*kScreenWidth, unitH);
-            [preBtn setImage:[UIImage imageNamed:@"icon_yulan"] forState:UIControlStateNormal];
-            [preBtn setTitle:@"预览" forState:UIControlStateNormal];
-            [preBtn setTitleColor:skinColor forState:UIControlStateNormal];
-            preBtn.titleLabel.font = smallMediumFont;
-            [preBtn addTarget:self action:@selector(browseBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-            [cell.contentView addSubview:preBtn];
-            
-            UIButton *downloadBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-            downloadBtn.frame = CGRectMake(CGRectGetMaxX(preBtn.frame)+0.01*kScreenWidth, CGRectGetMinY(preBtn.frame), CGRectGetWidth(preBtn.frame), CGRectGetHeight(preBtn.frame));
-            [downloadBtn setImage:[UIImage imageNamed:@"icon_xiazai"] forState:UIControlStateNormal];
-            [downloadBtn setTitle:@"下载" forState:UIControlStateNormal];
-            [downloadBtn setTitleColor:skinColor forState:UIControlStateNormal];
-            downloadBtn.titleLabel.font = smallMediumFont;
-            [downloadBtn addTarget:self action:@selector(downloadBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-            [cell.contentView addSubview:downloadBtn];
-            
-            UILabel *mainLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(manualLabel.frame), CGRectGetMaxY(manualLabel.frame)+unitH, CGRectGetWidth(manualLabel.frame), unitH)];
-            mainLabel.text = @"主营项目：";
-            mainLabel.font = normalFont;
-            [cell.contentView addSubview:mainLabel];
-            
-            UILabel *mainValue = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(mainLabel.frame), CGRectGetMinY(mainLabel.frame), 0.95*kScreenWidth-CGRectGetMaxX(mainLabel.frame), CGRectGetHeight(mainLabel.frame))];
-            if (self.model.product == nil || [self.model.product isEqualToString:@""]) {
-                mainValue.text = @"暂无";
-            }else {
-                mainValue.text = self.model.product;
-            }
+        CGFloat unitH = 0.4*kScreenWidth/6;
+        UIImageView *pdfImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0.022*kScreenWidth, 1.2*unitH, 1.5*unitH)];
+        pdfImageView.image = [UIImage imageNamed:@"icon_pdf"];
+        [cell.contentView addSubview:pdfImageView];
         
-            mainValue.font = normalFont;
-            [cell.contentView addSubview:mainValue];
-            
-            UILabel *demandLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(mainLabel.frame), CGRectGetMaxY(mainLabel.frame), CGRectGetWidth(mainLabel.frame), unitH)];
-            demandLabel.text = @"需求说明：";
-            demandLabel.font = normalFont;
-            [cell.contentView addSubview:demandLabel];
-            
-            UILabel *demandValue = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(demandLabel.frame), CGRectGetMinY(demandLabel.frame), 0.95*kScreenWidth-CGRectGetMaxX(demandLabel.frame), CGRectGetHeight(demandLabel.frame))];
-            if (self.model.requirement == nil || [self.model.requirement isEqualToString:@""]) {
-                demandValue.text = @"暂无";
-            }else {
-                demandValue.text = self.model.requirement;
-            }
-            demandValue.font = normalFont;
-            [cell.contentView addSubview:demandValue];
-            
-            UILabel *introduceLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(demandLabel.frame), CGRectGetMaxY(demandLabel.frame)+unitH, CGRectGetWidth(demandLabel.frame), unitH)];
-            introduceLabel.text = @"公司简介：";
-            introduceLabel.font = normalFont;
-            [cell.contentView addSubview:introduceLabel];
-            
-        } else {
-            CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.model.profile font:smallMediumFont]+20;
-            UILabel *introduceDetail = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0, 0.9*kScreenWidth, height)];
-            if (self.model.profile == nil || [self.model.profile isEqualToString:@""]) {
-                introduceDetail.text = @"暂无";
-            }else {
-                introduceDetail.text = self.model.profile;
-            }
-            introduceDetail.font = smallMediumFont;
-            introduceDetail.numberOfLines = 0;
-            [cell.contentView addSubview:introduceDetail];
+        NSArray *array = [self.model.productUrl componentsSeparatedByString:@","];
+        
+        UILabel *gsLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(pdfImageView.frame)+5, CGRectGetMinY(pdfImageView.frame)+2, 0.95*kScreenWidth-CGRectGetMaxX(pdfImageView.frame)-5, 0.025*kScreenWidth)];
+        gsLabel.text = self.model.productUrl;
+        gsLabel.font = smallFont;
+        [cell.contentView addSubview:gsLabel];
+        if (array[0]) {
+            gsLabel.text = array[0];
+        }else {
+            gsLabel.text = @"暂无产品手册";
         }
+        UIButton *preBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        preBtn.frame = CGRectMake(CGRectGetMinX(gsLabel.frame), CGRectGetMaxY(pdfImageView.frame)-0.75*unitH, 0.13*kScreenWidth, unitH);
+        [preBtn setImage:[UIImage imageNamed:@"icon_yulan"] forState:UIControlStateNormal];
+        [preBtn setTitle:@"预览" forState:UIControlStateNormal];
+        [preBtn setTitleColor:skinColor forState:UIControlStateNormal];
+        preBtn.titleLabel.font = smallMediumFont;
+        [preBtn addTarget:self action:@selector(browseBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+        [cell.contentView addSubview:preBtn];
+        
+        UIButton *downloadBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        downloadBtn.frame = CGRectMake(CGRectGetMaxX(preBtn.frame)+0.01*kScreenWidth, CGRectGetMinY(preBtn.frame), CGRectGetWidth(preBtn.frame), CGRectGetHeight(preBtn.frame));
+        [downloadBtn setImage:[UIImage imageNamed:@"icon_xiazai"] forState:UIControlStateNormal];
+        [downloadBtn setTitle:@"下载" forState:UIControlStateNormal];
+        [downloadBtn setTitleColor:skinColor forState:UIControlStateNormal];
+        downloadBtn.titleLabel.font = smallMediumFont;
+        [downloadBtn addTarget:self action:@selector(downloadBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+        [cell.contentView addSubview:downloadBtn];
     }else if (indexPath.section == 2) {
+        NSString *mainStr;
+        if (self.model.product.length == 0) {
+            mainStr = @"暂无";
+        }else {
+            mainStr = self.model.product;
+        }
+        CGFloat mainHeight = [[ZWToolActon shareAction]adaptiveTextHeight:mainStr font:smallMediumFont];
+        UILabel *mainValue = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0, 0.9*kScreenWidth, mainHeight)];
+        mainValue.text = mainStr;
+        mainValue.font = smallMediumFont;
+        mainValue.numberOfLines = 0;
+        [cell.contentView addSubview:mainValue];
+    }else if (indexPath.section == 3) {
+        
+        NSString *demandStr;
+        if (self.model.requirement.length == 0) {
+            demandStr = @"暂无";
+        }else {
+            demandStr = self.model.requirement;
+        }
+        CGFloat demandHeight = [[ZWToolActon shareAction]adaptiveTextHeight:demandStr font:smallMediumFont];
+        UILabel *demandValue = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0, 0.9*kScreenWidth, demandHeight)];
+        demandValue.text = demandStr;
+        demandValue.font = smallMediumFont;
+        [cell.contentView addSubview:demandValue];
+        
+    }else if (indexPath.section == 4) {
+        
+        NSString *introduceStr;
+        if (self.model.profile.length == 0) {
+            introduceStr = @"暂无";
+        }else {
+            introduceStr = self.model.profile;
+        }
+        CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.model.profile font:smallMediumFont]+20;
+        UILabel *introduceDetail = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0, 0.9*kScreenWidth, height)];
+        introduceDetail.text = introduceStr;
+        introduceDetail.font = smallMediumFont;
+        introduceDetail.numberOfLines = 0;
+        [cell.contentView addSubview:introduceDetail];
+        
+    }else if (indexPath.section == 5) {
         UILabel *myNotice;
         if (myNotice) {
             [myNotice removeFromSuperview];
@@ -282,8 +269,7 @@
         }else {
             [cell.contentView addSubview:self.collectionView];
         }
-    }else if (indexPath.section == 3) {
-        
+    }else if (indexPath.section == 6) {
         UILabel *myNotice;
         if (myNotice) {
             [myNotice removeFromSuperview];
@@ -296,7 +282,7 @@
             myNotice.textColor = [UIColor colorWithRed:215.0/255.0 green:215.0/255.0 blue:215.0/255.0 alpha:1];
             [cell.contentView addSubview:myNotice];
         }else {
-//            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
             ZWNewDynamicModel *model = self.dynamicsArray[indexPath.row];
             UIImageView *titleImage = [[UIImageView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0.025*kScreenWidth, 0.3*kScreenWidth, 0.2*kScreenWidth)];
             [titleImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",httpImageUrl,model.images[@"url"]]] placeholderImage:[UIImage imageNamed:@"fu_img_no_01"]];
@@ -307,9 +293,12 @@
             titleLabel.text = model.exhibitionName;
             [cell.contentView addSubview:titleLabel];
             
-            UILabel *dateLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(titleLabel.frame), CGRectGetMidY(titleImage.frame)-0.03*kScreenWidth, CGRectGetWidth(titleLabel.frame), CGRectGetHeight(titleLabel.frame))];
-            dateLabel.font = smallMediumFont;
             
+            NSString *startTime =[[ZWToolActon shareAction] getTimeFromTimestamp:model.startTime withDataStr:@"YYYY-MM-DD"];
+            NSString *endTime =[[ZWToolActon shareAction] getTimeFromTimestamp:model.endTime withDataStr:@"YYYY-MM-DD"];
+            UILabel *dateLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(titleLabel.frame), CGRectGetMidY(titleImage.frame)-0.03*kScreenWidth, CGRectGetWidth(titleLabel.frame), CGRectGetHeight(titleLabel.frame))];
+            dateLabel.font = smallFont;
+            dateLabel.text = [NSString stringWithFormat:@"%@~%@",startTime,endTime];
             [cell.contentView addSubview:dateLabel];
             
             UILabel *detailLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(dateLabel.frame), CGRectGetMaxY(titleImage.frame)-0.06*kScreenWidth, CGRectGetWidth(dateLabel.frame), 0.06*kScreenWidth)];
@@ -322,7 +311,6 @@
             detailLabel.numberOfLines = 2;
             [cell.contentView addSubview:detailLabel];
         }
-        
     }else {
         UILabel *myNotice;
         if (myNotice) {
@@ -339,44 +327,49 @@
             ZWExhibitorsContactModel *model = self.contactArray[indexPath.row];
             CGFloat height = 0.25*kScreenWidth/3;
             CGFloat width = 0.9*kScreenWidth/2;
-            
+
             UIView *toolView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 0.25*kScreenWidth)];
             toolView.backgroundColor = zwGrayColor;
             [cell.contentView addSubview:toolView];
-            
+
             CALayer *layer = [toolView layer];
             layer.shadowOffset = CGSizeMake(0, 3); //(0,0)时是四周都有阴影
             layer.shadowRadius = 1.0;
             layer.shadowColor = [UIColor blackColor].CGColor;
             layer.shadowOpacity = 0.1;
-            
+
             UILabel *nameLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0, width, height)];
             nameLabel.text = [NSString stringWithFormat:@"联系人：%@",model.contacts];
             nameLabel.font = smallMediumFont;
             [toolView addSubview:nameLabel];
-            
+
             UILabel *positionLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(nameLabel.frame), 0, width, height)];
             positionLabel.text = [NSString stringWithFormat:@"职务：%@",model.post];
             positionLabel.font = smallMediumFont;
             [toolView addSubview:positionLabel];
-            
+
             YYLabel *phoneLabel = [[YYLabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, CGRectGetMaxY(nameLabel.frame), width, height)];
-            NSMutableAttributedString *phoneString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"手机：%@",model.phone]];
-            NSRange phoneRange = [[phoneString string]rangeOfString:model.phone];
-            [phoneString setYy_color:[UIColor blackColor]];
-            __weak typeof (self) weakSelf = self;
-            [phoneString yy_setTextHighlightRange:phoneRange color:skinColor backgroundColor:[UIColor whiteColor] tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
-                __strong typeof (weakSelf) strongSelf = weakSelf;
-                [strongSelf takeCallWithValue:model.phone];
-            }];
-            phoneLabel.attributedText = phoneString;
+            phoneLabel.font = smallMediumFont;
+            if ([model.type isEqualToString:@"0"]) {
+                phoneLabel.text = @"手机：暂无";
+            }else {
+                NSMutableAttributedString *phoneString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"手机：%@",model.phone]];
+                NSRange phoneRange = [[phoneString string]rangeOfString:model.phone];
+                [phoneString setYy_color:[UIColor blackColor]];
+                __weak typeof (self) weakSelf = self;
+                [phoneString yy_setTextHighlightRange:phoneRange color:skinColor backgroundColor:[UIColor whiteColor] tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
+                    __strong typeof (weakSelf) strongSelf = weakSelf;
+                    [strongSelf takeCallWithValue:model.phone];
+                }];
+                phoneLabel.attributedText = phoneString;
+            }
             [toolView addSubview:phoneLabel];
-            
             
             YYLabel *telLabel = [[YYLabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(phoneLabel.frame), CGRectGetMinY(phoneLabel.frame), width, height)];
             NSMutableAttributedString *telString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"电话：%@",model.telephone]];
             NSRange telRange = [[telString string]rangeOfString:model.telephone];
             [telString setYy_color:[UIColor blackColor]];
+            __weak typeof (self) weakSelf = self;
             [telString yy_setTextHighlightRange:telRange color:skinColor backgroundColor:[UIColor whiteColor] tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
                 __strong typeof (weakSelf) strongSelf = weakSelf;
                 [strongSelf takeCallWithValue:model.telephone];
@@ -384,12 +377,12 @@
             telLabel.attributedText = telString;
             [toolView addSubview:telLabel];
 
-            
+
             UILabel *qqLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, CGRectGetMaxY(phoneLabel.frame), width, height)];
             qqLabel.text = [NSString stringWithFormat:@"Q  Q：%@",model.qq];
             qqLabel.font = smallMediumFont;
             [toolView addSubview:qqLabel];
-            
+
             UILabel *emalLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(qqLabel.frame), CGRectGetMinY(qqLabel.frame), width, height)];
             emalLabel.text = [NSString stringWithFormat:@"邮箱：%@",model.mail];
             emalLabel.font = smallMediumFont;
@@ -411,15 +404,37 @@
     if (indexPath.section == 0) {
         return 0.86*kScreenWidth/5;
     }else if (indexPath.section == 1) {
-        if (indexPath.row == 0) {
-            return 0.4*kScreenWidth;
+        return 0.2*kScreenWidth;
+    }else if (indexPath.section == 2) {
+        NSString *mainStr;
+        if (self.model.product == nil || [self.model.product isEqualToString:@""]) {
+            mainStr = @"暂无";
         }else {
-            CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.model.profile font:smallMediumFont]+20;
-            return height;
+            mainStr = self.model.product;
         }
-    } else if (indexPath.section == 2) {
+        CGFloat mainHeight = [[ZWToolActon shareAction]adaptiveTextHeight:mainStr font:smallMediumFont];
+        return mainHeight;
+    }else if (indexPath.section == 3) {
+        NSString *demandStr;
+        if (self.model.requirement == nil || [self.model.requirement isEqualToString:@""]) {
+            demandStr = @"暂无";
+        }else {
+            demandStr = self.model.requirement;
+        }
+        CGFloat demandHeight = [[ZWToolActon shareAction]adaptiveTextHeight:demandStr font:normalFont];
+        return demandHeight;
+    }else if (indexPath.section == 4) {
+        NSString *introduceStr;
+        if (self.model.profile == nil || [self.model.profile isEqualToString:@""]) {
+            introduceStr = @"暂无";
+        }else {
+            introduceStr = self.model.profile;
+        }
+        CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.model.profile font:smallMediumFont]+20;
+        return height;
+    }else if (indexPath.section == 5) {
         return 0.4*kScreenWidth;
-    } else if (indexPath.section == 3) {
+    }else if (indexPath.section == 6) {
         if (self.dynamicsArray.count == 0) {
             return 0.4*kScreenWidth;
         }else {
@@ -478,7 +493,7 @@
         
         UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(lineView.frame)+5, CGRectGetMaxY(self.banner.frame), 0.5*kScreenWidth, 0.1*kScreenWidth)];
         titleLabel.text = @"所属行业";
-        titleLabel.font = boldBigFont;
+        titleLabel.font = boldNormalFont;
         [view addSubview:titleLabel];
         
     } else {
@@ -491,13 +506,13 @@
             lineView.layer.masksToBounds = YES;
             [view addSubview:lineView];
             
-            NSArray *titles = @[@"公司信息",@"产品展示",@"最新参展动态",@"联系方式"];
+            NSArray *titles = @[@"产品手册",@"主营项目",@"需求说明",@"公司简介",@"产品展示",@"参展动态",@"联系方式"];
             UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(lineView.frame)+5, 0, 0.5*kScreenWidth, 0.1*kScreenWidth)];
             titleLabel.text = titles[section-1];
-            titleLabel.font = boldBigFont;
+            titleLabel.font = boldNormalFont;
             [view addSubview:titleLabel];
             
-            if (section == 3) {
+            if (section == 6) {
                 
                 CGFloat width = [[ZWToolActon shareAction]adaptiveTextWidth:@"更多" labelFont:smallMediumFont];
                 UIButton *moreBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -536,7 +551,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    if (indexPath.section == 3) {
+    if (indexPath.section == 6) {
         if (self.dynamicsArray.count != 0) {
             ZWNewDynamicModel *model = self.dynamicsArray[indexPath.row];
             
@@ -632,7 +647,7 @@
                 }
                 
                 strongSelf.industries = myArray;
-                
+            
                 strongSelf.imageArray = data[@"data"][@"images"];
                 NSDictionary *myData = data[@"data"][@"zwMerchantVo"];
                 ZWExhibitorsDetailModel *model = [ZWExhibitorsDetailModel parseJSON:myData];
@@ -669,7 +684,6 @@
 
 - (void)requestDynamicList {
     if (self.merchantId) {
-           
            NSDictionary *parametes = @{@"merchantId":self.merchantId,
                                        @"pageNo":@"1",
                                        @"pageSize":@"2"};
@@ -713,7 +727,7 @@
                [strongSelf.collectView reloadData];
             }
         } failureBlock:^(NSError * _Nonnull error) {
-            
+
         }];
     }
 }

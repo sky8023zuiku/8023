@@ -124,7 +124,7 @@
     style.whRatio = kScreenWidth/kScreenWidth;
 //    style.centerUpOffset = (100-zwNavBarHeight)/2;
     
-    style.centerUpOffset = 0.5*kScreenHeight-zwNavBarHeight-0.55*kScreenWidth;
+    style.centerUpOffset = 0.5*kScreenHeight-zwNavBarHeight-0.75*kScreenWidth;
     style.xScanRetangleOffset = 0;
     //扫码框周围4个角的类型设置为在框的上面
     style.photoframeAngleStyle = LBXScanViewPhotoframeAngleStyle_Outer;

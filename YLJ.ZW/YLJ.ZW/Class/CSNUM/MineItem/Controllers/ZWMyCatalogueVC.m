@@ -287,42 +287,71 @@
     UIView *searchView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 44)];
     searchView.backgroundColor = skinColor;
     [self.view addSubview:searchView];
-
-    CSSearchBarStyle *searchBar = [[CSSearchBarStyle alloc] initWithFrame:CGRectMake(15, 5, CGRectGetWidth(searchView.frame)-30, 30)];
-    searchBar.placeholder = @"请输入搜索内容";
-    searchBar.backgroundImage = [UIImage new];
-    searchBar.showsCancelButton = NO;
+//
+//    CSSearchBarStyle *searchBar = [[CSSearchBarStyle alloc] initWithFrame:CGRectMake(15, 5, CGRectGetWidth(searchView.frame)-30, 30)];
+//    searchBar.placeholder = @"请输入搜索内容";
+//    searchBar.backgroundImage = [UIImage new];
+//    searchBar.showsCancelButton = NO;
+//
+//    if ([[[UIDevice currentDevice]systemVersion] floatValue] >= 13.0) {
+//        searchBar.searchTextField.enabled = NO;
+//        searchBar.searchTextField.backgroundColor = [UIColor whiteColor];
+//        searchBar.searchTextField.font = smallMediumFont;
+//        searchBar.layer.cornerRadius = 15.0f;
+//        searchBar.layer.masksToBounds = YES;
+//    }else {
+//        UITextField *searchField = [searchBar valueForKey:@"_searchField"];
+//        searchField.backgroundColor = [UIColor whiteColor];
+//        searchField.enabled = NO;
+//        searchField.font = smallMediumFont;
+//        searchField.layer.cornerRadius = 15.0f;
+//        searchField.layer.masksToBounds = YES;
+//    }
+//
+//    [searchView addSubview:searchBar];
+//    self.searchBar = searchBar;
+//    [self.searchBar becomeFirstResponder];
+//    [searchView addSubview:self.searchBar];
+//    CGFloat height = searchBar.bounds.size.height;
+//    CGFloat top = (height - 30.0) / 2.0;
+//    CGFloat bottom = top;
+//    searchBar.contentInset = UIEdgeInsetsMake(top, 0, bottom, 0);
+//    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapItemClick:)];
+//    [self.searchBar addGestureRecognizer:tap];
     
-    if ([[[UIDevice currentDevice]systemVersion] floatValue] >= 13.0) {
-        searchBar.searchTextField.enabled = NO;
-        searchBar.searchTextField.backgroundColor = [UIColor whiteColor];
-        searchBar.searchTextField.font = smallMediumFont;
-        searchBar.layer.cornerRadius = 15.0f;
-        searchBar.layer.masksToBounds = YES;
-    }else {
-        UITextField *searchField = [searchBar valueForKey:@"_searchField"];
-        searchField.backgroundColor = [UIColor whiteColor];
-        searchField.enabled = NO;
-        searchField.font = smallMediumFont;
-        searchField.layer.cornerRadius = 15.0f;
-        searchField.layer.masksToBounds = YES;
-    }
     
+    
+    ZWSearchBar *searchBar = [[ZWSearchBar alloc]initWithFrame:CGRectMake(15, 0, kScreenWidth-30, 44)];
+    searchBar.layer.masksToBounds = YES;
     [searchView addSubview:searchBar];
-    self.searchBar = searchBar;
-    [self.searchBar becomeFirstResponder];
-    [searchView addSubview:self.searchBar];
-    CGFloat height = searchBar.bounds.size.height;
-    CGFloat top = (height - 30.0) / 2.0;
-    CGFloat bottom = top;
-    searchBar.contentInset = UIEdgeInsetsMake(top, 0, bottom, 0);
+    searchBar.backgroundColor = [UIColor clearColor];
+    searchBar.isFirstResponser = NO;
+    searchBar.isShowRightBtn = YES;
+    searchBar.iconName = @"icon_search";
+    searchBar.iconSize = CGSizeMake(15, 15);
+    searchBar.insetsIcon = UIEdgeInsetsMake(0, 13, 0, 0);
+    searchBar.placeHolder = @"请输入要搜索的内容";
+    searchBar.cusFontPlaceHolder = 20;
+    searchBar.colorSearchBg = [UIColor whiteColor];
+    searchBar.raidus = 14;
+    searchBar.insetsSearchBg = UIEdgeInsetsMake(8, 0, 8, 0);
+    searchBar.cusFontTxt = 14;
+    searchBar.colorTxtInput = [UIColor redColor];
+    searchBar.isEditable = NO;
+    searchBar.colorTitleBtn = [UIColor redColor];
+    
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapItemClick:)];
-    [self.searchBar addGestureRecognizer:tap];
+    [searchBar.txtField addGestureRecognizer:tap];
+    
+    
+    
+    
     
 }
 - (void)tapItemClick:(UITapGestureRecognizer *)recognizer {
     CSSearchVC *searchVC = [[CSSearchVC alloc]init];
     searchVC.type = 3;
+    searchVC.isAnimation = 1;
     [self.navigationController pushViewController:searchVC animated:YES];
 }
 

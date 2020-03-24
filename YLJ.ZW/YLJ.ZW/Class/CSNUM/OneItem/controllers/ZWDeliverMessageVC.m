@@ -79,59 +79,59 @@
     lineTwo.backgroundColor = [UIColor colorWithRed:244.0/255.0 green:244.0/255.0 blue:244.0/255.0 alpha:1];
     [self.scrollView addSubview:lineTwo];
     
-    UILabel *mailLabel = [[UILabel alloc]init];
-    mailLabel.text = @"邮箱： ";
-    mailLabel.font = normalFont;
-    self.mailText = [[UITextField alloc]initWithFrame:CGRectMake(CGRectGetMinX(lineTwo.frame), CGRectGetMaxY(lineTwo.frame)+15, CGRectGetWidth(lineTwo.frame), CGRectGetHeight(self.nameText.frame))];
-    self.mailText.placeholder = @"点击输入邮箱";
-    self.mailText.leftView = mailLabel;
-    self.mailText.leftViewMode = UITextFieldViewModeAlways;
-    self.mailText.font = normalFont;
-    [self.scrollView addSubview:self.mailText];
+//    UILabel *mailLabel = [[UILabel alloc]init];
+//    mailLabel.text = @"邮箱： ";
+//    mailLabel.font = normalFont;
+//    self.mailText = [[UITextField alloc]initWithFrame:CGRectMake(CGRectGetMinX(lineTwo.frame), CGRectGetMaxY(lineTwo.frame)+15, CGRectGetWidth(lineTwo.frame), CGRectGetHeight(self.nameText.frame))];
+//    self.mailText.placeholder = @"点击输入邮箱";
+//    self.mailText.leftView = mailLabel;
+//    self.mailText.leftViewMode = UITextFieldViewModeAlways;
+//    self.mailText.font = normalFont;
+//    [self.scrollView addSubview:self.mailText];
     
-    UIView *lineThree = [[UIView alloc]initWithFrame:CGRectMake(CGRectGetMinX(self.mailText.frame), CGRectGetMaxY(self.mailText.frame), CGRectGetWidth(self.mailText.frame), 1)];
-    lineThree.backgroundColor = [UIColor colorWithRed:244.0/255.0 green:244.0/255.0 blue:244.0/255.0 alpha:1];
-    [self.scrollView addSubview:lineThree];
+//    UIView *lineThree = [[UIView alloc]initWithFrame:CGRectMake(CGRectGetMinX(self.mailText.frame), CGRectGetMaxY(self.mailText.frame), CGRectGetWidth(self.mailText.frame), 1)];
+//    lineThree.backgroundColor = [UIColor colorWithRed:244.0/255.0 green:244.0/255.0 blue:244.0/255.0 alpha:1];
+//    [self.scrollView addSubview:lineThree];
     
-    UILabel *wechatLabel = [[UILabel alloc]init];
-    wechatLabel.text = @"微信： ";
-    wechatLabel.font = normalFont;
-    self.wechatText = [[UITextField alloc]initWithFrame:CGRectMake(CGRectGetMinX(lineThree.frame), CGRectGetMaxY(lineThree.frame)+15, CGRectGetWidth(lineThree.frame), CGRectGetHeight(self.nameText.frame))];
-    self.wechatText.placeholder = @"点击输入微信账号";
-    self.wechatText.leftView = wechatLabel;
-    self.wechatText.leftViewMode = UITextFieldViewModeAlways;
-    self.wechatText.font = normalFont;
-    [self.scrollView addSubview:self.wechatText];
+//    UILabel *wechatLabel = [[UILabel alloc]init];
+//    wechatLabel.text = @"微信： ";
+//    wechatLabel.font = normalFont;
+//    self.wechatText = [[UITextField alloc]initWithFrame:CGRectMake(CGRectGetMinX(lineThree.frame), CGRectGetMaxY(lineThree.frame)+15, CGRectGetWidth(lineThree.frame), CGRectGetHeight(self.nameText.frame))];
+//    self.wechatText.placeholder = @"点击输入微信账号";
+//    self.wechatText.leftView = wechatLabel;
+//    self.wechatText.leftViewMode = UITextFieldViewModeAlways;
+//    self.wechatText.font = normalFont;
+//    [self.scrollView addSubview:self.wechatText];
     
-    UIView *lineFour = [[UIView alloc]initWithFrame:CGRectMake(CGRectGetMinX(self.wechatText.frame), CGRectGetMaxY(self.wechatText.frame), CGRectGetWidth(self.wechatText.frame), 1)];
-    lineFour.backgroundColor = [UIColor colorWithRed:244.0/255.0 green:244.0/255.0 blue:244.0/255.0 alpha:1];
-    [self.scrollView addSubview:lineFour];
+//    UIView *lineFour = [[UIView alloc]initWithFrame:CGRectMake(CGRectGetMinX(self.wechatText.frame), CGRectGetMaxY(self.wechatText.frame), CGRectGetWidth(self.wechatText.frame), 1)];
+//    lineFour.backgroundColor = [UIColor colorWithRed:244.0/255.0 green:244.0/255.0 blue:244.0/255.0 alpha:1];
+//    [self.scrollView addSubview:lineFour];
     
     UILabel *companyLabel = [[UILabel alloc]init];
     companyLabel.text = @"公司： ";
     companyLabel.font = normalFont;
-    self.companyText = [[UITextField alloc]initWithFrame:CGRectMake(CGRectGetMinX(lineFour.frame), CGRectGetMaxY(lineFour.frame)+15, CGRectGetWidth(lineFour.frame), CGRectGetHeight(self.nameText.frame))];
+    self.companyText = [[UITextField alloc]initWithFrame:CGRectMake(CGRectGetMinX(lineTwo.frame), CGRectGetMaxY(lineTwo.frame)+15, CGRectGetWidth(lineTwo.frame), CGRectGetHeight(self.nameText.frame))];
     self.companyText.placeholder = @"点击输入公司名称";
     self.companyText.leftView = companyLabel;
     self.companyText.leftViewMode = UITextFieldViewModeAlways;
     self.companyText.font = normalFont;
     [self.scrollView addSubview:self.companyText];
     
-    UIView *lineFive = [[UIView alloc]initWithFrame:CGRectMake(CGRectGetMinX(self.companyText.frame), CGRectGetMaxY(self.companyText.frame), CGRectGetWidth(self.companyText.frame), 1)];
-    lineFive.backgroundColor = [UIColor colorWithRed:244.0/255.0 green:244.0/255.0 blue:244.0/255.0 alpha:1];
-    [self.scrollView addSubview:lineFive];
+//    UIView *lineFive = [[UIView alloc]initWithFrame:CGRectMake(CGRectGetMinX(self.companyText.frame), CGRectGetMaxY(self.companyText.frame), CGRectGetWidth(self.companyText.frame), 1)];
+//    lineFive.backgroundColor = [UIColor colorWithRed:244.0/255.0 green:244.0/255.0 blue:244.0/255.0 alpha:1];
+//    [self.scrollView addSubview:lineFive];
     
-    UILabel *addressLabel = [[UILabel alloc]init];
-    addressLabel.text = @"地址： ";
-    addressLabel.font = normalFont;
-    self.addressText = [[UITextField alloc]initWithFrame:CGRectMake(CGRectGetMinX(lineFive.frame), CGRectGetMaxY(lineFive.frame)+15, CGRectGetWidth(lineFive.frame), CGRectGetHeight(self.nameText.frame))];
-    self.addressText.placeholder = @"点击输入公司地址";
-    self.addressText.leftView = addressLabel;
-    self.addressText.leftViewMode = UITextFieldViewModeAlways;
-    self.addressText.font = normalFont;
-    [self.scrollView addSubview:self.addressText];
+//    UILabel *addressLabel = [[UILabel alloc]init];
+//    addressLabel.text = @"地址： ";
+//    addressLabel.font = normalFont;
+//    self.addressText = [[UITextField alloc]initWithFrame:CGRectMake(CGRectGetMinX(lineFive.frame), CGRectGetMaxY(lineFive.frame)+15, CGRectGetWidth(lineFive.frame), CGRectGetHeight(self.nameText.frame))];
+//    self.addressText.placeholder = @"点击输入公司地址";
+//    self.addressText.leftView = addressLabel;
+//    self.addressText.leftViewMode = UITextFieldViewModeAlways;
+//    self.addressText.font = normalFont;
+//    [self.scrollView addSubview:self.addressText];
     
-    UIView *lineSix = [[UIView alloc]initWithFrame:CGRectMake(CGRectGetMinX(self.addressText.frame), CGRectGetMaxY(self.addressText.frame), CGRectGetWidth(self.addressText.frame), 1)];
+    UIView *lineSix = [[UIView alloc]initWithFrame:CGRectMake(CGRectGetMinX(self.companyText.frame), CGRectGetMaxY(self.companyText.frame), CGRectGetWidth(self.companyText.frame), 1)];
     lineSix.backgroundColor = [UIColor colorWithRed:244.0/255.0 green:244.0/255.0 blue:244.0/255.0 alpha:1];
     [self.scrollView addSubview:lineSix];
     
@@ -175,22 +175,22 @@
         [self showOneAlertWithMessage:@"电话号码不能为空"];
         return;
     }
-    if ([self.mailText.text isEqualToString:@""]) {
-        [self showOneAlertWithMessage:@"邮箱不能为空"];
-        return;
-    }
-    if ([self.wechatText.text isEqualToString:@""]) {
-        [self showOneAlertWithMessage:@"微信不能为空"];
-        return;
-    }
-    if ([self.companyText.text isEqualToString:@""]) {
-        [self showOneAlertWithMessage:@"公司名称不能为空"];
-        return;
-    }
-    if ([self.addressText.text isEqualToString:@""]) {
-        [self showOneAlertWithMessage:@"公司地址不能为空"];
-        return;
-    }
+//    if ([self.mailText.text isEqualToString:@""]) {
+//        [self showOneAlertWithMessage:@"邮箱不能为空"];
+//        return;
+//    }
+//    if ([self.wechatText.text isEqualToString:@""]) {
+//        [self showOneAlertWithMessage:@"微信不能为空"];
+//        return;
+//    }
+//    if ([self.companyText.text isEqualToString:@""]) {
+//        [self showOneAlertWithMessage:@"公司名称不能为空"];
+//        return;
+//    }
+//    if ([self.addressText.text isEqualToString:@""]) {
+//        [self showOneAlertWithMessage:@"公司地址不能为空"];
+//        return;
+//    }
     if ([self.instructions.text isEqualToString:@""]) {
         [self showOneAlertWithMessage:@"请填写来意"];
         return;
@@ -225,10 +225,10 @@
     if (self.merchantId) {
         parametes = @{@"name":self.nameText.text,
                       @"phone":self.phoneText.text,
-                      @"email":self.mailText.text,
-                      @"wechart":self.wechatText.text,
+//                      @"email":self.mailText.text,
+//                      @"wechart":self.wechatText.text,
                       @"company":self.companyText.text,
-                      @"address":self.addressText.text,
+//                      @"address":self.addressText.text,
                       @"demand":self.instructions.text,
                       @"merchantId":self.merchantId};
     }

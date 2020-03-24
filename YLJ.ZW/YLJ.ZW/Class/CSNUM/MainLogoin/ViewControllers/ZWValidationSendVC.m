@@ -148,7 +148,7 @@
         } failureBlock:^(NSError * _Nonnull error) {
             __strong typeof (weakSelf) strongSlef = weakSelf;
             [strongSlef showOneItemAlertWithMessage:@"验证码发送失败"];
-        }];
+        } showInView:self.view];
     }
 }
 

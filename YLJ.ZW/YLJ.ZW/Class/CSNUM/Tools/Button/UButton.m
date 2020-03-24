@@ -27,10 +27,10 @@
 
 - (CGRect)imageRectForContentRect:(CGRect)contentRect {
     CGRect frame = contentRect;
-    frame.origin.x = self.frame.size.width/2-0.06*kScreenWidth;
+    frame.origin.x = self.frame.size.width/6;
     frame.origin.y = 0;
-    frame.size.width = 0.12*kScreenWidth;
-    frame.size.height = 0.12*kScreenWidth;
+    frame.size.width = self.bounds.size.width/3*2;
+    frame.size.height = self.bounds.size.width/3*2;
     return frame;
 }
 
@@ -69,14 +69,14 @@
 
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
-        self.titleLabel.textAlignment = NSTextAlignmentCenter;
+        self.titleLabel.textAlignment = NSTextAlignmentLeft;
     }
     return self;
 }
 
 - (CGRect)titleRectForContentRect:(CGRect)contentRect {
     CGRect frame = contentRect;
-    frame.origin.x = frame.size.height;
+    frame.origin.x = frame.size.height+8;
     frame.origin.y = 0;
     frame.size.width = frame.size.width-frame.size.height;
     frame.size.height = frame.size.height;
@@ -91,4 +91,34 @@
     frame.size.height = frame.size.height;
     return frame;
 }
+@end
+
+
+
+//**图片为原型**/
+@implementation UCButton
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        self.titleLabel.textAlignment = NSTextAlignmentCenter;
+    }
+    return self;
+}
+
+- (CGRect)titleRectForContentRect:(CGRect)contentRect {
+    CGRect frame = contentRect;
+    frame.origin.x = self.frame.size.width/2 - frame.size.width/2;
+    frame.origin.y = self.frame.size.height/2 - frame.size.height/4+5;
+    return frame;
+}
+
+- (CGRect)imageRectForContentRect:(CGRect)contentRect {
+    CGRect frame = contentRect;
+    frame.origin.x = self.frame.size.width/6;
+    frame.origin.y = 0;
+    frame.size.width = self.bounds.size.width/3*2;
+    frame.size.height = self.bounds.size.width/3*2;
+    return frame;
+}
+
 @end

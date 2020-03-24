@@ -104,6 +104,7 @@
     searchVC.exhibitionId = self.dataParameters[@"exhibitionId"];
     searchVC.isRreadAll = self.isRreadAll;
     searchVC.price = self.price;
+    searchVC.isAnimation = 1;
     [self.navigationController pushViewController:searchVC animated:YES];
 }
 
@@ -362,8 +363,18 @@
             [titlesArray addObject:newNumText];
             strongSelf.selectView.titles = titlesArray;
             NSArray *myData = data[@"data"][@"exhibitorList"];
+            NSArray *myShareData = data[@"data"][@"shareList"];
             strongSelf.isRreadAll = [data[@"data"][@"isReadAll"] integerValue];
             NSMutableArray *myArray = [NSMutableArray array];
+            
+            NSMutableArray *myShareArray = [NSMutableArray array];
+            
+            for (NSDictionary *shareDic in myShareData) {
+                ZWExExhibitorsModel *model = [ZWExExhibitorsModel parseJSON:shareDic];
+                [myShareArray addObject:model];
+            }
+            [strongSelf.dataSource addObjectsFromArray:myShareArray];
+                        
             for (NSDictionary *myDic in myData) {
                 ZWExExhibitorsModel *model = [ZWExExhibitorsModel parseJSON:myDic];
                 [myArray addObject:model];

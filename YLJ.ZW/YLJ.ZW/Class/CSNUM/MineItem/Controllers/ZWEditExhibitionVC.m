@@ -17,6 +17,12 @@
 #import "DCCycleScrollView.h"
 
 
+#import "JhScrollActionSheetView.h"
+#import "JhPageItemModel.h"
+#import <ShareSDK/ShareSDK.h>
+#import <ShareSDKUI/ShareSDK+SSUI.h>
+
+
 @interface ZWEditExhibitionVC ()<UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate,DCCycleScrollViewDelegate>
 
 @property(nonatomic, strong)UITableView *tableView;
@@ -45,6 +51,10 @@
 
 @property(nonatomic, strong)NSArray *imageData;
 
+@property(nonatomic, strong)NSMutableArray *shareArray;
+
+@property(nonatomic, strong)NSString *merchantName;//公司名称
+
 @end
 
 @implementation ZWEditExhibitionVC
@@ -57,7 +67,7 @@
     _tableView.delegate = self;
     _tableView.sectionHeaderHeight = 0;
     _tableView.sectionFooterHeight = 0;
-//    _tableView.bounces = NO;
+    _tableView.bounces = NO;
     _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     return _tableView;
 }
@@ -69,7 +79,115 @@
     [self setupChildViewController];
     [self requestData];
     [self createNotice];
+    
+    UIButton *shareBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    shareBtn.frame = CGRectMake(10, 80, 100, 100);
+    shareBtn.backgroundColor = [UIColor redColor];
+    [shareBtn addTarget:self action:@selector(shareBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:shareBtn];
 }
+
+- (void)shareBtnClick:(UIButton *)btn {
+    
+    [JhScrollActionSheetView showShareActionSheetWithTitle:@"分享" shareDataArray:self.shareArray handler:^(JhScrollActionSheetView *actionSheet, NSInteger index) {
+        NSLog(@" 点击分享 index %ld ",(long)index);
+        switch (index) {
+            case 0:
+                [self createShare:SSDKPlatformTypeWechat];
+                break;
+            case 1:
+                [self createShare:SSDKPlatformSubTypeWechatTimeline];
+                break;
+            case 2:
+                [self createShare:SSDKPlatformTypeSinaWeibo];
+                break;
+            case 3:
+                [self createShare:SSDKPlatformSubTypeQQFriend];
+                break;
+            case 4:
+                [self createShare:SSDKPlatformSubTypeQZone];
+                break;
+            default:
+                break;
+        }
+        
+    }];
+   
+}
+
+- (void)createShare:(SSDKPlatformType)type {
+        
+    NSMutableDictionary *shareParams = [NSMutableDictionary dictionary];
+    NSString *text;
+    if (type == SSDKPlatformTypeSinaWeibo) {
+//        text = @"http://www.csnum.com/share/html/share_exhibitors.html";
+        text = [NSString stringWithFormat:@"http://www.csnum.com/share/html/share_exhibitors.html?exhibitorId=%@",self.exhibitorId];
+    }else {
+        text = self.shareData[@"exhibitionName"];
+    }
+    [shareParams SSDKSetupShareParamsByText:text
+                                     images:[NSString stringWithFormat:@"%@%@",httpImageUrl,self.shareData[@"coverImages"]]
+                                        url:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.csnum.com/share/html/share_exhibitors.html?exhibitorId=%@",self.exhibitorId]]
+                                      title:self.merchantName
+                                       type:SSDKContentTypeAuto];
+    [ShareSDK share:type parameters:shareParams onStateChanged:^(SSDKResponseState state, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error) {
+        switch (state) {
+            case SSDKResponseStateSuccess:
+            {
+                NSLog(@"分享成功");
+                break;
+            }
+            case SSDKResponseStateFail:
+            {
+                NSLog(@"分享失败");
+                break;
+            }
+            default:
+                break;
+        }
+    }];
+}
+
+
+
+
+-(NSMutableArray *)shareArray{
+    if (!_shareArray) {
+        _shareArray = [NSMutableArray new];
+        
+        NSArray *data = @[
+                          @{
+                              @"text" : @"微信",
+                              @"img" : @"weixing",
+                              },
+                          @{
+                              @"text" : @"朋友圈",
+                              @"img" : @"friends",
+                              },
+                          @{
+                              @"text" : @"微博",
+                              @"img" : @"sina",
+                              },
+                          @{
+                              @"text" : @"QQ",
+                              @"img" : @"qq",
+                              },
+                          @{
+                              @"text" : @"QQ空间",
+                              @"img" : @"kongjian",
+                              }];
+        
+        for (NSDictionary *mydic in data) {
+            JhPageItemModel *model = [JhPageItemModel parseJSON:mydic];
+            [self.shareArray addObject:model];
+        }
+    }
+    return _shareArray;
+}
+
+//**********************************************************以上是分享********************************************************************/
+    
+
 - (void)createNotice {
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(refreshData) name:@"ZWEditExhibitionVC" object:nil];
 }
@@ -86,6 +204,7 @@
             NSLog(@"%@",respense.data);
             strongSelf.exhibitorsProperties = respense.data[@"exhibitor"][@"nature"];
             strongSelf.myexhibitorId = respense.data[@"exhibitor"][@"id"];
+            strongSelf.merchantName = respense.data[@"exhibitor"][@"merchantName"];
             strongSelf.titleImages = respense.data[@"images"];
             int imagesStatus = [respense.data[@"imagesStatus"] intValue];
             NSMutableArray *imgaeArr = [NSMutableArray array];
@@ -104,9 +223,8 @@
 
 - (void)createNavigationBar {
     [[YNavigationBar sharedInstance]createLeftBarWithImage:[UIImage imageNamed:@"zai_dao_icon_left"] barItem:self.navigationItem target:self action:@selector(goBack:)];
-    if (self.enterType == 1) {
-       [[YNavigationBar sharedInstance]createRightBarWithTitle:@"编辑" barItem:self.navigationItem target:self action:@selector(rightItemClcik:)];
-    }
+    [[YNavigationBar sharedInstance]createRightBarWithTitle:@"编辑" barItem:self.navigationItem target:self action:@selector(rightItemClcik:)];
+    
 }
 - (void)goBack:(UIBarButtonItem *)item {
     [self.navigationController popViewControllerAnimated:YES];
@@ -204,7 +322,7 @@
     }else {
         // 创建底部滚动视图
         self.mainScrollView = [[UIScrollView alloc] init];
-        self.mainScrollView.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight-0.1*kScreenWidth);
+        self.mainScrollView.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight-0.1*kScreenWidth-0.55*kScreenWidth-zwTabBarStausHeight);
         self.mainScrollView.contentSize = CGSizeMake(self.view.frame.size.width * 4, 0);
         self.mainScrollView.backgroundColor = [UIColor clearColor];
         self.mainScrollView.pagingEnabled = YES;
@@ -227,7 +345,7 @@
     if (indexPath.section == 0) {
         return 0.55*kScreenWidth;
     }else {
-        return kScreenHeight-zwNavBarHeight-0.1*kScreenWidth;
+        return kScreenHeight-zwNavBarHeight-0.1*kScreenWidth-0.55*kScreenWidth-zwTabBarStausHeight;
     }
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -316,7 +434,6 @@
 
     ZWExhibitorsInfomationVC *exhiebitionVC = [[ZWExhibitorsInfomationVC alloc] init];
     exhiebitionVC.exhibitorId = self.exhibitorId;
-    exhiebitionVC.enterType = self.enterType;
     exhiebitionVC.exhibitorType = 0;
     [self addChildViewController:exhiebitionVC];
 
@@ -326,8 +443,6 @@
 
     ZWProductDisplayVC *productDisplayVC = [[ZWProductDisplayVC alloc] init];
     productDisplayVC.exhibitorId = self.exhibitorId;
-    productDisplayVC.enterType = self.enterType;
-    productDisplayVC.exhibitorType = 0;
     [self addChildViewController:productDisplayVC];
 
     ZWContactUsVC *contactUsVC = [[ZWContactUsVC alloc] init];

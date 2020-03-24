@@ -32,12 +32,11 @@
         self.titleLabel = titleLabel;
         [self addSubview:titleLabel];
         
-        
-        
         UIImageView *imageView = [[UIImageView alloc]init];
         imageView.image = [UIImage imageNamed:@"h1.jpg"];
         imageView.layer.cornerRadius = 5;
         imageView.layer.masksToBounds = YES;
+        imageView.contentMode = UIViewContentModeScaleAspectFit;
         self.titleImage = imageView;
         [self addSubview:imageView];
         
@@ -120,7 +119,13 @@
     
     NSMutableAttributedString *str = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@%@",mText,model.name]];
     NSRange range = [[str string] rangeOfString:mText];
-    [str addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:range];
+    UIColor *textColor;
+    if ([mText isEqualToString:@"【取消】"]) {
+        textColor = skinColor;
+    }else {
+        textColor = [UIColor redColor];
+    }
+    [str addAttribute:NSForegroundColorAttributeName value:textColor range:range];
     self.titleLabel.attributedText = str;
     
     if (![model.developingState isEqualToString:@"0"]) {
@@ -140,17 +145,15 @@
         self.titleLabel.frame = CGRectMake(10, 0, kScreenWidth-20, 0.25*self.frame.size.height);
     }
     
-
-//    self.titleLabel.text = model.name;
-    
     [self.titleImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",httpImageUrl,model.url]] placeholderImage:[UIImage imageNamed:@"zw_zfzw_icon"]];
     self.areaLabel.text = [NSString stringWithFormat:@"地    点：%@  %@",model.country,model.city];
-    self.detailLabel.text = @"展    馆：上海市中国国际展馆";
     NSString *start = [model.startTime substringWithRange:NSMakeRange(0, 10)];
     NSString *end = [model.endTime substringWithRange:NSMakeRange(0, 10)];
     NSString *startTime = [start stringByReplacingOccurrencesOfString:@"-" withString:@"-"];
     NSString *endTime = [end stringByReplacingOccurrencesOfString:@"-" withString:@"-"];
     self.dateLabel.text = [NSString stringWithFormat:@"时    间：%@~%@",startTime,endTime];
+    self.hostLabel.text = [NSString stringWithFormat:@"主办方：%@",model.sponsor];
+    self.detailLabel.text =[NSString stringWithFormat:@"展    馆：%@",model.exhibitionHallName];
 }
 
 - (void)annBtnClick:(UIButton *)btn {

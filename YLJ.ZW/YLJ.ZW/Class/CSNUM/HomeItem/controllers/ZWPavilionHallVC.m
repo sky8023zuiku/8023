@@ -42,7 +42,9 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController setNavigationBarHidden:NO animated:animated];
+//    [self.navigationController setNavigationBarHidden:NO animated:animated];
+//    self.navigationController.navigationBar.barTintColor = skinColor;
+    [[YNavigationBar sharedInstance]createSkinNavigationBar:self.navigationController.navigationBar withBackColor:skinColor withTintColor:[UIColor whiteColor]];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -72,6 +74,7 @@
 - (void)sreachItemClick:(UIBarButtonItem *)item {
     CSSearchVC *searchVC = [[CSSearchVC alloc]init];
     searchVC.type = 8;
+    searchVC.isAnimation = 1;
     [self.navigationController pushViewController:searchVC animated:YES];
 }
 

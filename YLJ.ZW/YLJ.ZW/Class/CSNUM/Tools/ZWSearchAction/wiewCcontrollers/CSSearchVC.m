@@ -14,13 +14,12 @@
 
 @interface CSSearchVC ()<UISearchBarDelegate>
 
-@property (nonatomic, strong) UISearchBar *searchBar;
 @property (nonatomic, strong) CSSearchView *searchView;
 @property (nonatomic, strong) NSMutableArray *hotArray;
 @property (nonatomic, strong) NSMutableArray *historyArray;
 @property (nonatomic, strong) CSSearchSuggestionVC *searchSuggestVC;
-
 @property (nonatomic, strong) UIBarButtonItem *rightItem;
+@property (nonatomic, strong) ZWSearchBar *searchBar;
 
 @end
 
@@ -56,6 +55,7 @@
     }
     return _searchView;
 }
+
 - (CSSearchSuggestionVC *)searchSuggestVC
 {
     if (!_searchSuggestVC) {
@@ -80,43 +80,24 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    if (!_searchBar.isFirstResponder) {
-        [self.searchBar becomeFirstResponder];
-    }
-    
-//    if ([self.searchBar respondsToSelector:@selector(becomeFirstResponder)]) {
-//        [self.searchBar performSelector:@selector(becomeFirstResponder) withObject:nil afterDelay:0];
-//    }
-    
+    [self.searchBar.txtField becomeFirstResponder];
     [[YNavigationBar sharedInstance]createNavigationBarWithStatusBarStyle:UIStatusBarStyleLightContent withType:0];
 }
-
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
+    [self.searchBar.txtField resignFirstResponder];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
-    // 回收键盘
-    [self.searchBar resignFirstResponder];
     _searchSuggestVC.view.hidden = YES;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController setNavigationBarHidden:NO animated:animated];
+    [[YNavigationBar sharedInstance]createSkinNavigationBar:self.navigationController.navigationBar withBackColor:skinColor withTintColor:[UIColor whiteColor]];
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-//    __weak typeof (self) weakSelf = self;
-//    dispatch_async(dispatch_get_global_queue(0, 0), ^{
-//        dispatch_sync(dispatch_get_main_queue(), ^{
-//            __strong typeof (weakSelf) strongSelf = weakSelf;
-//            [strongSelf setBarButtonItem];
-//        });
-//    });
-    
     [self setBarButtonItem];
-    
     self.view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.searchView];
     [self.view addSubview:self.searchSuggestVC.view];
@@ -125,83 +106,58 @@
 - (void)setBarButtonItem
 {
     [self.navigationItem setHidesBackButton:YES];
-    // 创建搜索框
-    UIView *titleView = [[UIView alloc] initWithFrame:CGRectMake(0, 7, self.view.frame.size.width, 30)];
-    CSSearchBarStyle *searchBar = [[CSSearchBarStyle alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(titleView.frame) - 25, 30)];
-    searchBar.placeholder = @"请输入搜索内容";
-    searchBar.backgroundImage = [UIImage new];
-    searchBar.delegate = self;
-    searchBar.showsCancelButton = YES;
-    searchBar.tintColor = skinColor;
-    
-    if ([[[UIDevice currentDevice]systemVersion] floatValue] >= 13.0) {
-        searchBar.searchTextField.font = smallMediumFont;
-        searchBar.searchTextField.backgroundColor = [UIColor whiteColor];
-        searchBar.layer.cornerRadius = 7.0f;
-        searchBar.layer.masksToBounds = YES;
-    }else {
-        UITextField *searchField = [searchBar valueForKey:@"_searchField"];
-        searchField.backgroundColor = [UIColor whiteColor];
-        searchField.font = smallMediumFont;
-        searchField.layer.cornerRadius = 7.0f;
-        searchField.layer.masksToBounds = YES;
-    }
-    
-    [titleView addSubview:searchBar];
+
+    ZWSearchBar *searchBar = [[ZWSearchBar alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 44)];
+    searchBar.layer.masksToBounds = YES;
+    searchBar.backgroundColor = [UIColor redColor];
+    self.navigationItem.titleView = searchBar;
+    searchBar.backgroundColor = skinColor;
+    searchBar.isFirstResponser = YES;
+    searchBar.iconName = @"icon_search";
+    searchBar.iconSize = CGSizeMake(15, 15);
+    searchBar.insetsIcon = UIEdgeInsetsMake(0, 13, 0, 0);
+    searchBar.placeHolder = @"请输入要搜索的内容";
+    searchBar.cusFontPlaceHolder = 20;
+    searchBar.colorSearchBg = [UIColor whiteColor];
+    searchBar.raidus = 14;
+    searchBar.insetsSearchBg = UIEdgeInsetsMake(8, 0, 8, 60);
+    searchBar.cusFontTxt = 15;
+    searchBar.isShowRightBtn = YES;
+    searchBar.titleBtn = @"取消";
+    searchBar.colorTxtInput = [UIColor blackColor];
+    searchBar.colorTitleBtn = [UIColor whiteColor];
     self.searchBar = searchBar;
-//    [self.searchBar becomeFirstResponder];
-    self.navigationItem.titleView = titleView;
-
-//    CGFloat height = searchBar.bounds.size.height;
-//    CGFloat top = (height - 30.0) / 2.0;
-//    CGFloat bottom = top;
-//    searchBar.contentInset = UIEdgeInsetsMake(top, 0, bottom, 0);
-//    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:nil];
-    
-    CGFloat height = _searchBar.bounds.size.height;
-    CGFloat top = (height - 30.0) / 2.0;
-    CGFloat bottom = top;
-    searchBar.contentInset = UIEdgeInsetsMake(top, 0, bottom, 0);
-    [self createCancelBtn:searchBar];
-    self.navigationItem.titleView = titleView;
-    self.navigationItem.rightBarButtonItem = _rightItem;
-}
-
-- (void)createCancelBtn:(UISearchBar *)searchBar {
-    if ([[[UIDevice currentDevice]systemVersion] floatValue] >= 13.0) {
-        for(id cc in [self.searchBar subviews]) {
-            for (id zz in [cc subviews]) {
-                for (id gg in [zz subviews]) {
-                    if([gg isKindOfClass:[UIButton class]]){
-                        UIButton *cancelButton = (UIButton *)gg;
-                        [cancelButton setTitle:@"取消" forState:UIControlStateNormal];
-                        [cancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-                    }
-                }
-            }
+    __weak typeof (self) weakSelf = self;
+    [searchBar setTxtfieldEditingCallback:^(NSString *text) {
+        __strong typeof (weakSelf) strongSelf = weakSelf;
+        if (text == nil || [text length] <= 0) {
+            strongSelf.searchSuggestVC.view.hidden = YES;
+            [self.view bringSubviewToFront:strongSelf.searchView];
+        } else {
+            strongSelf.searchSuggestVC.view.hidden = NO;
+            [self.view bringSubviewToFront:strongSelf.searchSuggestVC.view];
+            [strongSelf.searchSuggestVC searchTestChangeWithTest:text];
         }
-    }else{
-        UIButton*cancelButton = (UIButton *)[_searchBar valueForKey:@"cancelButton"];
-        [cancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [cancelButton setTitle:@"取消" forState:UIControlStateNormal];
-    }
-}
-- (void)presentVCFirstBackClick:(UIButton *)sender
-{
-    [self.navigationController popViewControllerAnimated:YES];
-}
-/** 点击取消 */
-- (void)cancelDidClick
-{
-    [self.searchBar resignFirstResponder];
-    
-    [self dismissViewControllerAnimated:NO completion:nil];
+    }];
+    [searchBar setClickSearchCallback:^(NSString *keyword) {
+        __strong typeof (weakSelf) strongSelf = weakSelf;
+        [strongSelf pushToSearchResultWithSearchStr:keyword];
+    }];
+    [searchBar setClickRightBtnCallback:^{
+        __strong typeof (weakSelf) strongSelf = weakSelf;
+        if (strongSelf.isAnimation == 0) {
+            [strongSelf.navigationController popViewControllerAnimated:NO];
+        }else {
+            [strongSelf.navigationController popViewControllerAnimated:YES];
+        }
+    }];
 }
 
-
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [self.view endEditing:YES];
+}
 - (void)pushToSearchResultWithSearchStr:(NSString *)str
 {
-    self.searchBar.text = str;
     CSSearchResultVC *searchResultVC = [[CSSearchResultVC alloc] init];
     searchResultVC.type = self.type;
     searchResultVC.parameterType = self.parameterType;
@@ -209,7 +165,6 @@
     searchResultVC.searchStr = str;
     searchResultVC.hotArray = _hotArray;
     searchResultVC.historyArray = _historyArray;
-    
     searchResultVC.exhibitionId = self.exhibitionId;
     searchResultVC.isRreadAll = self.isRreadAll;
     searchResultVC.price = self.price;
@@ -227,40 +182,5 @@
     }
     [_historyArray insertObject:str atIndex:0];
     [NSKeyedArchiver archiveRootObject:_historyArray toFile:kHistorySearchPath];
-}
-
-
-#pragma mark - UISearchBarDelegate -
-
-
-- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
-{
-    [self pushToSearchResultWithSearchStr:searchBar.text];
-}
-
-
-- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
-{
-    self.navigationItem.rightBarButtonItem = _rightItem;
-    [self.searchBar resignFirstResponder];
-    [self.navigationController popViewControllerAnimated:YES];
-}
-
-- (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar
-{
-    self.navigationItem.rightBarButtonItem = _rightItem;
-    searchBar.showsCancelButton = YES;
-}
-
-- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
-{
-    if (searchBar.text == nil || [searchBar.text length] <= 0) {
-        _searchSuggestVC.view.hidden = YES;
-        [self.view bringSubviewToFront:_searchView];
-    } else {
-        _searchSuggestVC.view.hidden = NO;
-        [self.view bringSubviewToFront:_searchSuggestVC.view];
-        [_searchSuggestVC searchTestChangeWithTest:searchBar.text];
-    }
 }
 @end

@@ -151,4 +151,42 @@ static ZWToolActon *shareAction = nil;
     return encodeStr;
 }
 
+
+- (NSString *)getTimeFromTimestamp:(NSNumber *)stamp withDataStr:(NSString *)format{
+    NSString *str = [stamp stringValue];
+    double time;
+    if (str.length>10) {
+        time = [stamp doubleValue]/1000;
+    }else {
+        time = [stamp doubleValue];
+    }
+    NSDate * myDate=[NSDate dateWithTimeIntervalSince1970:time];
+    NSDateFormatter * formatter=[[NSDateFormatter alloc]init];
+    [formatter setDateFormat:format];
+    NSString *timeStr=[formatter stringFromDate:myDate];
+    return timeStr;
+}
+/**
+ *  设置两端对齐
+*/
+- (NSMutableAttributedString *)createBothEndsWithLabel:(UILabel *)label textAlignmentWith:(CGFloat)width {
+    
+    if(label.text==nil||label.text.length==0) {
+        return nil;
+    }
+    CGSize size = [label.text boundingRectWithSize:CGSizeMake(width,MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingTruncatesLastVisibleLine|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:label.font} context:nil].size;
+    NSInteger length = (label.text.length-1);
+    NSString* lastStr = [label.text substringWithRange:NSMakeRange(label.text.length-1,1)];
+    if([lastStr isEqualToString:@":"]||[lastStr isEqualToString:@"："]) {
+        length = (label.text.length-2);
+    }
+    CGFloat margin = (width - size.width)/length;
+    NSNumber*number = [NSNumber numberWithFloat:margin];
+    NSMutableAttributedString* attribute = [[NSMutableAttributedString alloc]initWithString:label.text];
+    [attribute addAttribute:NSKernAttributeName value:number range:NSMakeRange(0,length)];
+    return attribute;
+    
+}
+
+
 @end

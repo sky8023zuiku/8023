@@ -8,15 +8,17 @@
 
 #ifndef ZWDataUrl_h
 #define ZWDataUrl_h
+
+//#define share_url @"http://www.csnum.com/share/html/share_exhibitors.html"//测试分享
+#define share_url @"http://www.enet720.com/share/share_merchant/share/html/share_exhibitors.html"//正式分享
 /**
  *  正式环境
  */
-#define API_HOST @"http://www.enet720.com:9000"//网络请求域名
-//#define API_HOST @"http://www.enet720.com:9001"//网络请求域名
+//#define API_HOST @"http://www.enet720.com:9000"//网络请求域名
 /**
  *  本地环境1
  */
-//#define API_HOST @"http://192.168.7.101:9001"//网络请求域名
+#define API_HOST @"http://192.168.7.124:9000"//网络请求域名
 /**
  *  本地环境2
  */
@@ -24,31 +26,30 @@
 /**
  *  接口路径全拼
  */
-#define PATH(_path)  [NSString stringWithFormat:_path, API_HOST]
+#define PATH(_path) [NSString stringWithFormat:_path, API_HOST]
 
 //*********************************个人相关**************************************************/
 /**
  *  获取个人信息
  */
-#define zwTakeUserInfo  PATH(@"%@/zwkj/user/user_core.json")
-
+#define zwTakeUserInfo PATH(@"%@/zwkj/user/user_core.json")
 //*********************************在线展会**************************************************/
 /**
  *  获取在线展会列表
  */
-#define zwOnlineExhibitionList  PATH(@"%@/zwkj/page_lists.json")
+#define zwOnlineExhibitionList PATH(@"%@/zwkj/page_lists.json")
 /**
  *  收藏与取消展会
  */
-#define zwCollectionAndCancelExhibition  PATH(@"%@/zwkj/user/collection/exhibition/yesno.json")
+#define zwCollectionAndCancelExhibition PATH(@"%@/zwkj/user/collection/exhibition/yesno.json")
 /**
  *  在线展会导航
  */
-#define zwOnlineExhibitionNavigation  PATH(@"%@/zwkj/exhibition/navigation/detail.json")
+#define zwOnlineExhibitionNavigation PATH(@"%@/zwkj/exhibition/navigation/detail.json")
 /**
  *  展会展商列表
  */
-#define zwExhibitionExhibitorList  PATH(@"%@/zwkj/exhibitor/page_lists.json")
+#define zwExhibitionExhibitorList PATH(@"%@/zwkj/exhibitor/page_lists.json")
 /**
  *  展会展商行业列表
  */
@@ -110,15 +111,15 @@
 /**
  *  行业展商列表
  */
-#define zwIndustryExhibitorsList  PATH(@"%@/zwkj/merchant/page_lists.json")
+#define zwIndustryExhibitorsList PATH(@"%@/zwkj/merchant/page_lists.json")
 /**
  *  行业展商收藏和取消收藏
  */
-#define zwInduExhibitorsCollectionAndCancel  PATH(@"%@/zwkj/user/collection/merchant/yesno.json")
+#define zwInduExhibitorsCollectionAndCancel PATH(@"%@/zwkj/user/collection/merchant/yesno.json")
 /**
  *  行业展商，商业筛选
  */
-#define zwExhibitorsSelectedIndustry  PATH(@"%@/zwkj/industry/getParent_industry.json")
+#define zwExhibitorsSelectedIndustry PATH(@"%@/zwkj/industry/getParent_industry.json")
 /**
  *  行业展商，公司简介
  */
@@ -238,6 +239,7 @@
 #define zwForgotPassword PATH(@"%@/zwkj/retrieve.json")
 
 //**********************************************************企业认证**********************************************************/
+
 /**
  *      获取身份列表
  */
@@ -254,7 +256,6 @@
  *      选择国家省份城市
  */
 #define zwSelectCPC PATH(@"%@/zwkj/pcs/city_screen/selectAreaList.json")
-
 //**********************************************************展网首页**********************************************************/
 /**
  *      获取轮播图和热门展会
@@ -268,7 +269,6 @@
  *      获取公司认证审核状态
 */
 #define zwCompanyCertification PATH(@"%@/zwkj/user/authentication/authentication_status.json")
-
 //**********************************************************展馆展厅**********************************************************/
 /**
  *      展馆列表
@@ -282,11 +282,97 @@
  *      展会排期
 */
 #define zwHallDateLineList PATH(@"%@/zwkj/exhibition/hall/plan_exhibition_list")
-
-
 //**********************************************************搜索**********************************************************/
 /**
  *      展馆搜索
 */
 #define zwHallFuzzyResultt PATH(@"%@/zwkj/exhibition/hall/fuzzy_result.json")
+
+//**********************************************************我的邀请**********************************************************/
+/**
+ *      获取邀请列表
+*/
+#define zwInvitationList PATH(@"%@/zwkj/invite/invite_list.json")
+/**
+ *      解除首页查看公司
+*/
+#define zwDeleteMyFirstLookCompany PATH(@"%@/zwkj/invite/release_invite.json")
+/**
+ *      获取邀请人信息
+*/
+#define zwInviterInformation PATH(@"%@/zwkj/invite/get_recommend_detail.json")
+/**
+ *      设置邀请人
+*/
+#define zwSetInviter PATH(@"%@/zwkj/user/insert/recommend.json")
+
+//**********************************************************我的分享**********************************************************/
+/**
+ *      分享展会列表
+*/
+#define zwShareExhibitionList PATH(@"%@/zwkj/invite/get_merchant_part_list.json")
+/**
+ *      分享展会的用户列表
+*/
+#define zwShareUserList PATH(@"%@/zwkj/invite/share_list.json")
+/**
+ *      分享展会的用户列表
+*/
+#define zwShareBindExhibitionList PATH(@"%@/zwkj/invite/exhibition_list.json")
+/**
+ *      获取分享码价格列表
+*/
+#define zwGetShareCodeList PATH(@"%@/zwkj/invite/get_share_code_list.json")
+/**
+ *      购买分享码
+*/
+#define zwBuyShareCode PATH(@"%@/zwkj/order/purchase_share_code_by_score.json")
+/**
+ *      绑定分享码
+*/
+#define zwBindShareCodeWithExhibition PATH(@"%@/zwkj/invite/share_bind_exhibition.json")
+/**
+ *      获取网页版展商详情
+*/
+#define zwGetWebExhibitorDetail PATH(@"%@/zwkj/get_share_details.json")
+
+//**********************************************************会展服务商**********************************************************/
+/**
+ *      热门服务商列表
+*/
+#define zwGetExhibitionServerList PATH(@"%@/zwkj/service/provider/get_index.json")
+/**
+ *      获取服务商列表
+*/
+#define zwGetAllExhibitionServerList PATH(@"%@/zwkj/service/provider/get_service_provider_list.json")
+/**
+ *      获取服务商二级行业列表
+*/
+#define zwGetExhibitionServerSecondaryIndustryList PATH(@"%@/zwkj/industry/get_service_child_industry.json")
+/**
+ *      服务商公司详情
+*/
+#define zwGetExhibitionServerDetail PATH(@"%@/zwkj/service/provider/get_service_provider_detail.json")
+/**
+ *      拼单列表
+*/
+#define zwGetExhibitionServerSpellList PATH(@"%@/zwkj/spell/list/page_list.json")
+/**
+ *      服务商搜索
+*/
+#define zwServiceProviderSearchList PATH(@"%@/zwkj/service/provider/fuzzy_result.json")
+/**
+ *      会展服务商列表
+*/
+#define zwExhibitionServiceProviderList PATH(@"%@/zwkj/service/provider/get_service_provider_list.json")
+/**
+ *      拼单列表搜索
+*/
+#define zwGetExhibitionServerSpellSearchList PATH(@"%@/zwkj/spell/list/fuzzy_result.json")
+/**
+ *      查询服务商行业
+*/
+#define zwGetExhibitionServerIndustriesList PATH(@"%@/zwkj/industry/get_service_industry.json")
+
+
 #endif /* ZWDataUrl_h */

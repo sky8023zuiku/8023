@@ -39,12 +39,12 @@ static id _action = nil;
     manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json",@"application/xml",@"text/plain",@"application/rdf+xml",@"text/html",@"text/javascript", nil];
 }
 
-- (void)myParametes:(id)parametes  {
+- (void)myParametes:(id)parametes withMethod:(NSString *)method  {
     if (parametes) {
         NSData *data = [NSJSONSerialization dataWithJSONObject:parametes options:NSJSONWritingPrettyPrinted error:nil];
         NSString * parametesStr= [[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];
         NSLog(@"__参数__%@",parametesStr);
-        NSLog(@"__方式__Get");
+        NSLog(@"__方式__%@",method);
     }
 }
 - (void)myData:(id)_data {
@@ -65,7 +65,7 @@ static id _action = nil;
              successBlock:(mySuccess)success
              failureBlock:(myFailure)failure
                showInView:(UIView *)view{
-    [self myParametes:parametes];
+    [self myParametes:parametes withMethod:@"Get"];
     [MBProgressHUD showHUDAddedTo:view animated:YES];
     self.success = success;
     self.failure = failure;
@@ -97,7 +97,7 @@ static id _action = nil;
                 parametes:(id)parametes
              successBlock:(mySuccess)success
              failureBlock:(myFailure)failure {
-    [self myParametes:parametes];
+    [self myParametes:parametes withMethod:@"Get"];
     self.success = success;
     self.failure = failure;
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
@@ -128,7 +128,7 @@ static id _action = nil;
               successBlock:(mySuccess)success
               failureBlock:(myFailure)failure
                 showInView:(UIView *)view {
-    [self myParametes:parametes];
+    [self myParametes:parametes withMethod:@"Post"];
     [MBProgressHUD showHUDAddedTo:view animated:YES];
     self.success = success;
     self.failure = failure;
@@ -164,7 +164,7 @@ static id _action = nil;
                  parametes:(id)parametes
               successBlock:(mySuccess)success
               failureBlock:(myFailure)failure{
-    [self myParametes:parametes];
+    [self myParametes:parametes withMethod:@"Post"];
     self.success = success;
     self.failure = failure;
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
@@ -195,7 +195,7 @@ static id _action = nil;
               successBlock:(mySuccess)success
               failureBlock:(myFailure)failure
                 showInView:(UIView *)view {
-    [self myParametes:parametes];
+    [self myParametes:parametes withMethod:@"Post"];
     [MBProgressHUD showHUDAddedTo:view animated:YES];
     self.success = success;
     self.failure = failure;
@@ -229,7 +229,7 @@ static id _action = nil;
                          parametes:(id)parametes
                       successBlock:(mySuccess)success
                       failureBlock:(myFailure)failure {
-    [self myParametes:parametes];
+    [self myParametes:parametes withMethod:@"Post"];
     self.success = success;
     self.failure = failure;
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];

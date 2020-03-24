@@ -35,6 +35,8 @@
 
 #import "ZWMyInvitationVC.h"
 
+#import "ZWMyShareVC.h"
+
 #define IMAGE_HEIGHT 0.01*kScreenWidth
 #define SCROLL_DOWN_LIMIT 100
 #define LIMIT_OFFSET_Y -(IMAGE_HEIGHT + SCROLL_DOWN_LIMIT)
@@ -144,7 +146,7 @@
         if (roleId == 1||roleId == 5||roleId == 6||roleId == 7||roleId == 8||roleId == 12||roleId == 13) {
             return 3;
         } else if(roleId ==2||roleId==3 ||roleId ==4) {
-            return 5;
+            return 6;
         }else {
             return 4;
         }
@@ -186,9 +188,12 @@
             }else if (indexPath.row == 3) {
                 cell.textLabel.text = @"我的行业";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_zi"];
+            }else if (indexPath.row == 4) {
+                cell.textLabel.text = @"我的分享";
+                cell.imageView.image = [UIImage imageNamed:@"my_share_icon"];
             }else {
                 cell.textLabel.text = @"我的邀请";
-                cell.imageView.image = [UIImage imageNamed:@"ren_icon_zi"];
+                cell.imageView.image = [UIImage imageNamed:@"my_invitation_icon"];
             }
             
         }else if (roleId==9 ||roleId ==10) {
@@ -204,7 +209,7 @@
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_shouc"];
             }else {
                 cell.textLabel.text = @"我的邀请";
-                cell.imageView.image = [UIImage imageNamed:@"ren_icon_zi"];
+                cell.imageView.image = [UIImage imageNamed:@"my_invitation_icon"];
             }
             
         }else {
@@ -217,7 +222,7 @@
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_shouc"];
             } else {
                 cell.textLabel.text = @"我的邀请";
-                cell.imageView.image = [UIImage imageNamed:@"ren_icon_shouc"];
+                cell.imageView.image = [UIImage imageNamed:@"my_invitation_icon"];
             }
             
         }
@@ -279,7 +284,6 @@
             nameLabel.layer.masksToBounds = YES;
             nameLabel.textColor = [UIColor whiteColor];
             [headView addSubview:nameLabel];
-            
             
             
             CGFloat memBerwidth = [[ZWToolActon shareAction]adaptiveTextWidth:myDic[@"roleName"] labelFont:boldSmallFont]+20;
@@ -418,6 +422,12 @@
                 industriesVC.title = @"我的行业";
                 industriesVC.hidesBottomBarWhenPushed = YES;
                 [self.navigationController pushViewController:industriesVC animated:YES];
+            }else if (indexPath.row == 4) {
+                ZWMyShareVC *shareVC = [[ZWMyShareVC alloc]init];
+                shareVC.title = @"我的分享";
+                shareVC.userId = myDic[@"userId"];
+                shareVC.hidesBottomBarWhenPushed = YES;
+                [self.navigationController pushViewController:shareVC animated:YES];
             }else {
                 [self gotoMyInvitationVC];
             }
@@ -465,13 +475,12 @@
 }
 
 - (void)gotoMyInvitationVC {
+    
     ZWMyInvitationVC *invitationVC = [[ZWMyInvitationVC alloc]init];
     invitationVC.title = @"我的邀请";
     invitationVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:invitationVC animated:YES];
 }
-
-
 
 
 - (void)editorBtnClick:(UIButton *)btn {
@@ -488,7 +497,7 @@
 }
 - (void)integralBtnClick:(UIButton *)btn {
 
-    [[ZWDataAction sharedAction]getReqeustWithURL:zwTopUpList parametes:@{} successBlock:^(NSDictionary * _Nonnull data) {
+    [[ZWDataAction sharedAction]getReqeustWithURL:zwTopUpList parametes:@{@"type":@"0"} successBlock:^(NSDictionary * _Nonnull data) {
         if (zw_issuccess) {
             
             NSArray *myData = data[@"data"];

@@ -11,6 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ZWSpellListType04Cell : UIView
+- (instancetype)initWithFrame:(CGRect)frame withFont:(UIFont *)font;
 @property(nonatomic, strong)ZWSpellListModel *model;
 @end
 

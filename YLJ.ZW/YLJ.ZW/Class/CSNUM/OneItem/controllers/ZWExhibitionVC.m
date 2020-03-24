@@ -37,7 +37,8 @@
 #import "ZWExhibitionDelayCell.h"
 
 
-@interface ZWExhibitionVC ()<UITableViewDelegate,UITableViewDataSource,ZWExhibitionListsCellDelegate,ZWTopSelectViewDelegate,ZWExhibitionDelayCellDelegate>
+
+@interface ZWExhibitionVC ()<UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate,ZWExhibitionListsCellDelegate,ZWTopSelectViewDelegate,ZWExhibitionDelayCellDelegate>
 
 @property(nonatomic, strong)UITableView *tableView;
 @property(nonatomic, strong)UISearchBar *searchBar;
@@ -133,9 +134,11 @@
 //        [self requestPianExhibitionList:dic withPage:self.page];
     }
 }
+
 -(void)dealloc {
     [[NSNotificationCenter defaultCenter]removeObserver:self name:@"takeExhibitionDrawerValue" object:nil];
 }
+
 - (void)createNavigationBar {
     [[YNavigationBar sharedInstance]createRightBarWithImage:[UIImage imageNamed:@"zai_icon_shaixuan"] barItem:self.navigationItem target:self action:@selector(rightItemClick:)];
 }
@@ -193,6 +196,7 @@
     
     return cell;
 }
+
 - (void)createTableViewCell:(UITableViewCell *)cell cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     if (self.cellType == 0) {
@@ -222,8 +226,9 @@
         plansListCell.model = model;
         [cell.contentView addSubview:plansListCell];
     }
-    
+
 }
+
 #pragma ZWMyCatalogueCellDelegate
 -(void)collectionItemWithIndex:(ZWExhibitionListsCell *)cell withIndex:(NSInteger)index {
     NSLog(@"%ld",(long)index);
@@ -325,47 +330,39 @@
 }
 
 - (void)createSearchBar{
-
-    UIView *searchView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 30)];
-    CSSearchBarStyle *searchBar = [[CSSearchBarStyle alloc] initWithFrame:CGRectMake(0, 0, 0.84*kScreenWidth, 30)];
-    searchBar.placeholder = @"请输入搜索内容";
-
-    searchBar.backgroundImage = [UIImage new];
-    searchBar.showsCancelButton = NO;
-
-    if ([[[UIDevice currentDevice]systemVersion] floatValue] >= 13.0) {
-        searchBar.searchTextField.enabled = NO;
-        searchBar.searchTextField.backgroundColor = [UIColor whiteColor];
-        searchBar.searchTextField.font = smallMediumFont;
-        searchBar.layer.cornerRadius = 8.0f;
-        searchBar.layer.masksToBounds = YES;
-    }else {
-        UITextField *searchField = [searchBar valueForKey:@"_searchField"];
-        searchField.backgroundColor = [UIColor whiteColor];
-        searchField.font = smallMediumFont;
-        searchField.layer.cornerRadius = 8.0f;
-        searchField.layer.masksToBounds = YES;
-        searchField.enabled = NO;
-    }
-
-    CGFloat height = searchBar.bounds.size.height;
-    CGFloat top = (height - 30.0) / 2.0;
-    CGFloat bottom = top;
-    searchBar.contentInset = UIEdgeInsetsMake(top, 0, bottom, 0);
-    [searchView addSubview:searchBar];
     
-    self.navigationItem.titleView = searchView;
-    self.searchBar = searchBar;
-    [self.searchBar becomeFirstResponder];
+    ZWSearchBar *searchBar = [[ZWSearchBar alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 44)];
+    searchBar.layer.masksToBounds = YES;
+    self.navigationItem.titleView = searchBar;
+    searchBar.backgroundColor = [UIColor clearColor];
+    searchBar.isFirstResponser = NO;
+    searchBar.isShowRightBtn = YES;
+    searchBar.iconName = @"icon_search";
+    searchBar.iconSize = CGSizeMake(15, 15);
+    searchBar.insetsIcon = UIEdgeInsetsMake(0, 13, 0, 0);
+    searchBar.placeHolder = @"请输入要搜索的内容";
+    searchBar.cusFontPlaceHolder = 20;
+    searchBar.colorSearchBg = [UIColor whiteColor];
+    searchBar.raidus = 14;
+    searchBar.insetsSearchBg = UIEdgeInsetsMake(8, 0, 8, 0);
+    searchBar.cusFontTxt = 14;
+    searchBar.colorTxtInput = [UIColor redColor];
+    searchBar.isEditable = NO;
+    searchBar.colorTitleBtn = [UIColor redColor];
+    
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapItemClick:)];
-    [self.searchBar addGestureRecognizer:tap];
+    [searchBar.txtField addGestureRecognizer:tap];
     
 }
+
 - (void)tapItemClick:(UITapGestureRecognizer *)recognizer {
+    
     CSSearchVC *searchVC = [[CSSearchVC alloc]init];
     searchVC.type = 4;
     searchVC.hidesBottomBarWhenPushed = YES;
+    searchVC.isAnimation = 0;
     [self.navigationController pushViewController:searchVC animated:NO];
+    
 }
 
 - (void)showOneAlertWith:(NSString *)message {

@@ -9,7 +9,7 @@
 #import "ZWExhibitorsVC.h"
 #import "ZWTopSelectView.h"
 #import "ZWIndustryMerchantCell.h"
-#import "ZWCompanyDetailsVC.h"
+//#import "ZWCompanyDetailsVC.h"
 #import "ZWInduExhibitorsModel.h"
 #import "ZWExhibitorIndustryModel.h"
 #import "CSSearchVC.h"
@@ -124,6 +124,8 @@
 
     CSSearchVC *searchVC = [[CSSearchVC alloc]init];
     searchVC.type = 5;
+    searchVC.isAnimation = 1;
+    searchVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:searchVC animated:YES];
 
 }
@@ -223,6 +225,7 @@
     }
 }
 - (void)createRightTableViewCell:(UITableViewCell *)cell cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
     UIView *lineView = [[UIView alloc]initWithFrame:CGRectMake(10, 0.25*kScreenWidth-1, 0.8*kScreenWidth-20, 1)];
     lineView.backgroundColor = [UIColor colorWithRed:237/255.0 green:237/255.0 blue:237/255.0 alpha:1.0];
     [cell.contentView addSubview:lineView];

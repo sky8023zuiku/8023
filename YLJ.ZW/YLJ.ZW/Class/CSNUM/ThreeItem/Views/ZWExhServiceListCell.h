@@ -11,7 +11,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ZWExhServiceListCell : UIView
+@property(nonatomic, strong)UILabel *titleLabel;
+@property(nonatomic, strong)UILabel *detailLabel;
 @property(nonatomic, strong)ZWServiceProvidersListModel *model;
+
 @end
 
 NS_ASSUME_NONNULL_END

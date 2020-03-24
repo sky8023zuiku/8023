@@ -9,7 +9,12 @@
 #import "ZWMainTabBarController.h"
 #import "ZWHomeVC.h"
 #import "ZWMineVC.h"
-#import "ZWServiceVC.h"
+
+
+#import "ZWServiceVC.h"//v0
+#import "ZWExhibitionServerVC.h"//v1
+
+
 #import "ZWExhibitionVC.h"
 #import "ZWExhibitorsVC.h"
 #import "UIViewController+YCPopover.h"
@@ -137,9 +142,12 @@
     navTwo.navigationBar.translucent = NO;
     [navTwo.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
     
-    ZWServiceVC *threeVC = [[ZWServiceVC alloc]init];
-    threeVC.title = @"展会服务";
-    [self createVC:threeVC Title:@"展会服务" imageName:@"zai_icon_dibu_fuwu_no" selectImage:@"zai_icon_dibu_fuwu_click"];
+    
+    ZWExhibitionServerVC *threeVC = [[ZWExhibitionServerVC alloc]init];
+    
+//    ZWServiceVC *threeVC = [[ZWServiceVC alloc]init];
+    threeVC.title = @"会展服务";
+    [self createVC:threeVC Title:@"会展服务" imageName:@"zai_icon_dibu_fuwu_no" selectImage:@"zai_icon_dibu_fuwu_click"];
     UINavigationController *navThree = [[UINavigationController alloc]initWithRootViewController:threeVC];
     navThree.navigationBar.barTintColor = skinColor;
     navThree.navigationBar.tintColor = [UIColor whiteColor];

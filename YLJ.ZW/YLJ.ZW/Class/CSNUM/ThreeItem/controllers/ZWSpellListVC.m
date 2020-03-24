@@ -62,6 +62,7 @@
     searchVC.type = 2;
     searchVC.city = self.selectedCity;
     searchVC.parameterType = self.type;
+    searchVC.isAnimation = 1;
     [self.navigationController pushViewController:searchVC animated:YES];
 }
 //刷新

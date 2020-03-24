@@ -40,7 +40,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController setNavigationBarHidden:NO animated:animated];
+    [[YNavigationBar sharedInstance]createSkinNavigationBar:self.navigationController.navigationBar withBackColor:skinColor withTintColor:[UIColor whiteColor]];
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -69,6 +69,7 @@
     searchVC.type = 1;
     searchVC.city = self.selectedCity;
     searchVC.parameterType = self.type;
+    searchVC.isAnimation = 1;
     [self.navigationController pushViewController:searchVC animated:YES];
 }
 //刷新

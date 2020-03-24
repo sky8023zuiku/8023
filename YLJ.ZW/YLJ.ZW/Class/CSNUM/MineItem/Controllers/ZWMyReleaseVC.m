@@ -202,13 +202,18 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
     ZWMyReleaseListModel *model = self.dataSource[indexPath.row];
-    ZWEditExhibitionVC *exhibitionVC = [[ZWEditExhibitionVC alloc]init];
-    exhibitionVC.title = @"展商详情";
-    exhibitionVC.exhibitorId = model.exhibitorId;
-    exhibitionVC.merchantId = model.merchantId;
-    exhibitionVC.enterType = 1;
-    [self.navigationController pushViewController:exhibitionVC animated:YES];
+    NSDictionary *shareData = @{@"exhibitionName":model.exhibitionName,
+                                @"coverImages":model.coverImages};
+    if (shareData) {
+        ZWEditExhibitionVC *exhibitionVC = [[ZWEditExhibitionVC alloc]init];
+        exhibitionVC.title = @"展商详情";
+        exhibitionVC.exhibitorId = model.exhibitorId;
+        exhibitionVC.merchantId = model.merchantId;
+        exhibitionVC.shareData = shareData;
+        [self.navigationController pushViewController:exhibitionVC animated:YES];
+    }
 }
 
 @end

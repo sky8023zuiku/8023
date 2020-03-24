@@ -26,6 +26,8 @@
         titleImage.image = [UIImage imageNamed:@"h1.jpg"];
         titleImage.layer.cornerRadius = 5;
         titleImage.layer.masksToBounds = YES;
+        titleImage.layer.borderWidth = 1;
+        titleImage.layer.borderColor = zwGrayColor.CGColor;
         titleImage.contentMode = UIViewContentModeScaleAspectFit;
         self.titleImage = titleImage;
         [self addSubview:titleImage];
@@ -38,13 +40,13 @@
         
         UILabel *mainDetail = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(titleLabel.frame), CGRectGetMaxY(titleLabel.frame)+0.1*CGRectGetHeight(titleImage.frame), 0.5*frame.size.width, 0.3*CGRectGetHeight(titleImage.frame))];
         mainDetail.text = @"主营：汽车轮胎";
-        mainDetail.font = normalFont;
+        mainDetail.font = smallMediumFont;
         self.mainDetail = mainDetail;
         [self addSubview:mainDetail];
         
         UILabel *xqDetail = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(mainDetail.frame), CGRectGetMaxY(mainDetail.frame), frame.size.width-1.1*frame.size.height-CGRectGetHeight(mainDetail.frame), 0.3*CGRectGetHeight(titleImage.frame))];
         xqDetail.text = @"需求：寻找有钱又可靠的合作商";
-        xqDetail.font = normalFont;
+        xqDetail.font = smallMediumFont;
         self.xqDetail = xqDetail;
         [self addSubview:xqDetail];
         

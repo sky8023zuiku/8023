@@ -7,6 +7,7 @@
 //
 
 #import "ZWSelectIndustriesVC.h"
+
 #import "ZWLevel3SelectView.h"
 #import "ZWIndustriesModel.h"
 #import "ZWChosenIndustriesModel.h"
@@ -125,7 +126,6 @@
     [self.topView addSubview:self.labelView];
     
 }
-
 
 
 - (void)dealloc {
@@ -272,6 +272,9 @@
     label.font = smallFont;
     label.textColor = [UIColor colorWithRed:153/255.0 green:153/255.0 blue:153/255.0 alpha:1.0];
     [self.topView addSubview:label];
+    
+    
+    NSLog(@"------%@",self.industriesArray);
     
     [self createTopItem:self.industriesArray];
     

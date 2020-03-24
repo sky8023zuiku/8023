@@ -112,7 +112,7 @@
         _contentTableView.dataSource = self;
         _contentTableView.sectionHeaderHeight = 0;
         _contentTableView.sectionFooterHeight = 0;
-        _contentTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+        _contentTableView.separatorInset = UIEdgeInsetsMake(0, 10, 0, 0);        
     }
     return _contentTableView;
 }
@@ -146,7 +146,7 @@
 }
 
 - (void)createTableViewCell:(UITableViewCell *)cell cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    ZWExhibitionListModel *model = self.dataArray[indexPath.section];
+    ZWExhibitionListModel *model = self.dataArray[indexPath.row];
     ZWExhibitionListsCell *exhibitionCell = [[ZWExhibitionListsCell alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 0.28*kScreenWidth)];
     exhibitionCell.delegate = self;
     exhibitionCell.model = model;

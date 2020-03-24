@@ -28,6 +28,8 @@
         self.announcementImages = myDic[@"announcementImages"];
         self.myNewStartTime = myDic[@"newStartTime"];
         self.myNewEndTime = myDic[@"newEndTime"];
+        self.exhibitionHallName = myDic[@"exhibitionHallName"];
+        self.sponsor = myDic[@"sponsor"];
     }
     return self;
 }

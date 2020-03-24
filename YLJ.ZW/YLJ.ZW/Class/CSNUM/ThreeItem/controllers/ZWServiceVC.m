@@ -159,7 +159,7 @@
 //    [[YNavigationBar sharedInstance]createLeftBarWithTitle:@"上海市▼" barItem:self.navigationItem target:self action:@selector(leftItemClick:)];
 }
 - (void)createUI {
-    self.title = @"展会服务";
+//    self.title = @"会展服务";
     self.dataArray = [NSMutableArray array];
     [self.view addSubview:self.tableView];
 
@@ -213,12 +213,21 @@
 }
 
 #pragma UITableViewDataSource
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 2;
+}
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (self.dataArray.count == 0) {
-        return 1;
+    
+    if (section == 0) {
+        return 2;
     }else {
-        return self.dataArray.count;
+        if (self.dataArray.count == 0) {
+            return 1;
+        }else {
+            return self.dataArray.count;
+        }
     }
+    
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *myCell = @"cell";
@@ -231,11 +240,8 @@
         }
     }
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    if (self.dataArray.count == 0) {
-        [self createBlankPagesWithCell:cell];
-    }else {
-        [self createTableViewCell:cell cellForRowAtIndexPath:indexPath];
-    }
+    
+    [self createTableViewCell:cell cellForRowAtIndexPath:indexPath];
     return cell;
 }
 - (void)createBlankPagesWithCell:(UITableViewCell *)cell {
@@ -252,36 +258,116 @@
 }
 
 - (void)createTableViewCell:(UITableViewCell *)cell cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    ZWServiceProvidersListModel *model = self.dataArray[indexPath.row];
-    
-    ZWExhServiceListCell *showCell = [[ZWExhServiceListCell alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 0.3*kScreenWidth)];
-    showCell.model = model;
-    [cell.contentView addSubview:showCell];
-    
-    UIView *lineView = [[UIView alloc]initWithFrame:CGRectMake(0.045*kScreenWidth, 0.3*kScreenWidth-1, 0.91*kScreenWidth, 1)];
-    lineView.backgroundColor = [UIColor colorWithRed:235/255.0 green:236/255.0 blue:237/255.0 alpha:1.0];
-    [cell.contentView addSubview:lineView];
-    
+    if (indexPath.section == 0) {
+        if (indexPath.row == 0) {
+            CGFloat itemWidth = kScreenWidth/5;
+            CGFloat itemHeight = kScreenWidth/5;
+            NSArray *titleArr = @[@"设计公司",
+                                  @"展览工厂",
+                                  @"制作拼单",
+                                  @"会展租赁",
+                                  @"会展餐饮",
+                                  @"广告制作",
+                                  @"五金建材",
+                                  @"保险拼单",
+                                  @"看馆拼单",
+                                  @"货车拼单"];
+            
+            NSArray *iconArr = @[@"fu_icon_sheji",
+                                 @"fu_icon_gogncang",
+                                 @"fu_icon_zhantai",
+                                 @"fu_icon_zulin",
+                                 @"fu_icon_canyin",
+                                 @"fu_icon_guanggao",
+                                 @"fu_icon_wu",
+                                 @"fu_icon_baoxian",
+                                 @"fu_icon_kanguang",
+                                 @"fu_icon_huoche"];
+            
+            for (int i = 0; i<titleArr.count; i++) {
+                
+                int row = i/5;
+                int col = i%5;
+                
+                UIButton *mainBtn = [UButton buttonWithType:UIButtonTypeCustom];
+                mainBtn.frame = CGRectMake(itemWidth*col, 15+row*itemHeight, itemWidth, itemHeight);
+                mainBtn.titleLabel.font = [UIFont systemFontOfSize:0.03*kScreenWidth];
+                [mainBtn setImage:[UIImage imageNamed:iconArr[i]] forState:UIControlStateNormal];
+                [mainBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+                [mainBtn setTitle:titleArr[i] forState:UIControlStateNormal];
+                mainBtn.tag = 1000+i;
+                [mainBtn addTarget:self action:@selector(itemClick:) forControlEvents:UIControlEventTouchUpInside];
+                [cell.contentView addSubview:mainBtn];
+            }
+        }else {
+            NSMutableArray *images = [NSMutableArray array];
+            for (int i=0; i<self.lbtAarry.count; i++) {
+                NSString *imageStr = [NSString stringWithFormat:@"%@%@",httpImageUrl,self.lbtAarry[i]];
+                [images addObject:imageStr];
+            }
+
+            SDCycleScrollView *cycleScrollView = [SDCycleScrollView cycleScrollViewWithFrame:CGRectMake(0.03*kScreenWidth, 0, 0.94*kScreenWidth, 0.23*kScreenWidth) delegate:self placeholderImage:[UIImage imageNamed:@"fu_img_no_01"]];
+            cycleScrollView.pageControlAliment = SDCycleScrollViewPageContolAlimentCenter;
+            cycleScrollView.delegate = self;
+            cycleScrollView.layer.cornerRadius = 3;
+            cycleScrollView.layer.masksToBounds = YES;
+            cycleScrollView.bannerImageViewContentMode = UIViewContentModeScaleToFill;
+            cycleScrollView.showPageControl = YES;
+            cycleScrollView.imageURLStringsGroup = images;
+            cycleScrollView.autoScrollTimeInterval = 3;
+            cycleScrollView.currentPageDotImage = [UIImage imageWithColor:[UIColor whiteColor] withCornerRadius:1.5 forSize:CGSizeMake(15, 3)];
+            cycleScrollView.pageDotImage = [UIImage imageWithColor:[UIColor colorWithRed:206.0/255.0 green:206.0/255.0 blue:206.0/255.0 alpha:1] withCornerRadius:1.5 forSize:CGSizeMake(15, 3)];
+            [cell.contentView addSubview:cycleScrollView];
+            self.dataImages = images;
+        }
+    }else {
+        
+        if (self.dataArray.count == 0) {
+            [self createBlankPagesWithCell:cell];
+        }else {
+            ZWServiceProvidersListModel *model = self.dataArray[indexPath.row];
+            ZWExhServiceListCell *showCell = [[ZWExhServiceListCell alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 0.3*kScreenWidth)];
+            showCell.model = model;
+            [cell.contentView addSubview:showCell];
+            UIView *lineView = [[UIView alloc]initWithFrame:CGRectMake(0.045*kScreenWidth, 0.3*kScreenWidth-1, 0.91*kScreenWidth, 1)];
+            lineView.backgroundColor = [UIColor colorWithRed:235/255.0 green:236/255.0 blue:237/255.0 alpha:1.0];
+            [cell.contentView addSubview:lineView];
+        }
+        
+    }
+
 }
 
 #pragma UITableViewDelegate
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.dataArray.count == 0) {
-        return kScreenWidth;
+    if (indexPath.section == 0) {
+        if (indexPath.row == 0) {
+            return 30+kScreenWidth/5*2;
+        }else {
+            return 0.28*kScreenWidth;
+        }
     }else {
-        return 0.3*kScreenWidth;
+        if (self.dataArray.count == 0) {
+            return kScreenWidth;
+        }else {
+            return 0.3*kScreenWidth;
+        }
     }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 0.45*kScreenWidth+30+kScreenWidth/5*2;
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+//    return 0.45*kScreenWidth+30+kScreenWidth/5*2;
+    
     return 0.1;
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    if (section == 0) {
+        return 0.03*kScreenWidth;
+    }else {
+        return 0.1;
+    }
+}
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.dataArray.count != 0) {
         ZWServiceProvidersListModel *model = self.dataArray[indexPath.row];
@@ -291,74 +377,12 @@
         [self.navigationController pushViewController:companyDetailVC animated:YES];
     }
 }
-
-- (nullable UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    return [self createShuffling];
+- (nullable UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
+    UIView *tool = [[UIView alloc]init];
+    tool.backgroundColor = zwGrayColor;
+    return tool;
 }
 
-- (UIView *)createShuffling {
-    
-    UIView *view = [[UIView alloc]init];
-
-    NSMutableArray *images = [NSMutableArray array];
-    for (int i=0; i<self.lbtAarry.count; i++) {
-        NSString *imageStr = [NSString stringWithFormat:@"%@%@",httpImageUrl,self.lbtAarry[i]];
-        [images addObject:imageStr];
-    }
-
-    SDCycleScrollView *cycleScrollView = [SDCycleScrollView cycleScrollViewWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 0.45*kScreenWidth) delegate:self placeholderImage:[UIImage imageNamed:@"fu_img_no_01"]];
-    cycleScrollView.pageControlAliment = SDCycleScrollViewPageContolAlimentCenter;
-    cycleScrollView.delegate = self;
-    cycleScrollView.bannerImageViewContentMode = UIViewContentModeScaleToFill;
-    cycleScrollView.showPageControl = YES;
-    cycleScrollView.imageURLStringsGroup = images;
-    cycleScrollView.autoScrollTimeInterval = 3;
-    cycleScrollView.currentPageDotImage = [UIImage imageWithColor:[UIColor whiteColor] withCornerRadius:1.5 forSize:CGSizeMake(15, 3)];
-    cycleScrollView.pageDotImage = [UIImage imageWithColor:[UIColor colorWithRed:206.0/255.0 green:206.0/255.0 blue:206.0/255.0 alpha:1] withCornerRadius:1.5 forSize:CGSizeMake(15, 3)];
-    [view addSubview:cycleScrollView];
-    
-    self.dataImages = images;
-    CGFloat itemWidth = kScreenWidth/5;
-    CGFloat itemHeight = kScreenWidth/5;
-    NSArray *titleArr = @[@"设计公司",
-                          @"展览工厂",
-                          @"制作拼单",
-                          @"会展租赁",
-                          @"会展餐饮",
-                          @"广告制作",
-                          @"五金建材",
-                          @"保险拼单",
-                          @"看馆拼单",
-                          @"货车拼单"];
-    
-    NSArray *iconArr = @[@"fu_icon_sheji",
-                         @"fu_icon_gogncang",
-                         @"fu_icon_zhantai",
-                         @"fu_icon_zulin",
-                         @"fu_icon_canyin",
-                         @"fu_icon_guanggao",
-                         @"fu_icon_wu",
-                         @"fu_icon_baoxian",
-                         @"fu_icon_kanguang",
-                         @"fu_icon_huoche"];
-    
-    for (int i = 0; i<titleArr.count; i++) {
-        
-        int row = i/5;
-        int col = i%5;
-        
-        UIButton *mainBtn = [UButton buttonWithType:UIButtonTypeCustom];
-        mainBtn.frame = CGRectMake(itemWidth*col, CGRectGetMaxY(cycleScrollView.frame)+15+row*itemHeight, itemWidth, itemHeight);
-        mainBtn.titleLabel.font = [UIFont systemFontOfSize:0.03*kScreenWidth];
-        [mainBtn setImage:[UIImage imageNamed:iconArr[i]] forState:UIControlStateNormal];
-        [mainBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        [mainBtn setTitle:titleArr[i] forState:UIControlStateNormal];
-        mainBtn.tag = 1000+i;
-        [mainBtn addTarget:self action:@selector(itemClick:) forControlEvents:UIControlEventTouchUpInside];
-        [view addSubview:mainBtn];
-    }
-    return view;
-}
 //点击图片的代理
 - (void)cycleScrollView:(SDCycleScrollView *)cycleScrollView didSelectItemAtIndex:(NSInteger)index {
    NSLog(@"index = %ld",(long)index);
@@ -523,8 +547,6 @@
         [self createRequest:self.page];
     }
 }
-
-
 
 - (void)locationManager:(CLLocationManager *)manager
        didFailWithError:(NSError *)error {

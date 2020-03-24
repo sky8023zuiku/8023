@@ -21,7 +21,7 @@
 @end
 @implementation ZWPlanExhibitionSearchView
 
-- (instancetype)initWithFrame:(CGRect)frame withSearchText:(NSString *)text
+- (instancetype)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame]) {
         self.dataArray = [NSMutableArray array];
@@ -74,7 +74,7 @@
 - (void)createTableViewCell:(UITableViewCell *)cell cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     ZWExhPlanListModel *model = self.dataArray[indexPath.row];
     ZWPlansListCell *plansListCell = [[ZWPlansListCell alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 0.3*kScreenWidth)];
-    plansListCell.tag = indexPath.section;
+    plansListCell.tag = indexPath.row;
     plansListCell.model = model;
     [cell.contentView addSubview:plansListCell];
 }
@@ -147,6 +147,7 @@
         [strongSelf.contentTableView.mj_header endRefreshing];
         [strongSelf.contentTableView.mj_footer endRefreshing];
         if (zw_issuccess) {
+            
             if (page == 1) {
                 [strongSelf.dataArray removeAllObjects];
             }

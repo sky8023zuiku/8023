@@ -11,6 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 //制作拼单
 @interface ZWSpellListType01Cell : UIView
+- (instancetype)initWithFrame:(CGRect)frame withFont:(UIFont *)font;
 @property(nonatomic, strong)ZWSpellListModel *model;
 @end
 

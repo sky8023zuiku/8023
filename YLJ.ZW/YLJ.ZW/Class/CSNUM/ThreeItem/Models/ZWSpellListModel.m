@@ -35,6 +35,7 @@
         self.exhibitorCount = myDic[@"exhibitorCount"];
         self.dismanted = myDic[@"dismanted"];
         self.destination = myDic[@"destination"];
+        self.type = myDic[@"type"];
     }
     return self;
 }

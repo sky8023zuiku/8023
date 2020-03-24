@@ -39,8 +39,8 @@
             self.dataArray = [(NSArray *)data subarrayWithRange:NSMakeRange(0, 4)];
         }
         _layout = [[UICollectionViewFlowLayout alloc]init];
-        _layout.minimumLineSpacing = 0.0135*kScreenWidth;
-        _layout.minimumInteritemSpacing = 0.01*kScreenWidth;
+        _layout.minimumLineSpacing = 0.0235*kScreenWidth;
+        _layout.minimumInteritemSpacing = 0.02*kScreenWidth;
         [self addSubview:self.collectionView];
     }
     return self;
@@ -69,7 +69,7 @@
 
 //定义每一个cell的大小
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-   return CGSizeMake((0.95*kScreenWidth-0.0135*kScreenWidth)/2, (0.95*kScreenWidth-0.0135*kScreenWidth)/2+0.15*kScreenWidth);
+   return CGSizeMake((0.95*kScreenWidth-0.0235*kScreenWidth)/2, (0.95*kScreenWidth-0.0235*kScreenWidth)/2+0.15*kScreenWidth);
 }
 
 //cell的点击事件

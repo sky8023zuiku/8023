@@ -14,6 +14,9 @@
 #import "ZWMerchantSearchRequst.h"
 #import "ZWExExhibitorsFuzzySearchModel.h"
 #import "ZWPlanExhibitionFuzzyModel.h"
+
+#import "ZWSpellListModel.h"
+
 @interface CSSearchSuggestionVC ()<UITableViewDelegate, UITableViewDataSource>
 
 @property (nonatomic, strong) UITableView *contentView;
@@ -56,58 +59,82 @@
         [self createExhibitionHallSearchRequst:text];
     }
 }
-//展商列表搜索
+//服务商搜索
 - (void)createExhibitorAssociationListRequst:(NSString *)text {
-    ZWServiceProvidersListRequst *requst = [[ZWServiceProvidersListRequst alloc]init];
-    requst.status = 2;
-    requst.merchantName = text;
-    requst.city = self.city;
-    requst.type = self.parameterType;
-    requst.pageNo = 1;
-    requst.pageSize = 50;
+//    ZWServiceProvidersListRequst *requst = [[ZWServiceProvidersListRequst alloc]init];
+//    requst.status = 2;
+//    requst.merchantName = text;
+//    requst.city = self.city;
+//    requst.type = self.parameterType;
+//    requst.pageNo = 1;
+//    requst.pageSize = 50;
+//    __weak typeof(self) weakSelf = self;
+//    [requst postRequestCompleted:^(YHBaseRespense *respense) {
+//
+//        __strong typeof (self) strongSelf = weakSelf;
+//        if (respense.isFinished) {
+//            NSLog(@"%@",[[ZWToolActon shareAction]transformDic:respense.data[@"result"]]);
+//            NSArray *array = respense.data[@"result"];
+//            NSMutableArray *myArr = [NSMutableArray array];
+//            for (NSDictionary *myDic in array) {
+//                ZWServiceProvidersListModel *model = [ZWServiceProvidersListModel parseJSON:myDic];
+//                [myArr addObject:model];
+//            }
+//            strongSelf.dataSource = myArr;
+//            [strongSelf.contentView reloadData];
+//        }
+//    }];
     __weak typeof(self) weakSelf = self;
-    [requst postRequestCompleted:^(YHBaseRespense *respense) {
-        
+    [[ZWDataAction sharedAction]getReqeustWithURL:zwServiceProviderSearchList parametes:@{@"name":text} successBlock:^(NSDictionary * _Nonnull data) {
         __strong typeof (self) strongSelf = weakSelf;
-        if (respense.isFinished) {
-            NSLog(@"%@",[[ZWToolActon shareAction]transformDic:respense.data[@"result"]]);
-            NSArray *array = respense.data[@"result"];
-            NSMutableArray *myArr = [NSMutableArray array];
-            for (NSDictionary *myDic in array) {
-                ZWServiceProvidersListModel *model = [ZWServiceProvidersListModel parseJSON:myDic];
-                [myArr addObject:model];
-            }
-            strongSelf.dataSource = myArr;
+        if (zw_issuccess) {
+            NSLog(@"%@",[[ZWToolActon shareAction]transformDic:data[@"data"]]);
+            strongSelf.dataSource = data[@"data"];
             [strongSelf.contentView reloadData];
         }
+    } failureBlock:^(NSError * _Nonnull error) {
+        
     }];
+
 }
 //拼单列表搜索名称
 - (void)createSpellListVCRequst:(NSString *)text {
-   ZWServiceSpellListRequst *requst = [[ZWServiceSpellListRequst alloc]init];
-    requst.status = 2;
-    requst.merchantName = text;
-    requst.city = self.city;
-    requst.type = self.parameterType;
-    requst.pageNo = 1;
-    requst.pageSize = 20;
+//   ZWServiceSpellListRequst *requst = [[ZWServiceSpellListRequst alloc]init];
+//    requst.status = 2;
+//    requst.merchantName = text;
+//    requst.city = self.city;
+//    requst.type = self.parameterType;
+//    requst.pageNo = 1;
+//    requst.pageSize = 20;
+//    __weak typeof (self) weakSelf = self;
+//    [requst postRequestCompleted:^(YHBaseRespense *respense) {
+//        __strong typeof (weakSelf) strongSelf = weakSelf;
+//        if (respense.isFinished) {
+//            NSLog(@"%@",respense.data[@"result"]);
+//            NSArray *arry = respense.data[@"result"];
+//            NSMutableArray *myArray = [NSMutableArray array];
+//            for (NSDictionary *myDic in arry) {
+//                ZWServiceSpellListModel *model= [ZWServiceSpellListModel parseJSON:myDic];
+//                [myArray addObject:model];
+//            }
+//            self.dataSource =myArray;
+//            [strongSelf.contentView reloadData];
+//        }else {
+//
+//        }
+//    }];
+    
     __weak typeof (self) weakSelf = self;
-    [requst postRequestCompleted:^(YHBaseRespense *respense) {
+    [[ZWDataAction sharedAction]postReqeustWithURL:zwGetExhibitionServerSpellSearchList parametes:@{@"name":text,@"city":self.city} successBlock:^(NSDictionary * _Nonnull data) {
         __strong typeof (weakSelf) strongSelf = weakSelf;
-        if (respense.isFinished) {
-            NSLog(@"%@",respense.data[@"result"]);
-            NSArray *arry = respense.data[@"result"];
-            NSMutableArray *myArray = [NSMutableArray array];
-            for (NSDictionary *myDic in arry) {
-                ZWServiceSpellListModel *model= [ZWServiceSpellListModel parseJSON:myDic];
-                [myArray addObject:model];
-            }
-            self.dataSource =myArray;
+        if (zw_issuccess) {
+            strongSelf.dataSource = data[@"data"];
             [strongSelf.contentView reloadData];
-        }else {
-          
         }
+    } failureBlock:^(NSError * _Nonnull error) {
+        
     }];
+    
 }
 
 - (void)createCatalogueSearchRequst:(NSString *)text {
@@ -149,6 +176,7 @@
         }
     }];
 }
+
 - (void)createExhExhibitorSearchRequst:(NSString *)text {
     if (self.exhibitionId) {
         __weak typeof (self) weakSelf = self;
@@ -224,11 +252,12 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
     }
     if (self.type == 1) {
-        ZWServiceProvidersListModel *model = self.dataSource[indexPath.row];
-        cell.textLabel.text = model.name;
+//        ZWServiceProvidersListModel *model = self.dataSource[indexPath.row];
+//        cell.textLabel.text = model.name;
+        cell.textLabel.text = self.dataSource[indexPath.row];
     }else if (self.type == 2) {
-        ZWServiceSpellListModel *model = self.dataSource[indexPath.row];
-        cell.textLabel.text = model.merchantName;
+//        ZWServiceSpellListModel *model = self.dataSource[indexPath.row];
+        cell.textLabel.text = self.dataSource[indexPath.row];
     }else if (self.type == 3||self.type == 4){
         ZWMyCatalogueSearchModel *model = self.dataSource[indexPath.row];
         cell.textLabel.text = model.name;
@@ -258,14 +287,14 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (self.type == 1) {
-        ZWServiceProvidersListModel *model = self.dataSource[indexPath.row];
+//        ZWServiceProvidersListModel *model = self.dataSource[indexPath.row];
         if (self.searchBlock) {
-            self.searchBlock(model.name);
+            self.searchBlock(self.dataSource[indexPath.row]);
         }
     }else if (self.type == 2) {
-        ZWServiceSpellListModel *model = self.dataSource[indexPath.row];
+//        ZWServiceSpellListModel *model = self.dataSource[indexPath.row];
         if (self.searchBlock) {
-            self.searchBlock(model.merchantName);
+            self.searchBlock(self.dataSource[indexPath.row]);
         }
     }else if (self.type == 3||self.type == 4){
         ZWMyCatalogueSearchModel *model = self.dataSource[indexPath.row];

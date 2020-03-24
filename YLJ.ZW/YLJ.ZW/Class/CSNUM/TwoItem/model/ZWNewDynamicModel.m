@@ -23,8 +23,6 @@
 //        self.url = myDic[@"url"];
 //        self.merchantId = myDic[@"merchantId"];
 //        self.ID = myDic[@"id"];
-//        self.endTime = myDic[@"endTime"];
-//        self.startTime = myDic[@"startTime"];
 //        self.describe = myDic[@"describe"];
         self.exhibitionName = myDic[@"exhibitionName"];
         self.exhibitionId = myDic[@"exhibitionId"];
@@ -35,6 +33,8 @@
         self.images = myDic[@"images"];
         self.price = myDic[@"price"];
         self.purchased = myDic[@"purchased"];
+        self.endTime = myDic[@"endTime"];
+        self.startTime = myDic[@"startTime"];
     }
     return self;
 }

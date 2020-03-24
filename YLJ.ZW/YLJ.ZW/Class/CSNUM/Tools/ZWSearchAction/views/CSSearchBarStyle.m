@@ -9,9 +9,7 @@
 #import "CSSearchBarStyle.h"
 #import <UIKit/UIKit.h>
 @interface CSSearchBarStyle()
-
 @property(nonatomic,assign) BOOL isChangeFrame;//是否要改变searchBar的frame
-
 @end
 @implementation CSSearchBarStyle
 

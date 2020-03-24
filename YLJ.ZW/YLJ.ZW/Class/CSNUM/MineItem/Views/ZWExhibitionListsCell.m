@@ -139,7 +139,13 @@
             [self.ff_navViewController pushViewController:VC animated:YES];
         }];
         NSRange rangeTwo = [[labelStr string]rangeOfString:mtext];
-        [labelStr yy_setTextHighlightRange:rangeTwo color:[UIColor redColor] backgroundColor:[UIColor whiteColor] userInfo:nil];
+        UIColor *textColor;
+        if ([mtext isEqualToString:@"【取消】"]) {
+            textColor = skinColor;
+        }else {
+            textColor = [UIColor redColor];
+        }
+        [labelStr yy_setTextHighlightRange:rangeTwo color:textColor backgroundColor:[UIColor whiteColor] userInfo:nil];
         self.titleLabel.attributedText = labelStr;
     }else {
         NSMutableAttributedString *labelStr = [[NSMutableAttributedString alloc]initWithString:model.name];

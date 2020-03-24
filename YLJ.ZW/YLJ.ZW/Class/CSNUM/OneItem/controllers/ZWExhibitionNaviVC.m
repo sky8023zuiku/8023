@@ -40,7 +40,7 @@
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController setNavigationBarHidden:NO animated:YES];
+    [[YNavigationBar sharedInstance]createSkinNavigationBar:self.navigationController.navigationBar withBackColor:skinColor withTintColor:[UIColor whiteColor]];
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -62,9 +62,7 @@
 - (void)createUI {
     
     self.view.backgroundColor = [UIColor whiteColor];
-    
     self.imageViewsArray = [NSMutableArray array];
-    
     [self.view addSubview:self.tableView];
 
     UIButton *bottomBtn = [[UIButton alloc]initWithFrame:CGRectMake(15, kScreenHeight-zwTabBarHeight-zwNavBarHeight, kScreenWidth-30, 0.1*kScreenWidth)];
@@ -141,7 +139,7 @@
     return 0.6*kScreenWidth+40;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 273+0.35 *kScreenWidth;
+    return 273+0.5 *kScreenWidth;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     return zwTabBarHeight+15;
@@ -168,7 +166,7 @@
         [https addObject:url];
     }
     
-    DCCycleScrollView *banner = [DCCycleScrollView cycleScrollViewWithFrame:CGRectMake(20, CGRectGetMaxY(titleOne.frame)+10, kScreenWidth-40, 0.35*kScreenWidth) shouldInfiniteLoop:YES imageGroups:https];
+    DCCycleScrollView *banner = [DCCycleScrollView cycleScrollViewWithFrame:CGRectMake(20, CGRectGetMaxY(titleOne.frame)+10, kScreenWidth-40, 0.5*kScreenWidth) shouldInfiniteLoop:YES imageGroups:https];
     banner.layer.cornerRadius = 5;
     banner.layer.masksToBounds = YES;
     banner.autoScrollTimeInterval = 5;

@@ -127,6 +127,13 @@
             [strongSelf.navigationController pushViewController:VC animated:YES];
         }];
         NSRange rangeTwo = [[titleStr string]rangeOfString:titleState];
+        
+        UIColor *textColor;
+        if ([titleState isEqualToString:@"【取消】"]) {
+            textColor = skinColor;
+        }else {
+            textColor = [UIColor redColor];
+        }
         [titleStr yy_setTextHighlightRange:rangeTwo color:[UIColor redColor] backgroundColor:[UIColor whiteColor] userInfo:nil];
         titleLabel.attributedText = titleStr;
     }
@@ -134,7 +141,9 @@
     
 
     UILabel *dateLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(titleLabel.frame), CGRectGetMinY(titleImage.frame)+0.5*CGRectGetHeight(titleImage.frame), CGRectGetWidth(titleLabel.frame), 0.5*CGRectGetHeight(titleImage.frame)/2)];
-    dateLabel.text = @"时    间：2018-06-07~2018-06-10";
+    NSString *start = [model.startTime substringWithRange:NSMakeRange(0,10)];
+    NSString *end = [model.endTime substringWithRange:NSMakeRange(0,10)];
+    dateLabel.text = [NSString stringWithFormat:@"时    间：%@~%@",start,end];
     dateLabel.font = smallMediumFont;
     dateLabel.textColor = [UIColor colorWithRed:67/255.0 green:67/255.0 blue:67/255.0 alpha:1.0];
     [cell.contentView addSubview:dateLabel];

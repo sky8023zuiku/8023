@@ -76,35 +76,71 @@
 }
 
 - (void)createRequst:(NSString *)text withPage:(NSInteger)page{
-    ZWServiceSpellListRequst *requst = [[ZWServiceSpellListRequst alloc]init];
-    requst.status = 2;
-    requst.merchantName = text;
-    requst.city = self.city;
-    requst.type = self.parameterType;
-    requst.pageNo = (int)page;
-    requst.pageSize = 5;
-    __weak typeof (self) weakSelf = self;
-    [requst postRequestCompleted:^(YHBaseRespense *respense) {
-        __strong typeof (weakSelf) strongSelf = weakSelf;
-        [strongSelf.contentTableView.mj_header endRefreshing];
-        [strongSelf.contentTableView.mj_footer endRefreshing];
-        if (respense.isFinished) {
-            if (page == 1) {
-                [strongSelf.dataArray removeAllObjects];
-            }
-            NSLog(@"%@",respense.data[@"result"]);
-            NSArray *arry = respense.data[@"result"];
-            NSMutableArray *myArray = [NSMutableArray array];
-            for (NSDictionary *myDic in arry) {
-                ZWSpellListModel *model= [ZWSpellListModel parseJSON:myDic];
-                [myArray addObject:model];
-            }
-            [self.dataArray addObjectsFromArray:myArray];
-            [strongSelf.contentTableView reloadData];
-        }else {
-          
+//    ZWServiceSpellListRequst *requst = [[ZWServiceSpellListRequst alloc]init];
+//    requst.status = 2;
+//    requst.merchantName = text;
+//    requst.city = self.city;
+//    requst.type = self.parameterType;
+//    requst.pageNo = (int)page;
+//    requst.pageSize = 5;
+//    __weak typeof (self) weakSelf = self;
+//    [requst postRequestCompleted:^(YHBaseRespense *respense) {
+//        __strong typeof (weakSelf) strongSelf = weakSelf;
+//        [strongSelf.contentTableView.mj_header endRefreshing];
+//        [strongSelf.contentTableView.mj_footer endRefreshing];
+//        if (respense.isFinished) {
+//            if (page == 1) {
+//                [strongSelf.dataArray removeAllObjects];
+//            }
+//            NSLog(@"%@",respense.data[@"result"]);
+//            NSArray *arry = respense.data[@"result"];
+//            NSMutableArray *myArray = [NSMutableArray array];
+//            for (NSDictionary *myDic in arry) {
+//                ZWSpellListModel *model= [ZWSpellListModel parseJSON:myDic];
+//                [myArray addObject:model];
+//            }
+//            [self.dataArray addObjectsFromArray:myArray];
+//            [strongSelf.contentTableView reloadData];
+//        }else {
+//
+//        }
+//    }];
+    
+    NSDictionary *parameters = @{
+        @"city":self.self.city,
+        @"merchantName":text,
+        @"type":@"",
+        @"status":@"2",
+        @"pageQuery":@{
+                @"pageNo":[NSString stringWithFormat:@"%ld",page],
+                @"pageSize":@"5"
         }
-    }];
+    };
+    if (parameters) {
+        __weak typeof (self) weakSelf = self;
+        [[ZWDataAction sharedAction]postReqeustWithURL:zwGetExhibitionServerSpellList parametes:parameters successBlock:^(NSDictionary * _Nonnull data) {
+            __strong typeof (weakSelf) strongSelf = weakSelf;
+                    [strongSelf.contentTableView.mj_header endRefreshing];
+                    [strongSelf.contentTableView.mj_footer endRefreshing];
+                    if (zw_issuccess) {
+                        if (page == 1) {
+                            [strongSelf.dataArray removeAllObjects];
+                        }
+                        NSArray *arry = data[@"data"][@"result"];
+                        NSMutableArray *myArray = [NSMutableArray array];
+                        for (NSDictionary *myDic in arry) {
+                            ZWSpellListModel *model = [ZWSpellListModel parseJSON:myDic];
+                            [myArray addObject:model];
+                        }
+                        [self.dataArray addObjectsFromArray:myArray];
+                        [strongSelf.contentTableView reloadData];
+                    }else {
+                        
+                    }
+        } failureBlock:^(NSError * _Nonnull error) {
+            
+        }];
+    }
 }
 - (UITableView *)contentTableView
 {
@@ -114,7 +150,7 @@
         _contentTableView.dataSource = self;
         _contentTableView.sectionHeaderHeight = 0;
         _contentTableView.sectionFooterHeight = 0;
-        _contentTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+//        _contentTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     }
     return _contentTableView;
 }
@@ -141,48 +177,42 @@
     return cell;
 }
 - (void)createTableViewCell:(UITableViewCell *)cell cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-//    ZWServiceSpellListModel *model = self.dataArray[indexPath.section];
-//    model.type = self.parameterType;//获取拼单类型
-//    ZWSpellListCell *spellListCell = [[ZWSpellListCell alloc]initWithFrame:CGRectMake(10, 10, kScreenWidth-20, 0.6*kScreenWidth-10)];
-//    spellListCell.model = model;
-//    spellListCell.backgroundColor = [UIColor whiteColor];
-//    [cell.contentView addSubview:spellListCell];
     
     ZWSpellListModel *model = self.dataArray[indexPath.row];
-    if ([self.parameterType isEqualToString:@"1"]) {
-        ZWSpellListType01Cell *T01Cell = [[ZWSpellListType01Cell alloc]initWithFrame:CGRectMake(10, 10, kScreenWidth-20, 0.7*kScreenWidth-10)];
-        T01Cell.backgroundColor = [UIColor whiteColor];
-        T01Cell.model = model;
-        [cell.contentView addSubview:T01Cell];
-    }else if ([self.parameterType isEqualToString:@"2"]) {
-        ZWSpellListType02Cell *T02Cell = [[ZWSpellListType02Cell alloc]initWithFrame:CGRectMake(10, 10, kScreenWidth-20, 0.6*kScreenWidth-10)];
+    if ([model.type isEqualToString:@"4"]) {
+        ZWSpellListType02Cell *T02Cell = [[ZWSpellListType02Cell alloc]initWithFrame:CGRectMake(10, 10, kScreenWidth-20, 0.6*kScreenWidth-10) withFont:smallMediumFont];
         T02Cell.backgroundColor = [UIColor whiteColor];
         T02Cell.model = model;
         [cell.contentView addSubview:T02Cell];
-    }else if ([self.parameterType isEqualToString:@"3"]) {
-        ZWSpellListType03Cell *T03Cell = [[ZWSpellListType03Cell alloc]initWithFrame:CGRectMake(10, 10, kScreenWidth-20, 0.55*kScreenWidth-10)];
+    }else if ([model.type isEqualToString:@"5"]) {
+        ZWSpellListType03Cell *T03Cell = [[ZWSpellListType03Cell alloc]initWithFrame:CGRectMake(10, 10, kScreenWidth-20, 0.55*kScreenWidth-10) withFont:smallMediumFont];
         T03Cell.backgroundColor = [UIColor whiteColor];
         T03Cell.model = model;
         [cell.contentView addSubview:T03Cell];
-    }else {
-        ZWSpellListType04Cell *T04Cell = [[ZWSpellListType04Cell alloc]initWithFrame:CGRectMake(10, 10, kScreenWidth-20, 0.6*kScreenWidth-10)];
+    }else if ([model.type isEqualToString:@"6"]) {
+        ZWSpellListType04Cell *T04Cell = [[ZWSpellListType04Cell alloc]initWithFrame:CGRectMake(10, 10, kScreenWidth-20, 0.6*kScreenWidth-10) withFont:smallMediumFont];
         T04Cell.backgroundColor = [UIColor whiteColor];
         T04Cell.model = model;
         [cell.contentView addSubview:T04Cell];
+    } else {
+        ZWSpellListType01Cell *T01Cell = [[ZWSpellListType01Cell alloc]initWithFrame:CGRectMake(10, 10, kScreenWidth-20, 0.7*kScreenWidth-10) withFont:smallMediumFont];
+        T01Cell.backgroundColor = [UIColor whiteColor];
+        T01Cell.model = model;
+        [cell.contentView addSubview:T01Cell];
     }
-    
 }
 
 #pragma UITableViewDelegate
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if ([self.parameterType isEqualToString:@"1"]) {
-        return 0.7*kScreenWidth;
-    }else if ([self.parameterType isEqualToString:@"2"]) {
+    ZWSpellListModel *model = self.dataArray[indexPath.row];
+    if ([model.type isEqualToString:@"4"]) {
         return 0.6*kScreenWidth;
-    }else if ([self.parameterType isEqualToString:@"3"]) {
+    }else if ([model.type isEqualToString:@"5"]) {
         return 0.55*kScreenWidth;
-    }else {
+    }else if ([model.type isEqualToString:@"6"]) {
         return 0.6*kScreenWidth;
+    }else {
+        return 0.7*kScreenWidth;
     }
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {

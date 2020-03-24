@@ -33,9 +33,17 @@
 
 #import "UIViewController+YCPopover.h"
 
+#import "ZWHomeMainTuiView.h"
+
 #import "ZWScanVC.h"
 #import "Global.h"
 #import "StyleDIY.h"
+
+#import "ZWCompanyDetailVC.h"
+
+#import "ZWMessageCenterVC.h"
+
+#import "ZWExhibitionServerListVC.h"
 
 @interface ZWHomeVC ()<UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate,SDCycleScrollViewDelegate,ZWHomeTuiExhibitorsViewDelegate>
 @property(nonatomic, strong)UITableView *tableView;
@@ -44,13 +52,16 @@
 @property(nonatomic, strong)NSArray *exhibitionArray;//展会数组
 @property(nonatomic, strong)NSMutableArray *recommentArray;//推荐展商
 @property(nonatomic, strong)NSArray *httpImages;
+
+@property(nonatomic, strong)NSDictionary *mainCdic;//C位公司
+
 @end
 
 @implementation ZWHomeVC
 
 -(UITableView *)tableView {
     if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, zwNavBarHeight, kScreenWidth, kScreenHeight-zwTabBarHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
+        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwTabBarHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
     }
     _tableView.dataSource = self;
     _tableView.delegate = self;
@@ -66,16 +77,19 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [[YNavigationBar sharedInstance]createNavigationBarWithStatusBarStyle:UIStatusBarStyleDefault withType:1];
-    [self.navigationController setNavigationBarHidden:YES animated:YES];
+    
+    [[YNavigationBar sharedInstance]createNavigationBarWithStatusBarStyle:UIStatusBarStyleLightContent withType:1];
     self.tabBarController.tabBar.hidden = NO;
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
     [self createRequst];
+    
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self createUI];
     [self createNotice];
-    [self createNavigation];
+    [self createNavigationBar];
+    [self createSearchBar];
 
 }
 
@@ -90,34 +104,51 @@
 }
 
 - (void)changeTheStatusBarColor:(NSNotification *)notice {
-    [[YNavigationBar sharedInstance]createNavigationBarWithStatusBarStyle:UIStatusBarStyleDefault withType:1];
-    self.navigationController.navigationBar.tintColor = [UIColor blackColor];
+//    [[YNavigationBar sharedInstance]createNavigationBarWithStatusBarStyle:UIStatusBarStyleDefault withType:1];
+//    self.navigationController.navigationBar.tintColor = [UIColor blackColor];
+
 }
 
-- (void)createNavigation {
-    UIView *navView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, zwNavBarHeight)];
-    navView.backgroundColor = [UIColor whiteColor];
-    [self.view addSubview:navView];
-    
-    UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.2*kScreenWidth, zwStatusBarHeight, 0.6*kScreenWidth, 44)];
-    titleLabel.text = @"首页";
-    titleLabel.font = [UIFont systemFontOfSize:17];
-    titleLabel.textColor = [UIColor blackColor];
-    titleLabel.textAlignment = NSTextAlignmentCenter;
-    [navView addSubview:titleLabel];
-    
-//    UIImageView *scanImage = [[UIImageView alloc]initWithFrame:CGRectMake(kScreenWidth-35, zwStatusBarHeight+10, 25, 25)];
-//    scanImage.image = [UIImage imageNamed:@"scan_icon"];
-//    [navView addSubview:scanImage];
-    
-    UIButton *rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    rightBtn.frame = CGRectMake(kScreenWidth-35, zwStatusBarHeight+10, 25, 25);
-    [rightBtn setBackgroundImage:[UIImage imageNamed:@"scan_icon"] forState:UIControlStateNormal];
-    [rightBtn addTarget:self action:@selector(rightBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-    [navView addSubview:rightBtn];
+- (void)createNavigationBar {
+    [[YNavigationBar sharedInstance]createRightBarWithImage:[UIImage imageNamed:@"main_message_icon"] barItem:self.navigationItem target:self action:@selector(rightBtnClick:) withColor:[UIColor whiteColor]];
+    [[YNavigationBar sharedInstance]createLeftBarWithImage:[UIImage imageNamed:@"scan_icon"] barItem:self.navigationItem target:self action:@selector(LeftBtnClick:)];
 }
 
-- (void)rightBtnClick:(UIButton *)btn {
+- (void)createSearchBar{
+    
+    ZWSearchBar *searchBar = [[ZWSearchBar alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 44)];
+    searchBar.layer.masksToBounds = YES;
+    self.navigationItem.titleView = searchBar;
+    searchBar.backgroundColor = [UIColor clearColor];
+    searchBar.isFirstResponser = NO;
+    searchBar.isShowRightBtn = YES;
+    searchBar.iconName = @"icon_search";
+    searchBar.iconSize = CGSizeMake(15, 15);
+    searchBar.insetsIcon = UIEdgeInsetsMake(0, 13, 0, 0);
+    searchBar.placeHolder = @"请输入要搜索的企业";
+    searchBar.cusFontPlaceHolder = 20;
+    searchBar.colorSearchBg = [UIColor whiteColor];
+    searchBar.raidus = 14;
+    searchBar.insetsSearchBg = UIEdgeInsetsMake(8, 0, 8, 0);
+    searchBar.cusFontTxt = 14;
+    searchBar.colorTxtInput = [UIColor redColor];
+    searchBar.isEditable = NO;
+    searchBar.colorTitleBtn = [UIColor redColor];
+    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapItemClick:)];
+    [searchBar.txtField addGestureRecognizer:tap];
+}
+
+- (void)tapItemClick:(UITapGestureRecognizer *)recognizer {
+    CSSearchVC *searchVC = [[CSSearchVC alloc]init];
+    searchVC.type = 5;
+    searchVC.isAnimation = 0;
+    searchVC.hidesBottomBarWhenPushed = YES;
+    searchVC.navigationController.navigationBar.barTintColor = skinColor;
+    [self.navigationController pushViewController:searchVC animated:NO];
+}
+
+- (void)LeftBtnClick:(UIBarButtonItem *)item {
     ZWScanVC *VC = [[ZWScanVC alloc]init];
     VC.hidesBottomBarWhenPushed = YES;
     VC.libraryType = [Global sharedManager].libraryType;
@@ -126,6 +157,13 @@
     //镜头拉远拉近功能
     VC.isVideoZoom = YES;
     [self.navigationController pushViewController:VC animated:YES];
+}
+
+- (void)rightBtnClick:(UIBarButtonItem *)btn {
+    ZWMessageCenterVC *messageCenterVC = [[ZWMessageCenterVC alloc]init];
+    messageCenterVC.title = @"消息中心";
+    messageCenterVC.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:messageCenterVC animated:YES];
 }
 
 - (void)rollingTableView:(NSNotification *)notice {
@@ -157,12 +195,18 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 3;
+    return 4;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (section == 2) {
+    if (section == 3) {
         return self.recommentArray.count;
+    }else if (section == 2) {
+        if (self.mainCdic) {
+            return 1;
+        }else {
+            return 0;
+        }
     }else {
         return 1;
     }
@@ -227,6 +271,17 @@
         CGFloat itemHeight = (0.95*kScreenWidth-5)/2+0.15*kScreenWidth;
         ZWCollectionTool *tool = [[ZWCollectionTool alloc]initWithFrame:CGRectMake(0.025*kScreenWidth, 0, 0.95*kScreenWidth, itemHeight*2+0.04*kScreenWidth) withData:self.exhibitionArray];
         [cell.contentView addSubview:tool];
+    }else if (indexPath.section == 2) {
+        
+        ZWHomeMainTuiView *mainTuiView = [[ZWHomeMainTuiView alloc]initWithFrame:CGRectMake(0.025*kScreenWidth, 0, 0.95*kScreenWidth, 0.3*kScreenWidth)];
+        mainTuiView.backgroundColor = [UIColor whiteColor];
+        mainTuiView.layer.cornerRadius = 0.02*kScreenWidth;
+        mainTuiView.collectionBtn.tag = indexPath.row;
+        mainTuiView.myData = self.mainCdic;
+//        [self addShadowToView:mainTuiView withColor:[UIColor grayColor]];
+//        tuiExhibitorsView.delegate = self;
+        [cell.contentView addSubview:mainTuiView];
+
     }else {
         ZWInduExhibitorsModel *model = self.recommentArray[indexPath.row];
         ZWHomeTuiExhibitorsView *tuiExhibitorsView = [[ZWHomeTuiExhibitorsView alloc]initWithFrame:CGRectMake(0.025*kScreenWidth, 0, 0.95*kScreenWidth, 0.25*kScreenWidth)];
@@ -239,12 +294,26 @@
     }
 }
 
+/// 添加四边阴影效果
+- (void)addShadowToView:(UIView *)theView withColor:(UIColor *)theColor {
+    // 阴影颜色
+    theView.layer.shadowColor = theColor.CGColor;
+    // 阴影偏移，默认(0, -3)
+    theView.layer.shadowOffset = CGSizeMake(0,0);
+    // 阴影透明度，默认0
+    theView.layer.shadowOpacity = 0.5;
+    // 阴影半径，默认3
+    theView.layer.shadowRadius = 30;
+}
+    
+
 - (void)itemClick:(UIButton *)btn {
     
     if ([self goToLogin] != YES) {
         if (btn.tag == 1000) {
             CSSearchVC *searchVC = [[CSSearchVC alloc]init];
             searchVC.type = 5;
+            searchVC.isAnimation = 1;
             searchVC.hidesBottomBarWhenPushed = YES;
             searchVC.navigationController.navigationBar.barTintColor = skinColor;
             [self.navigationController pushViewController:searchVC animated:YES];
@@ -254,11 +323,40 @@
             visitVC.hidesBottomBarWhenPushed = YES;
             [self.navigationController pushViewController:visitVC animated:YES];
         }else if (btn.tag == 1002) {
-            ZWCompanyDesignVC *companyDesignVC = [[ZWCompanyDesignVC alloc]init];
-            companyDesignVC.hidesBottomBarWhenPushed = YES;
-            companyDesignVC.title = @"展览工厂";
-            companyDesignVC.type = @"4";
-            [self.navigationController pushViewController:companyDesignVC animated:YES];
+//            ZWCompanyDesignVC *companyDesignVC = [[ZWCompanyDesignVC alloc]init];
+//            companyDesignVC.hidesBottomBarWhenPushed = YES;
+//            companyDesignVC.selectedCity = @"";
+//            companyDesignVC.title = @"展览工厂";
+//            companyDesignVC.type = @"4";
+//            [self.navigationController pushViewController:companyDesignVC animated:YES];
+            
+            
+            
+            NSMutableDictionary *myParameter = [[NSMutableDictionary alloc]init];
+            [myParameter setValue:@"" forKey:@"city"];
+            [myParameter setValue:@"" forKey:@"country"];
+            [myParameter setValue:@"3" forKey:@"firstIndustry"];
+            [myParameter setValue:@"" forKey:@"merchantName"];
+            [myParameter setValue:@"" forKey:@"province"];
+            [myParameter setValue:@"" forKey:@"secondIndustry"];
+            
+            
+            NSMutableDictionary *mySpellParameter = [[NSMutableDictionary alloc]init];
+            [mySpellParameter setValue:@"" forKey:@"city"];
+            [mySpellParameter setValue:@"" forKey:@"type"];
+            [mySpellParameter setValue:@"2" forKey:@"status"];
+            [mySpellParameter setValue:@"" forKey:@"merchantName"];
+            
+            
+            ZWExhibitionServerListVC *ServerListVC = [[ZWExhibitionServerListVC alloc]init];
+            ServerListVC.hidesBottomBarWhenPushed = YES;
+            ServerListVC.currentIndex = 3;
+            ServerListVC.myParameter = myParameter;
+            ServerListVC.mySpellParameter = mySpellParameter;
+            ServerListVC.selectedCity = @"";
+            [self.navigationController pushViewController:ServerListVC animated:YES];
+            
+            
         }else if (btn.tag == 1003) {
             [self takeCompanyCertificationStatus];
         }else {
@@ -305,6 +403,9 @@
     }else if (indexPath.section == 1) {
         CGFloat itemHeight = (0.95*kScreenWidth-5)/2+0.15*kScreenWidth;
         return itemHeight*2+0.04*kScreenWidth;
+    }else if (indexPath.section == 2) {
+//        return 0.2635*kScreenWidth;
+        return 0.3135*kScreenWidth;
     }else {
         return 0.2635*kScreenWidth;
     }
@@ -313,6 +414,8 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     if (section == 0) {
         return 0.45*kScreenWidth;
+    }else if (section == 3) {
+        return 0.1;
     }else {
         return 0.1*kScreenWidth;
     }
@@ -352,15 +455,17 @@
         myLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:0.042*kScreenWidth];
         [view addSubview:myLabel];
         
-    }else {
+    }else if (section == 2) {
         UIImageView *titleImage = [[UIImageView alloc]initWithFrame:CGRectMake(0.025*kScreenWidth, 0, 0.05*kScreenWidth, 0.065*kScreenWidth)];
         titleImage.image = [UIImage imageNamed:@"recommended_icon"];
         [view addSubview:titleImage];
         
         UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(titleImage.frame)+8, CGRectGetMinY(titleImage.frame)+3, 0.5*kScreenWidth, CGRectGetHeight(titleImage.frame))];
-        myLabel.text = @"推荐展商";
+        myLabel.text = @"推荐";
         myLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:0.042*kScreenWidth];
         [view addSubview:myLabel];
+    }else {
+        
     }
     return view;
 }
@@ -368,12 +473,26 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     if ([self goToLogin] != YES) {
-        ZWInduExhibitorsModel *model = self.recommentArray[indexPath.row];
-        ZWExhibitorsDetailsVC *detailsVC = [[ZWExhibitorsDetailsVC alloc]init];
-        detailsVC.hidesBottomBarWhenPushed = YES;
-        detailsVC.title = @"展商详情";
-        detailsVC.merchantId = model.merchantId;
-        [self.navigationController pushViewController:detailsVC animated:YES];
+        if (indexPath.section == 2) {
+            if ([self.mainCdic[@"identityId"] isEqualToString:@"2"]) {
+                ZWExhibitorsDetailsVC *detailsVC = [[ZWExhibitorsDetailsVC alloc]init];
+                detailsVC.hidesBottomBarWhenPushed = YES;
+                detailsVC.title = @"展商详情";
+                detailsVC.merchantId = self.mainCdic[@"id"];
+                [self.navigationController pushViewController:detailsVC animated:YES];
+            }else {
+                ZWCompanyDetailVC *companyDetailVC = [[ZWCompanyDetailVC alloc]init];
+                companyDetailVC.serviceId = [NSString stringWithFormat:@"%@",self.mainCdic[@"id"]];
+                [self.navigationController pushViewController:companyDetailVC animated:YES];
+            }
+        }else {
+            ZWInduExhibitorsModel *model = self.recommentArray[indexPath.row];
+            ZWExhibitorsDetailsVC *detailsVC = [[ZWExhibitorsDetailsVC alloc]init];
+            detailsVC.hidesBottomBarWhenPushed = YES;
+            detailsVC.title = @"展商详情";
+            detailsVC.merchantId = model.merchantId;
+            [self.navigationController pushViewController:detailsVC animated:YES];
+        }
     }
     
 }
@@ -404,7 +523,6 @@
     }
     
 }
-
 
 - (void)createRequst {
     [self refreshHotData];
@@ -465,7 +583,8 @@
             if (page == 1) {
                 [strongSelf.recommentArray removeAllObjects];
             }
-            NSArray *myData = data[@"data"];
+            NSArray *myData = data[@"data"][@"list"];
+            strongSelf.mainCdic = data[@"data"][@"recommendMerchant"];
             NSMutableArray *myArray = [NSMutableArray array];
             for (NSDictionary *myDic in myData) {
                 ZWInduExhibitorsModel *model = [ZWInduExhibitorsModel parseJSON:myDic];
@@ -473,6 +592,8 @@
             }
             [strongSelf.recommentArray addObjectsFromArray:myArray];
             [strongSelf.tableView reloadData];
+            
+            NSLog(@"-=-=-=-=-=-=%@",data[@"data"][@"recommendMerchant"]);
         }
     } failureBlock:^(NSError * _Nonnull error) {
         

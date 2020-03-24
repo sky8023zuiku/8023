@@ -8,7 +8,12 @@
 	<string>展网</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
-		<dict/>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>pdf</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
@@ -117,17 +122,5 @@
 	<string>Light</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-    
-    
-    <key>CFBundleDocumentTypes</key>
-    <array>
-    <dict>
-    <key>CFBundleTypeName</key>
-    <string>pdf</string>
-    <key>LSHandlerRank</key>
-    <string>Default</string>
-    </dict>
-    </array>
-    
 </dict>
 </plist>

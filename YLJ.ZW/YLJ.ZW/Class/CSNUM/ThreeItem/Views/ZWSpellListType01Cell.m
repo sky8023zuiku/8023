@@ -25,7 +25,7 @@
 
 @end
 @implementation ZWSpellListType01Cell
-- (instancetype)initWithFrame:(CGRect)frame
+- (instancetype)initWithFrame:(CGRect)frame withFont:(UIFont *)font
 {
     self = [super initWithFrame:frame];
     if (self) {
@@ -40,7 +40,7 @@
         
         UILabel *endDateLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(titleLabel.frame), CGRectGetMinY(titleLabel.frame), frame.size.width/2-0.04*frame.size.width, CGRectGetHeight(titleLabel.frame))];
         endDateLabel.text = @"截止日期：2019.07.29";
-        endDateLabel.font = smallMediumFont;
+        endDateLabel.font = font;
         endDateLabel.textAlignment = NSTextAlignmentRight;
         endDateLabel.textColor = [UIColor colorWithRed:102/255.0 green:102/255.0 blue:102/255.0 alpha:1.0];
         self.endDateLabel = endDateLabel;
@@ -49,7 +49,7 @@
         ZWLeftImageLabelView *exhibitionName = [[ZWLeftImageLabelView alloc]initWithFrame:CGRectMake(CGRectGetMinX(titleLabel.frame), CGRectGetMaxY(titleLabel.frame)+unitHeight/4, 0.96*frame.size.width, unitHeight)];
         exhibitionName.imageView.image = [UIImage imageNamed:@"fu_zhantaipin_icon_ming"];
         exhibitionName.titleLabel.text = @"上海国际进口贸易博览会上海国际进口博览会";
-        exhibitionName.titleLabel.font = smallMediumFont;
+        exhibitionName.titleLabel.font = font;
         exhibitionName.titleLabel.textColor = [UIColor blackColor];
         self.exhibitionName = exhibitionName;
         [self addSubview:exhibitionName];
@@ -57,7 +57,7 @@
         ZWLeftImageLabelView *hallName = [[ZWLeftImageLabelView alloc]initWithFrame:CGRectMake(CGRectGetMinX(exhibitionName.frame), CGRectGetMaxY(exhibitionName.frame)+unitHeight/2, 0.98*frame.size.width, CGRectGetHeight(exhibitionName.frame))];
         hallName.imageView.image = [UIImage imageNamed:@"fu_zhantaipin_icon_guan"];
         hallName.titleLabel.text = @"国家会展中心（上海）";
-        hallName.titleLabel.font = smallMediumFont;
+        hallName.titleLabel.font = font;
         hallName.titleLabel.textColor = [UIColor blackColor];
         self.hallName = hallName;
         [self addSubview:hallName];
@@ -65,7 +65,7 @@
         ZWLeftImageLabelView *decorateTime = [[ZWLeftImageLabelView alloc]initWithFrame:CGRectMake(CGRectGetMinX(hallName.frame), CGRectGetMaxY(hallName.frame)+unitHeight/2, 0.98*frame.size.width, CGRectGetHeight(hallName.frame))];
         decorateTime.imageView.image = [UIImage imageNamed:@"fu_zhantaipin_icon_shi"];
         decorateTime.titleLabel.text = @"布展：2019-10-23~2019-10-25";
-        decorateTime.titleLabel.font = smallMediumFont;
+        decorateTime.titleLabel.font = font;
         decorateTime.titleLabel.textColor = [UIColor blackColor];
         self.decorateTime = decorateTime;
         [self addSubview:decorateTime];
@@ -73,7 +73,7 @@
         ZWLeftImageLabelView *exhibitionTime = [[ZWLeftImageLabelView alloc]initWithFrame:CGRectMake(CGRectGetMinX(decorateTime.frame), CGRectGetMaxY(decorateTime.frame)+unitHeight/2, 0.98*frame.size.width, CGRectGetHeight(decorateTime.frame))];
         exhibitionTime.imageView.image = [UIImage imageNamed:@"exhibition_date_icon"];
         exhibitionTime.titleLabel.text = @"展期：2019-10-23~2019-10-25";
-        exhibitionTime.titleLabel.font = smallMediumFont;
+        exhibitionTime.titleLabel.font = font;
         exhibitionTime.titleLabel.textColor = [UIColor blackColor];
         self.exhibitionTime = exhibitionTime;
         [self addSubview:exhibitionTime];
@@ -81,7 +81,7 @@
         ZWLeftImageLabelView *areaSize = [[ZWLeftImageLabelView alloc]initWithFrame:CGRectMake(CGRectGetMinX(exhibitionTime.frame), CGRectGetMaxY(exhibitionTime.frame)+unitHeight/2, 0.5*frame.size.width-0.02*frame.size.width, CGRectGetHeight(exhibitionTime.frame))];
         areaSize.imageView.image = [UIImage imageNamed:@"area_size_icon"];
         areaSize.titleLabel.text = @"展台面积：50㎡";
-        areaSize.titleLabel.font = smallMediumFont;
+        areaSize.titleLabel.font = font;
         areaSize.titleLabel.textColor = [UIColor blackColor];
         self.areaSize = areaSize;
         [self addSubview:areaSize];
@@ -89,7 +89,7 @@
         ZWLeftImageLabelView *hallSMName = [[ZWLeftImageLabelView alloc]initWithFrame:CGRectMake(CGRectGetMaxX(areaSize.frame), CGRectGetMinY(areaSize.frame), CGRectGetWidth(areaSize.frame), CGRectGetHeight(exhibitionTime.frame))];
         hallSMName.imageView.image = [UIImage imageNamed:@"small_hall_icon"];
         hallSMName.titleLabel.text = @"展厅：N3馆";
-        hallSMName.titleLabel.font = smallMediumFont;
+        hallSMName.titleLabel.font = font;
         hallSMName.titleLabel.textColor = [UIColor blackColor];
         self.hallSMName = hallSMName;
         [self addSubview:hallSMName];
@@ -97,7 +97,7 @@
         ZWLeftImageLabelView *materialLabel = [[ZWLeftImageLabelView alloc]initWithFrame:CGRectMake(CGRectGetMinX(areaSize.frame), CGRectGetMaxY(areaSize.frame)+unitHeight/2, 0.5*frame.size.width-0.02*frame.size.width, CGRectGetHeight(areaSize.frame))];
         materialLabel.imageView.image = [UIImage imageNamed:@"material_icon"];
         materialLabel.titleLabel.text = @"材质：木结构家具贴";
-        materialLabel.titleLabel.font = smallMediumFont;
+        materialLabel.titleLabel.font = font;
         materialLabel.titleLabel.textColor = [UIColor blackColor];
         self.materialLabel = materialLabel;
         [self addSubview:materialLabel];
@@ -105,7 +105,7 @@
         ZWLeftImageLabelView *boothNum = [[ZWLeftImageLabelView alloc]initWithFrame:CGRectMake(CGRectGetMaxX(materialLabel.frame), CGRectGetMinY(materialLabel.frame), CGRectGetWidth(materialLabel.frame), CGRectGetHeight(materialLabel.frame))];
         boothNum.imageView.image = [UIImage imageNamed:@"hall_number_icon"];
         boothNum.titleLabel.text = @"展台数量：1个";
-        boothNum.titleLabel.font = smallMediumFont;
+        boothNum.titleLabel.font = font;
         boothNum.titleLabel.textColor = [UIColor blackColor];
         self.boothNum = boothNum;
         [self addSubview:boothNum];
@@ -113,7 +113,7 @@
         ZWLeftImageLabelView *contactsLabel = [[ZWLeftImageLabelView alloc]initWithFrame:CGRectMake(CGRectGetMinX(materialLabel.frame), CGRectGetMaxY(materialLabel.frame)+unitHeight/2, 0.25*frame.size.width, CGRectGetHeight(materialLabel.frame))];
         contactsLabel.imageView.image = [UIImage imageNamed:@"fu_zhantaipin_icon_xing"];
         contactsLabel.titleLabel.text = @"王小姐";
-        contactsLabel.titleLabel.font = smallMediumFont;
+        contactsLabel.titleLabel.font = font;
         contactsLabel.titleLabel.textColor = [UIColor blackColor];
         self.contactsLabel = contactsLabel;
         [self addSubview:contactsLabel];
@@ -121,7 +121,7 @@
         ZWLeftImageLabelView *phoneLabel = [[ZWLeftImageLabelView alloc]initWithFrame:CGRectMake(CGRectGetMaxX(contactsLabel.frame), CGRectGetMinY(contactsLabel.frame), 0.5*frame.size.width, CGRectGetHeight(contactsLabel.frame))];
         phoneLabel.imageView.image = [UIImage imageNamed:@"fu_zhantaipin_icon_dianhua"];
         phoneLabel.titleLabel.text = @"18862353837";
-        phoneLabel.titleLabel.font = smallMediumFont;
+        phoneLabel.titleLabel.font = font;
         phoneLabel.titleLabel.textColor = [UIColor blackColor];
         self.phoneLabel = phoneLabel;
         [self addSubview:phoneLabel];
@@ -129,7 +129,7 @@
         ZWLeftImageLabelView *noteLabel = [[ZWLeftImageLabelView alloc]initWithFrame:CGRectMake(CGRectGetMinX(contactsLabel.frame), CGRectGetMaxY(contactsLabel.frame)+unitHeight/2, 0.98*frame.size.width, CGRectGetHeight(contactsLabel.frame))];
         noteLabel.imageView.image = [UIImage imageNamed:@"note_icon"];
         noteLabel.titleLabel.text = @"备注：方案已定，年前需要制作";
-        noteLabel.titleLabel.font = smallMediumFont;
+        noteLabel.titleLabel.font = font;
         noteLabel.titleLabel.textColor = [UIColor blackColor];
         self.noteLabel = noteLabel;
         [self addSubview:noteLabel];

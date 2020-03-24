@@ -64,6 +64,11 @@ static id _instance = nil;
     rightItem.tintColor = [UIColor whiteColor];
     item.rightBarButtonItems = @[rightItem];
 }
+-(void)createRightBarWithImage:(UIImage *)image barItem:(UINavigationItem *)item target:(id)target action:(SEL)action withColor:(UIColor *)color{
+    UIBarButtonItem *rightItem = [[UIBarButtonItem alloc]initWithImage:image style:UIBarButtonItemStylePlain target:target action:action];
+    rightItem.tintColor = color;
+    item.rightBarButtonItems = @[rightItem];
+}
 //导航右边图片按钮
 -(void)createCustomRightBarWithImage:(UIImage *)image barItem:(UINavigationItem *)item target:(id)target action:(SEL)action{
     UIButton *nextBtn = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, 28, 28)];
@@ -86,5 +91,16 @@ static id _instance = nil;
     NSDictionary *attributes = @{NSFontAttributeName:[UIFont systemFontOfSize:17]};
     [[UIBarButtonItem appearance] setTitleTextAttributes:attributes forState:UIControlStateNormal];
 }
+
+//导航右边字体按钮
+-(void)createSkinNavigationBar:(UINavigationBar *)navitionBar withBackColor:(UIColor *)backColor withTintColor:(UIColor *)tintColor{
+   navitionBar.barTintColor = backColor;
+   [navitionBar setTitleTextAttributes:@{NSForegroundColorAttributeName:tintColor,
+   NSFontAttributeName : [UIFont fontWithName:@"Helvetica-Bold" size:17]}];
+}
+
+
+
+
 
 @end
