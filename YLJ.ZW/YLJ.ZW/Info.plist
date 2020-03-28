@@ -79,6 +79,13 @@
 		<string>sinaweibohd</string>
 		<string>weibosdk</string>
 		<string>weibosdk2.5</string>
+		<string>mqqopensdkapiv2</string>
+		<string>mqqopensdkapiv3</string>
+		<string>wtloginmqq2</string>
+		<string>mqqapi</string>
+		<string>mqqwpa</string>
+		<string>mqqbrowser</string>
+		<string>mqzone</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

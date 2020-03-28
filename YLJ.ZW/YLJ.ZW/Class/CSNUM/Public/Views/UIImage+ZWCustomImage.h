@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UIImage (ZWCustomImage)
 + (UIImage *)imageWithColor:(UIColor *)color withCornerRadius:(CGFloat)radius forSize:(CGSize)size;
++ (id)createRoundedRectImage:(UIImage*)image size:(CGSize)size radius:(NSInteger)radius;
+
 @end
 
 NS_ASSUME_NONNULL_END

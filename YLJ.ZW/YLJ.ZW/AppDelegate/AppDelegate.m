@@ -107,28 +107,41 @@
 
 
 - (void)versionUpdate {
+    
     NSString *version=[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
     NSLog(@"我的版本号码= %@",version);
-    [[ZWDataAction sharedAction]postReqeustWithURL:@"http://itunes.apple.com/lookup?id=1483303004" parametes:nil successBlock:^(NSDictionary *data) {
+    
+    [[ZWDataAction sharedAction]postReqeustWithURL:@"http://itunes.apple.com/cn/lookup?id=1483303004" parametes:@{} successBlock:^(NSDictionary *data) {
+        
         NSString *strVersion = data[@"results"][0][@"version"];
+        
+        NSLog(@"---我的版本%@ is bigger22",strVersion);
+        
         if ([strVersion compare:version options:NSNumericSearch] == NSOrderedDescending) {
+            
             NSLog(@"---我的版本%@ is bigger22",strVersion);
             UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"更新提示" message:[NSString stringWithFormat:@"展网新版本已发布,为了让您有更好的体验,我们需要您更新为新版本,请谅解!"] delegate:self cancelButtonTitle:nil otherButtonTitles:@"前去更新", nil];
             alert.tag = 222;
             [alert show];
+            
         }
+        
     } failureBlock:^(NSError *error) {
         
     }];
+    
 }
+
 -(void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
+    
     if (alertView.tag==222) {
         if (buttonIndex==0) {
             NSURL *url=[NSURL URLWithString:@"https://itunes.apple.com/cn/app/id1483303004?mt=8"];
             [[UIApplication sharedApplication]openURL:url];
         }
     }
+    
 }
 
 @end

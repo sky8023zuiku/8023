@@ -270,7 +270,6 @@
         detailsVC.title = @"展商详情";
         detailsVC.merchantId = model.merchantId;
         [self.navigationController pushViewController:detailsVC animated:YES];
-        
     }
 }
 

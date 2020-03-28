@@ -220,11 +220,13 @@
             
         }
     }else {
+        
         ZWExhPlanListModel *model = self.dataSource[indexPath.row];
         ZWPlansListCell *plansListCell = [[ZWPlansListCell alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 0.28*kScreenWidth)];
         plansListCell.tag = indexPath.row;
         plansListCell.model = model;
         [cell.contentView addSubview:plansListCell];
+        
     }
 
 }

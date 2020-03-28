@@ -171,11 +171,16 @@
     
     UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(15, 0, kScreenWidth-30, 0.08*kScreenWidth)];
     myLabel.font = normalFont;
-    if (section == 0) {
-        myLabel.text = @"我的邀请人";
+    if (self.dataDiictionary) {
+        if (section == 0) {
+            myLabel.text = @"我的邀请人";
+        }else {
+            myLabel.text = @"我邀请的人";
+        }
     }else {
         myLabel.text = @"我邀请的人";
     }
+    
     [toolView addSubview:myLabel];
     
     return toolView;

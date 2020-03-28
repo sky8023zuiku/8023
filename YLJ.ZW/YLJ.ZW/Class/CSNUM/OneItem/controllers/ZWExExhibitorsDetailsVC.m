@@ -44,6 +44,8 @@
 
 @property (nonatomic, strong)NSMutableArray *exhibitorInfoValues;//展商
 
+@property (nonatomic, assign)BOOL isOpen;
+
 @end
 
 @implementation ZWExExhibitorsDetailsVC
@@ -92,6 +94,7 @@
 }
 
 - (void)createUI {
+    self.isOpen = NO;
     self.view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.tableView];
     
@@ -146,15 +149,6 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-//    if (section==0) {
-//        return 10;
-//    }else if (section == 1) {
-//        return 1;
-//    }else if (section == 2) {
-//        return 1;
-//    }else {
-
-//    }
     
     if (section == 0) {
         return 1;
@@ -239,6 +233,7 @@
             browseBtn.frame = CGRectMake(CGRectGetMaxX(exNameLabel.frame), 0, 0.1*kScreenWidth, CGRectGetHeight(exNameLabel.frame));
             [browseBtn setTitle:@"预览" forState:UIControlStateNormal];
             [browseBtn setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
+            browseBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
             browseBtn.titleLabel.font = normalFont;
             [browseBtn addTarget:self action:@selector(browseBtnClick:) forControlEvents:UIControlEventTouchUpInside];
             [cell.contentView addSubview:browseBtn];
@@ -289,17 +284,26 @@
                 
     }else if (indexPath.section == 3) {
         
-        CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.companyIntroduction  font:smallMediumFont]+50;
-        UILabel *introduceDetail = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 10, 0.9*kScreenWidth, height)];
-        if (self.companyIntroduction.length == 0) {
-            introduceDetail.text = @"暂无";
-        }else {
-            introduceDetail.text = self.companyIntroduction;
-        }
+        UILabel *introduceDetail = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 10, 0.9*kScreenWidth, [self takeIntroduceHeight])];
+        introduceDetail.text = [self takeIntroduceAfterTheProcessing];
         introduceDetail.font = smallMediumFont;
         introduceDetail.numberOfLines = 0;
         [cell.contentView addSubview:introduceDetail];
         
+        if ([self takeIntroduceValue].length > 80) {
+            UIButton * moreBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+            moreBtn.frame = CGRectMake(0, CGRectGetMaxY(introduceDetail.frame), kScreenWidth, 0.1*kScreenWidth);
+            if (self.isOpen == YES) {
+                [moreBtn setTitle:@"收起" forState:UIControlStateNormal];
+            }else {
+                [moreBtn setTitle:@"点击此处查看全部" forState:UIControlStateNormal];
+            }
+            moreBtn.titleLabel.font = smallMediumFont;
+            [moreBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
+            [moreBtn addTarget:self action:@selector(introduceMoreBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+            [cell.contentView addSubview:moreBtn];
+        }
+
     }else if (indexPath.section == 4) {
         
         UILabel *myNotice;
@@ -307,6 +311,7 @@
             [myNotice removeFromSuperview];
         }
         if (self.contactArray.count == 0) {
+            
             myNotice = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 10, 0.9*kScreenWidth, 0.4*kScreenWidth-20)];
             myNotice.text = @"暂无联系人";
             myNotice.textAlignment = NSTextAlignmentCenter;
@@ -463,6 +468,58 @@
     
 }
 
+- (void)introduceMoreBtnClick:(UIButton *)btn {
+    self.isOpen = !self.isOpen;
+    [self.tableView reloadData];
+}
+
+//**********************************************************公司简介处理*******************************************************************/
+
+//获取完整的公司简介
+- (NSString *)takeIntroduceValue {
+    
+    NSString *introduceStr;
+    if (self.companyIntroduction.length == 0) {
+        introduceStr = @"暂无";
+    }else {
+        introduceStr = self.companyIntroduction;
+    }
+    return introduceStr;
+    
+}
+//获取处理过后的简介
+- (NSString *)takeIntroduceAfterTheProcessing {
+    NSString *subString;
+    if (self.isOpen == YES) {
+        subString = [self takeIntroduceValue];
+    }else {
+        if ([self takeIntroduceValue].length >= 80) {
+            subString = [NSString stringWithFormat:@"%@...",[[self takeIntroduceValue] substringWithRange:NSMakeRange(0, 80)]] ;
+        }else {
+            subString = [self takeIntroduceValue];
+        }
+    }
+    return subString;
+}
+//计算公司简介需要返回的labal高度
+- (CGFloat)takeIntroduceHeight {
+    NSString *subString;
+    if (self.isOpen == YES) {
+        subString = [self takeIntroduceValue];
+    }else {
+        if ([self takeIntroduceValue].length >= 80) {
+            subString = [NSString stringWithFormat:@"%@...",[[self takeIntroduceValue] substringWithRange:NSMakeRange(0, 80)]] ;
+        }else {
+            subString = [self takeIntroduceValue];
+        }
+    }
+    CGFloat introduceHeight = [[ZWToolActon shareAction]adaptiveTextHeight:subString font:smallMediumFont]+20;
+    return introduceHeight;
+}
+
+
+
+
 - (void)makePhoneCall:(UIButton *)btn {
     [self takeCallWithValue:btn.titleLabel.text];
 }
@@ -506,8 +563,11 @@
         }
         
     }else if (indexPath.section == 3) {
-        CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.companyIntroduction font:smallMediumFont]+50;
-        return height+20;
+        if ([self takeIntroduceValue].length > 80) {
+            return [self takeIntroduceHeight]+0.1*kScreenWidth+10;
+        }else {
+            return [self takeIntroduceHeight]+20;
+        }
     }else if (indexPath.section == 4) {
         if (self.contactArray.count == 0) {
             return 0.4*kScreenWidth;
@@ -594,7 +654,6 @@
     cell.titleLabel.font = smallFont;
     cell.layer.borderWidth = 1;
     cell.layer.borderColor = zwGrayColor.CGColor;
-//    cell.backgroundColor = [UIColor whiteColor];
     return cell;
 
 }
@@ -852,6 +911,7 @@
     return result;
 }
 - (UIViewController *)getCurrentVC {
+    
     UIViewController *result = nil;
     UIWindow * window = [[UIApplication sharedApplication] keyWindow];
     if (window.windowLevel != UIWindowLevelNormal) {
@@ -863,6 +923,7 @@
             }
         }
     }
+    
     UIView *frontView = [[window subviews] objectAtIndex:0];
     id nextResponder = [frontView nextResponder];
     if ([nextResponder isKindOfClass:[UIViewController class]]) {
@@ -871,6 +932,7 @@
         result = window.rootViewController;
     }
     return result;
+    
 }
 
 - (void)downloadBtnClick:(UIButton *)btn {

@@ -14,11 +14,11 @@
 /**
  *  正式环境
  */
-//#define API_HOST @"http://www.enet720.com:9000"//网络请求域名
+#define API_HOST @"http://www.enet720.com:9000"//网络请求域名
 /**
  *  本地环境1
  */
-#define API_HOST @"http://192.168.7.124:9000"//网络请求域名
+//#define API_HOST @"http://192.168.7.124:9000"//网络请求域名
 /**
  *  本地环境2
  */

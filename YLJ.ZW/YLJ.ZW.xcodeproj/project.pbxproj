@@ -208,6 +208,7 @@
 		28596B4A237E866F0060A05E /* ZWMainSaveLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 28596B49237E866F0060A05E /* ZWMainSaveLocation.m */; };
 		285980BA240E2F130078BE94 /* ZWMyShareBindListModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 285980B9240E2F130078BE94 /* ZWMyShareBindListModel.m */; };
 		285980BD240E3EA90078BE94 /* ZWMyShareBindAlertVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 285980BC240E3EA90078BE94 /* ZWMyShareBindAlertVC.m */; };
+		285A4B0E242DC994001A5ACD /* ZWImageTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 285A4B0D242DC994001A5ACD /* ZWImageTool.m */; };
 		285A5B252428446800FBC51D /* ZWExhibitionServerSelectIndustriesVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 285A5B242428446800FBC51D /* ZWExhibitionServerSelectIndustriesVC.m */; };
 		285AB25223F6814E003E2109 /* ZWPlanDelayCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 285AB25123F6814E003E2109 /* ZWPlanDelayCell.m */; };
 		285AE5DA23ADAEA80043FD21 /* ZWDrawerDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 285AE5D923ADAEA80043FD21 /* ZWDrawerDataManager.m */; };
@@ -715,6 +716,8 @@
 		285980B9240E2F130078BE94 /* ZWMyShareBindListModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZWMyShareBindListModel.m; sourceTree = "<group>"; };
 		285980BB240E3EA90078BE94 /* ZWMyShareBindAlertVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZWMyShareBindAlertVC.h; sourceTree = "<group>"; };
 		285980BC240E3EA90078BE94 /* ZWMyShareBindAlertVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZWMyShareBindAlertVC.m; sourceTree = "<group>"; };
+		285A4B0C242DC994001A5ACD /* ZWImageTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZWImageTool.h; sourceTree = "<group>"; };
+		285A4B0D242DC994001A5ACD /* ZWImageTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZWImageTool.m; sourceTree = "<group>"; };
 		285A5B232428446800FBC51D /* ZWExhibitionServerSelectIndustriesVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZWExhibitionServerSelectIndustriesVC.h; sourceTree = "<group>"; };
 		285A5B242428446800FBC51D /* ZWExhibitionServerSelectIndustriesVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZWExhibitionServerSelectIndustriesVC.m; sourceTree = "<group>"; };
 		285AB25023F6814E003E2109 /* ZWPlanDelayCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZWPlanDelayCell.h; sourceTree = "<group>"; };
@@ -1054,6 +1057,8 @@
 				2804A80023409D4900205464 /* ZWTextView.m */,
 				286E6C8323CD4CF2007E3ECE /* ZWLeftImageLabelView.h */,
 				286E6C8423CD4CF2007E3ECE /* ZWLeftImageLabelView.m */,
+				285A4B0C242DC994001A5ACD /* ZWImageTool.h */,
+				285A4B0D242DC994001A5ACD /* ZWImageTool.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -2670,6 +2675,7 @@
 				2804A8E823409D7000205464 /* ZWIndustryMerchantCell.m in Sources */,
 				28514FDB23C5C09400A1CB01 /* ZWPavilionHallVC.m in Sources */,
 				2804A8D923409D7000205464 /* ZWEditReleaseShufflingVC.m in Sources */,
+				285A4B0E242DC994001A5ACD /* ZWImageTool.m in Sources */,
 				2804A82923409D4900205464 /* ZWCollectionViewCell.m in Sources */,
 				28E4BFA2231CB17700AAAD37 /* YHConfigUrl.m in Sources */,
 				2804A8D123409D7000205464 /* ZWInviteCodeVC.m in Sources */,
@@ -2928,7 +2934,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = DGF5DCT362;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = YLJ.ZW/PrefixHeader.pch;
@@ -2938,7 +2944,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.25;
+				MARKETING_VERSION = 1.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zw.action;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2954,7 +2960,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = DGF5DCT362;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = YLJ.ZW/PrefixHeader.pch;
@@ -2964,7 +2970,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.25;
+				MARKETING_VERSION = 1.27;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zw.action;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
