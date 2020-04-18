@@ -77,13 +77,20 @@
     
     if ([self goToLogin] != YES) {
         ZWExhibitionListModel *model = self.dataArray[indexPath.row];
+        NSDictionary *shareData = @{
+            @"exhibitionId":model.listId,
+            @"exhibitionName":model.name,
+            @"exhibitionTitleImage":model.imageUrl
+        };
         ZWExhibitionNaviVC *naviVC = [[ZWExhibitionNaviVC alloc]init];
         naviVC.hidesBottomBarWhenPushed = YES;
         naviVC.title = @"展会导航";
         naviVC.exhibitionId = model.listId;
         naviVC.price = model.price;
+        naviVC.shareData = shareData;
         [self.ff_navViewController pushViewController:naviVC animated:YES];
     }
+    
 }
 
 -(void)collectionItemWithIndex:(ZWHotExhibitionsCollectionViewCell *)cell withIndex:(NSInteger)index {

@@ -23,8 +23,19 @@
 
 #import "UButton.h"
 
-@interface ZWExExhibitorsDetailsVC ()<UITableViewDataSource,UITableViewDelegate,DCCycleScrollViewDelegate,UICollectionViewDelegate,UICollectionViewDataSource,QLPreviewControllerDataSource>
-@property(nonatomic, strong)UITableView *tableView;
+#import <WebKit/WebKit.h>
+
+#import "ZWPDFLoadVC.h"
+
+#import "ZWShareManager.h"
+#import "ZWShareModel.h"
+
+#import "ZWExExhibitorsQrCodeVC.h"
+#import "UIViewController+YCPopover.h"
+
+@interface ZWExExhibitorsDetailsVC ()<UITableViewDataSource,UITableViewDelegate,DCCycleScrollViewDelegate,UICollectionViewDelegate,UICollectionViewDataSource,QLPreviewControllerDataSource,ZWShareManagerDelegate>
+
+@property(nonatomic, strong)ZWBaseEmptyTableView *tableView;
 @property(nonatomic, strong)DCCycleScrollView *banner;
 @property(nonatomic, strong)UICollectionView *collectionView;
 @property(nonatomic, strong)UICollectionViewFlowLayout *layout;
@@ -46,13 +57,19 @@
 
 @property (nonatomic, assign)BOOL isOpen;
 
+@property (nonatomic, assign)CGFloat positionH;//基本高度
+@property (nonatomic, assign)CGFloat cellHeght;//行高
+@property (nonatomic, assign)CGFloat IntroductionH;//简介文本的高度
+
+@property (nonatomic, strong)UIButton *delBtn;//投递消息按钮
+
 @end
 
 @implementation ZWExExhibitorsDetailsVC
 
--(UITableView *)tableView {
+-(ZWBaseEmptyTableView *)tableView {
     if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
+        _tableView = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
     }
     _tableView.dataSource = self;
     _tableView.delegate = self;
@@ -78,16 +95,66 @@
 //    return _collectionView;
 //}
 
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self createNavigationBar];
+    [self createEmptyView];
     [self createUI];
     [self createRequest];
 }
 
 - (void)createNavigationBar {
     [[YNavigationBar sharedInstance]createLeftBarWithImage:[UIImage imageNamed:@"zai_dao_icon_left"] barItem:self.navigationItem target:self action:@selector(goBack:)];
+    [[YNavigationBar sharedInstance]createRightBarWithImage:[UIImage imageNamed:@"share_forward_icon"] barItem:self.navigationItem target:self action:@selector(rightItemClick:)];
 }
+
+- (void)rightItemClick:(UIBarButtonItem *)item {
+    
+    ZWShareModel *model = [[ZWShareModel alloc]init];
+    NSLog(@"我的展商id = %@",self.shareModel.exhibitorId);
+    model.shareName = self.shareModel.name;
+    model.shareTitleImage = [NSString stringWithFormat:@"%@%@",httpImageUrl,self.shareModel.coverImages];
+    model.shareUrl = [NSString stringWithFormat:@"%@/html/share_exhibitors.html?exhibitorId=%@",share_url,self.shareModel.exhibitorId];
+    model.shareDetail = @"查看详情";
+    [[ZWShareManager shareManager]shareTwoActionSheetWithData:model];
+    [ZWShareManager shareManager].delegate = self;
+
+}
+
+- (void)clickItemWithIndex:(NSInteger)index {
+    if (index == 0) {
+        NSDictionary *OrCodeDic = @{
+               @"zw_status":@"1",//0为邀请二维码
+               @"zw_content":@{
+                   @"exhibitionId":self.shareModel.exhibitionId,
+                   @"merchantId":self.shareModel.merchantId,
+                   @"coverImages":self.shareModel.coverImages,
+                   @"exhibitorId":self.shareModel.exhibitorId
+               }
+           };
+        
+        ZWExExhibitorsQrCodeVC *QrCodeVC = [[ZWExExhibitorsQrCodeVC alloc]init];
+        QrCodeVC.logoImageStr = [NSString stringWithFormat:@"%@%@",httpImageUrl,self.shareModel.coverImages];
+        QrCodeVC.qrDic = OrCodeDic;
+        [self yc_centerPresentController:QrCodeVC presentedSize:CGSizeMake(0.65*kScreenWidth, 0.65*kScreenWidth) completeHandle:^(BOOL presented) {
+            
+        }];
+    }
+}
+
+- (void)createEmptyView {
+    
+    UIImageView *emptyView = [[UIImageView alloc]initWithFrame:CGRectMake(0.1*kScreenWidth, 0.3*kScreenWidth, 0.8*kScreenWidth, 0.5*kScreenWidth)];
+    emptyView.image = [UIImage imageNamed:@"qita_img_wu"];
+    emptyView.contentMode = UIViewContentModeScaleAspectFit;
+    [self.view addSubview:emptyView];
+}
+
 
 - (void)goBack:(UINavigationItem *)item {
     [self.navigationController popViewControllerAnimated:YES];
@@ -96,7 +163,6 @@
 - (void)createUI {
     self.isOpen = NO;
     self.view.backgroundColor = [UIColor whiteColor];
-    [self.view addSubview:self.tableView];
     
     _layout=[[UICollectionViewFlowLayout alloc]init];
     [_layout prepareLayout];
@@ -108,33 +174,13 @@
     self.previewController  =  [[QLPreviewController alloc]  init];
     self.previewController.dataSource  = self;
     
-//    UIButton *delBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-//    delBtn.frame = CGRectMake(0.75*kScreenWidth, kScreenHeight-zwTabBarHeight-0.45*kScreenWidth-zwNavBarHeight, 0.25*kScreenWidth, 0.25*kScreenWidth);
-//    [delBtn setBackgroundImage:[UIImage imageNamed:@"icon_act"] forState:UIControlStateNormal];
-//    [delBtn addTarget:self action:@selector(delBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-//    [self.view addSubview:delBtn];
-//
-//    UIImageView *imageV = [[UIImageView alloc]initWithFrame:CGRectMake(0.085*kScreenWidth, 0.06*kScreenWidth, 0.08*kScreenWidth, 0.08*kScreenWidth)];
-//    imageV.image = [UIImage imageNamed:@"edit"];
-//    [delBtn addSubview:imageV];
-//
-//    UILabel *deliMessage = [[UILabel alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(imageV.frame), 0.25*kScreenWidth, 0.04*kScreenWidth)];
-//    deliMessage.textAlignment = NSTextAlignmentCenter;
-//    deliMessage.font = smallFont;
-//    deliMessage.textColor = [UIColor whiteColor];
-//    deliMessage.text = @"投递消息";
-//    [delBtn addSubview:deliMessage];
-    
-    
-    UIButton *delBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    delBtn.frame = CGRectMake(0.05*kScreenWidth , kScreenHeight-zwTabBarStausHeight-0.1*kScreenWidth-zwNavBarHeight, 0.9*kScreenWidth, 0.1*kScreenWidth);
-    [delBtn setTitle:@"投递消息" forState:UIControlStateNormal];
-    delBtn.backgroundColor = skinColor;
-    delBtn.layer.cornerRadius = 5;
-    delBtn.layer.masksToBounds = YES;
-    [delBtn addTarget:self action:@selector(delBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:delBtn];
-    
+    self.delBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.delBtn.frame = CGRectMake(0.05*kScreenWidth , kScreenHeight-zwTabBarStausHeight-0.1*kScreenWidth-zwNavBarHeight, 0.9*kScreenWidth, 0.1*kScreenWidth);
+    [self.delBtn setTitle:@"投递消息" forState:UIControlStateNormal];
+    self.delBtn.backgroundColor = skinColor;
+    self.delBtn.layer.cornerRadius = 5;
+    self.delBtn.layer.masksToBounds = YES;
+    [self.delBtn addTarget:self action:@selector(delBtnClick:) forControlEvents:UIControlEventTouchUpInside];
 }
 - (void)delBtnClick:(UIButton *)btn {
     
@@ -167,9 +213,20 @@
     }else {
         return 1;
     }
-    
-    
 }
+
+//-(CGFloat)takeTextHeight:(NSString *)text andLabel:(YYLabel *)lb
+//{
+//    NSMutableAttributedString *introText = [[NSMutableAttributedString alloc] initWithString:text];
+//    introText.yy_font = smallMediumFont;
+//    introText.yy_lineSpacing = 5;
+//    lb.attributedText = introText;
+//    CGSize introSize = CGSizeMake(kScreenWidth-100, CGFLOAT_MAX);
+//    YYTextLayout *layout = [YYTextLayout layoutWithContainerSize:introSize text:introText];
+//    lb.textLayout = layout;
+//    CGFloat introHeight = layout.textBoundingSize.height;
+//    return introHeight;
+//}
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *myCell = @"cell";
@@ -213,19 +270,31 @@
     }else if (indexPath.section == 1) {
         NSArray *titles = @[@"展会名称：",@"公司名称：",@"主营项目：",@"展位号：",@"展台属性：",@"需求说明：",@"产品手册："];
         
-        CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.exhibitorInfoValues[indexPath.row] font:normalFont];
-        
-        UILabel *exNameLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0, 0.2*kScreenWidth, height+10)];
-        exNameLabel.text = titles[indexPath.row];
-        exNameLabel.font = normalFont;
-        [cell.contentView addSubview:exNameLabel];
-        exNameLabel.attributedText = [[ZWToolActon shareAction]createBothEndsWithLabel:exNameLabel textAlignmentWith:CGRectGetWidth(exNameLabel.frame)];
-        
-        UILabel *exNameValue = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(exNameLabel.frame), CGRectGetMinY(exNameLabel.frame), 0.95*kScreenWidth-CGRectGetMaxX(exNameLabel.frame), height+10)];
-        exNameValue.text = self.exhibitorInfoValues[indexPath.row];
-        exNameValue.font = normalFont;
+        UILabel *exNameValue = [[UILabel alloc]init];
+        self.positionH = [[ZWToolActon shareAction]adaptiveTextHeight:@"暂无" textFont:smallMediumFont textWidth:0.7*kScreenWidth];
+        if (self.exhibitorInfoValues.count == 0) {
+            self.cellHeght = [[ZWToolActon shareAction]adaptiveTextHeight:@"暂无" textFont:smallMediumFont textWidth:0.7*kScreenWidth];
+        }else {
+            self.cellHeght = [[ZWToolActon shareAction]adaptiveTextHeight:self.exhibitorInfoValues[indexPath.row] textFont:smallMediumFont textWidth:0.7*kScreenWidth];
+        }
+        exNameValue.frame = CGRectMake(0.25*kScreenWidth, 0, 0.7*kScreenWidth, self.cellHeght);
+        if (self.exhibitorInfoValues.count == 0) {
+            if (indexPath.row !=6) {
+                exNameValue.text = @"暂无";
+            }
+        }else {
+            exNameValue.text = self.exhibitorInfoValues[indexPath.row];
+        }
+        exNameValue.font = smallMediumFont;
         exNameValue.numberOfLines = 0;
         [cell.contentView addSubview:exNameValue];
+        
+        UILabel *exNameLabel = [[UILabel alloc]init];
+        exNameLabel.font = smallMediumFont;
+        exNameLabel.frame = CGRectMake(0.05*kScreenWidth, 0, 0.2*kScreenWidth, self.positionH);
+        exNameLabel.text = titles[indexPath.row];
+        [cell.contentView addSubview:exNameLabel];
+        exNameLabel.attributedText = [[ZWToolActon shareAction]createBothEndsWithLabel:exNameLabel textAlignmentWith:CGRectGetWidth(exNameLabel.frame)];
         
         if (indexPath.row == 6) {
             
@@ -234,7 +303,7 @@
             [browseBtn setTitle:@"预览" forState:UIControlStateNormal];
             [browseBtn setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
             browseBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
-            browseBtn.titleLabel.font = normalFont;
+            browseBtn.titleLabel.font = smallMediumFont;
             [browseBtn addTarget:self action:@selector(browseBtnClick:) forControlEvents:UIControlEventTouchUpInside];
             [cell.contentView addSubview:browseBtn];
             
@@ -242,12 +311,11 @@
             downloadBtn.frame = CGRectMake(CGRectGetMaxX(browseBtn.frame), 0, 0.1*kScreenWidth, CGRectGetHeight(browseBtn.frame));
             [downloadBtn setTitle:@"下载" forState:UIControlStateNormal];
             [downloadBtn setTitleColor:skinColor forState:UIControlStateNormal];
-            downloadBtn.titleLabel.font = normalFont;
+            downloadBtn.titleLabel.font = smallMediumFont;
             [downloadBtn addTarget:self action:@selector(downloadBtnClick:) forControlEvents:UIControlEventTouchUpInside];
             [cell.contentView addSubview:downloadBtn];
             
         }
-        
         
     }else if (indexPath.section == 2) {
         
@@ -256,7 +324,7 @@
             [myNotice removeFromSuperview];
         }
         if (self.productArray.count == 0) {
-            myNotice = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 10, 0.9*kScreenWidth, 0.4*kScreenWidth-20)];
+            myNotice = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0, 0.9*kScreenWidth, 0.4*kScreenWidth-20)];
             myNotice.text = @"暂无产品";
             myNotice.textAlignment = NSTextAlignmentCenter;
             myNotice.backgroundColor = zwGrayColor;
@@ -265,11 +333,11 @@
         }else {
             
             if (self.productArray.count <=3 ) {
-                _collectionView=[[UICollectionView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0.025*kScreenWidth, 0.9*kScreenWidth, 0.4*kScreenWidth) collectionViewLayout:_layout];
+                _collectionView=[[UICollectionView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0, 0.9*kScreenWidth, 0.4*kScreenWidth) collectionViewLayout:_layout];
             }else if (self.productArray.count <= 6 && self.productArray.count >3) {
-                _collectionView=[[UICollectionView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0.025*kScreenWidth, 0.9*kScreenWidth, 0.8*kScreenWidth) collectionViewLayout:_layout];
+                _collectionView=[[UICollectionView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0, 0.9*kScreenWidth, 0.8*kScreenWidth) collectionViewLayout:_layout];
             }else {
-                _collectionView=[[UICollectionView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0.025*kScreenWidth, 0.9*kScreenWidth, 1.2*kScreenWidth) collectionViewLayout:_layout];
+                _collectionView=[[UICollectionView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0, 0.9*kScreenWidth, 1.2*kScreenWidth) collectionViewLayout:_layout];
             }
             
             _collectionView.delegate=self;
@@ -284,7 +352,10 @@
                 
     }else if (indexPath.section == 3) {
         
-        UILabel *introduceDetail = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 10, 0.9*kScreenWidth, [self takeIntroduceHeight])];
+        
+        UILabel *introduceDetail = [[UILabel alloc]init];
+        self.IntroductionH = [self takeIntroduceHeight:introduceDetail];
+        introduceDetail.frame = CGRectMake(0.05*kScreenWidth, 0, 0.9*kScreenWidth, self.IntroductionH);
         introduceDetail.text = [self takeIntroduceAfterTheProcessing];
         introduceDetail.font = smallMediumFont;
         introduceDetail.numberOfLines = 0;
@@ -312,7 +383,7 @@
         }
         if (self.contactArray.count == 0) {
             
-            myNotice = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 10, 0.9*kScreenWidth, 0.4*kScreenWidth-20)];
+            myNotice = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0, 0.9*kScreenWidth, 0.4*kScreenWidth-20)];
             myNotice.text = @"暂无联系人";
             myNotice.textAlignment = NSTextAlignmentCenter;
             myNotice.backgroundColor = zwGrayColor;
@@ -325,7 +396,7 @@
             CGFloat magin = 0.28*kScreenWidth/2/5;
             CGFloat width = 0.9*kScreenWidth/2;
             
-            UIView *toolView = [[UIView alloc]initWithFrame:CGRectMake(10, 10, kScreenWidth-20, 0.28*kScreenWidth)];
+            UIView *toolView = [[UIView alloc]initWithFrame:CGRectMake(10, 0, kScreenWidth-20, 0.28*kScreenWidth)];
             toolView.backgroundColor = zwGrayColor;
             toolView.layer.cornerRadius = 5;
             toolView.layer.masksToBounds = YES;
@@ -414,7 +485,7 @@
         CGFloat width = 0.8*kScreenWidth/2;
         
         //邮箱
-        ZWLeftImageBtn *emailBtn = [[ZWLeftImageBtn alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, magin, width, height)];
+        ZWLeftImageBtn *emailBtn = [[ZWLeftImageBtn alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0, width, height)];
         if (self.model.email.length == 0) {
             [emailBtn setTitle:@"暂无" forState:UIControlStateNormal];
         }else {
@@ -502,7 +573,7 @@
     return subString;
 }
 //计算公司简介需要返回的labal高度
-- (CGFloat)takeIntroduceHeight {
+- (CGFloat)takeIntroduceHeight:(UILabel *)label {
     NSString *subString;
     if (self.isOpen == YES) {
         subString = [self takeIntroduceValue];
@@ -513,11 +584,9 @@
             subString = [self takeIntroduceValue];
         }
     }
-    CGFloat introduceHeight = [[ZWToolActon shareAction]adaptiveTextHeight:subString font:smallMediumFont]+20;
+    CGFloat introduceHeight = [[ZWToolActon shareAction]adaptiveTextHeight:subString textFont:smallMediumFont textWidth:0.9*kScreenWidth];
     return introduceHeight;
 }
-
-
 
 
 - (void)makePhoneCall:(UIButton *)btn {
@@ -536,8 +605,6 @@
     
 }
 
-
-
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     if (indexPath.section == 0) {
@@ -546,11 +613,11 @@
         if (indexPath.row == 6) {
             return 0.1*kScreenWidth;
         }else {
-            CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.exhibitorInfoValues[indexPath.row] font:normalFont];
-            if (height) {
-                return height+10;
+            
+            if (self.exhibitorInfoValues.count == 0) {
+                return self.positionH+10;
             }else {
-                return 0.04*kScreenWidth;
+                return self.cellHeght+10;
             }
         }
     }else if (indexPath.section == 2) {
@@ -563,11 +630,7 @@
         }
         
     }else if (indexPath.section == 3) {
-        if ([self takeIntroduceValue].length > 80) {
-            return [self takeIntroduceHeight]+0.1*kScreenWidth+10;
-        }else {
-            return [self takeIntroduceHeight]+20;
-        }
+        return self.IntroductionH+0.1*kScreenWidth;
     }else if (indexPath.section == 4) {
         if (self.contactArray.count == 0) {
             return 0.4*kScreenWidth;
@@ -587,7 +650,7 @@
     if (section == 0) {
         return 0.1;
     }else {
-        return 0.1*kScreenWidth;
+        return 0.13*kScreenWidth;
     }
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
@@ -684,9 +747,9 @@
     [self requestExExhibitorsDetail];
 }
 - (void)requestExExhibitorsDetail {
-    if (self.exhibitorId) {
+    if (self.shareModel.exhibitorId) {
         __weak typeof (self) weakSelf = self;
-        [[ZWDataAction sharedAction]postReqeustWithURL:zwExhibitionExhibitorDetails parametes:@{@"exhibitorId":self.exhibitorId} successBlock:^(NSDictionary * _Nonnull data) {
+        [[ZWDataAction sharedAction]postReqeustWithURL:zwExhibitionExhibitorDetails parametes:@{@"exhibitorId":self.shareModel.exhibitorId} successBlock:^(NSDictionary * _Nonnull data) {
             __strong typeof (weakSelf) strongSelf = weakSelf;
             if (zw_issuccess) {
                 strongSelf.imageArray = data[@"data"][@"images"];
@@ -695,9 +758,12 @@
                 strongSelf.imagesStatus = [myStatus integerValue];
                 ZWExhibitorDetailsModel *model = [ZWExhibitorDetailsModel  parseJSON:dataDic];
                 strongSelf.model = model;
+                strongSelf.shareModel.name = model.merchantName;
                 [self createExhibitorInfomation:model];
                 NSLog(@"---====++++++++%@",strongSelf.model.productUrl);
 //                [strongSelf.tableView reloadData];
+                [strongSelf.view addSubview:strongSelf.tableView];
+                [strongSelf.view addSubview:strongSelf.delBtn];
                 [strongSelf requestExExhibitorsProfile];
             }
         } failureBlock:^(NSError * _Nonnull error) {
@@ -710,35 +776,29 @@
     
     self.exhibitorInfoValues = [NSMutableArray array];
     //展会名称
-    if (model.exhibitionName == nil||[model.exhibitionName isEqualToString:@""]) {
+    if (model.exhibitionName.length == 0) {
         [self.exhibitorInfoValues  addObject:@"暂无"];
     }else {
         [self.exhibitorInfoValues  addObject:model.exhibitionName];
     }
     //公司名称
-    if (model.merchantName == nil||[model.merchantName isEqualToString:@""]) {
+    if (model.merchantName.length == 0) {
         [self.exhibitorInfoValues  addObject:@"暂无"];
     }else {
         [self.exhibitorInfoValues  addObject:model.merchantName];
     }
     //主营项目
-    if (model.product == nil||[model.product isEqualToString:@""]) {
+    if (model.product.length == 0) {
         [self.exhibitorInfoValues  addObject:@"暂无"];
     }else {
         [self.exhibitorInfoValues  addObject:model.product];
     }
     //展位编号
-    if (model.exposition == nil||[model.exposition isEqualToString:@""]) {
+    if (model.exposition.length == 0) {
         [self.exhibitorInfoValues  addObject:@"暂无"];
     }else {
         [self.exhibitorInfoValues  addObject:model.exposition];
     }
-//    //公司邮箱
-//    if (model.email == nil||[model.email isEqualToString:@""]) {
-//        [self.exhibitorInfoValues  addObject:@"暂无"];
-//    }else {
-//        [self.exhibitorInfoValues  addObject:model.email];
-//    }
     //展台属性
     if (model.nature) {
         if ([model.nature isEqualToString:@"1"]) {
@@ -749,33 +809,15 @@
             [self.exhibitorInfoValues  addObject:@"未标注"];
         }
     }
-//    //公司网址
-//    if (model.website == nil||[model.website isEqualToString:@""]) {
-//        [self.exhibitorInfoValues  addObject:@"暂无"];
-//    }else {
-//        [self.exhibitorInfoValues  addObject:model.website];
-//    }
-//    //公司电话
-//    if (model.telephone == nil||[model.telephone isEqualToString:@""]) {
-//        [self.exhibitorInfoValues  addObject:@"暂无"];
-//    }else {
-//        [self.exhibitorInfoValues  addObject:model.telephone];
-//    }
-//    //公司地址
-//    if (model.address == nil||[model.address isEqualToString:@""]) {
-//        [self.exhibitorInfoValues  addObject:@"暂无"];
-//    }else {
-//        [self.exhibitorInfoValues  addObject:model.address];
-//    }
     //需求说明
-    if (model.requirement == nil||[model.requirement isEqualToString:@""]) {
+    if (model.requirement.length == 0) {
         [self.exhibitorInfoValues  addObject:@"暂无"];
     }else {
         [self.exhibitorInfoValues  addObject:model.requirement];
     }
     
     //需求说明
-    if (model.requirement == nil||[model.requirement isEqualToString:@""]) {
+    if (model.requirement.length == 0) {
         [self.exhibitorInfoValues  addObject:@""];
     }else {
         [self.exhibitorInfoValues  addObject:@""];
@@ -783,9 +825,9 @@
 }
 
 - (void)requestExExhibitorsProfile {
-    if (self.merchantId) {
+    if (self.shareModel.merchantId) {
         __weak typeof (self) weakSelf = self;
-        [[ZWDataAction sharedAction]postFormDataReqeustWithURL:zwExExhibitorProfile parametes:@{@"merchantId":self.merchantId} successBlock:^(NSDictionary * _Nonnull data) {
+        [[ZWDataAction sharedAction]postFormDataReqeustWithURL:zwExExhibitorProfile parametes:@{@"merchantId":self.shareModel.merchantId} successBlock:^(NSDictionary * _Nonnull data) {
             __strong typeof (weakSelf) strongSelf = weakSelf;
             if (zw_issuccess) {
                 strongSelf.companyIntroduction = data[@"data"][@"zwMerchantVo"][@"profile"];
@@ -798,9 +840,9 @@
     }
 }
 - (void)requestExExhibitorsProductList {
-    if (self.exhibitorId) {
+    if (self.shareModel.exhibitorId) {
         __weak typeof (self) weakSelf = self;
-        [[ZWDataAction sharedAction]postFormDataReqeustWithURL:zwExExhibitorProductList parametes:@{@"exhibitorId":self.exhibitorId,@"status":@""} successBlock:^(NSDictionary * _Nonnull data) {
+        [[ZWDataAction sharedAction]postFormDataReqeustWithURL:zwExExhibitorProductList parametes:@{@"exhibitorId":self.shareModel.exhibitorId,@"status":@""} successBlock:^(NSDictionary * _Nonnull data) {
             __strong typeof (weakSelf) strongSelf = weakSelf;
             if (zw_issuccess) {
                 NSArray *myData = data[@"data"];
@@ -820,7 +862,7 @@
 }
 - (void)requestExExhibitorsContactList {
     __weak typeof (self) weakSelf = self;
-    [[ZWDataAction sharedAction]postFormDataReqeustWithURL:zwExExhibitorContactersList parametes:@{@"exhibitorId":self.exhibitorId} successBlock:^(NSDictionary * _Nonnull data) {
+    [[ZWDataAction sharedAction]postFormDataReqeustWithURL:zwExExhibitorContactersList parametes:@{@"exhibitorId":self.shareModel.exhibitorId} successBlock:^(NSDictionary * _Nonnull data) {
         __strong typeof (weakSelf) strongSelf = weakSelf;
         if (zw_issuccess) {
             NSArray *dataArray = data[@"data"];
@@ -840,6 +882,11 @@
 
 
 - (void)browseBtnClick:(UIButton *)btn {
+    
+//    ZWPDFLoadVC *VC = [[ZWPDFLoadVC alloc]init];
+//    VC.pdfUrl = self.model.productUrl;
+//    [self presentViewController:VC animated:YES completion:nil];
+    
     NSLog(@"%@",self.model.productUrl);
     if (!self.model.productUrl||[self.model.productUrl isEqualToString:@""]) {
         [self showOneAlertWithMessage:@"暂无产品手册"];

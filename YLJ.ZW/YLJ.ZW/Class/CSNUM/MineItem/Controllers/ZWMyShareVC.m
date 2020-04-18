@@ -23,7 +23,7 @@
 #import <ShareSDKUI/ShareSDK+SSUI.h>
 
 @interface ZWMyShareVC ()<UITableViewDelegate,UITableViewDataSource>
-@property(nonatomic, strong)UITableView *tableView;
+@property(nonatomic, strong)ZWBaseEmptyTableView *tableView;
 @property(nonatomic, strong)NSArray *dataArray;
 @property(nonatomic, assign)NSInteger page;
 
@@ -38,10 +38,10 @@
 
 @implementation ZWMyShareVC
 
--(UITableView *)tableView {
+-(ZWBaseEmptyTableView *)tableView {
     if (!_tableView) {
         
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStylePlain];
+        _tableView = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStylePlain];
         _tableView.dataSource = self;
         _tableView.delegate = self;
         _tableView.sectionHeaderHeight = 0;
@@ -113,7 +113,7 @@
 }
 - (void)createTableViewCell:(UITableViewCell *)cell cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+//    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     
     ZWMyShareBindListModel *model = self.dataArray[indexPath.row];
     
@@ -133,29 +133,37 @@
     titleLabel.numberOfLines = 2;
     [cell.contentView addSubview:titleLabel];
     
-    UILabel *numLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(titleLabel.frame), CGRectGetMinY(titleLabel.frame), 0.1*kScreenWidth+25, 0.05*kScreenWidth)];
-    numLabel.text = [NSString stringWithFormat:@"（%@/%@）",model.bindSize,model.total];
-    numLabel.font = boldSmallFont;
-    numLabel.textAlignment = NSTextAlignmentRight;
-    [cell.contentView addSubview:numLabel];
+//    UILabel *numLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(titleLabel.frame), CGRectGetMinY(titleLabel.frame), 0.1*kScreenWidth+25, 0.05*kScreenWidth)];
+//    numLabel.text = [NSString stringWithFormat:@"（%@/%@）",model.bindSize,model.total];
+//    numLabel.font = boldSmallFont;
+//    numLabel.textAlignment = NSTextAlignmentRight;
+//    [cell.contentView addSubview:numLabel];
+//
+//    NSInteger total = [model.total integerValue];
+//    NSInteger bindSize = [model.bindSize integerValue];
+//    NSInteger xValue = total-bindSize;
+//    if (xValue > 50) {
+//        numLabel.textColor = [UIColor greenColor];
+//    }else {
+//        if (xValue == 0) {
+//            numLabel.textColor = [UIColor redColor];
+//        }else {
+//            numLabel.textColor = [UIColor orangeColor];
+//        }
+//    }
     
-    NSInteger total = [model.total integerValue];
-    NSInteger bindSize = [model.bindSize integerValue];
-    NSInteger xValue = total-bindSize;
-    if (xValue > 50) {
-        numLabel.textColor = [UIColor greenColor];
-    }else {
-        if (xValue == 0) {
-            numLabel.textColor = [UIColor redColor];
-        }else {
-            numLabel.textColor = [UIColor orangeColor];
-        }
-    }
     UILabel *dateLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(titleLabel.frame), CGRectGetMaxY(titleLabel.frame), CGRectGetWidth(titleLabel.frame), 0.05*kScreenWidth)];
     dateLabel.text = [NSString stringWithFormat:@"时间：%@～%@",[model.startTime substringWithRange:NSMakeRange(0,10)],[model.endTime substringWithRange:NSMakeRange(0,10)]];
     dateLabel.font = smallFont;
     dateLabel.textColor = [UIColor grayColor];
     [cell.contentView addSubview:dateLabel];
+    
+    UILabel *addrssLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(dateLabel.frame), CGRectGetMaxY(dateLabel.frame), CGRectGetWidth(titleLabel.frame), 0.05*kScreenWidth)];
+    addrssLabel.text = [NSString stringWithFormat:@"地点：%@   %@",model.country,model.city];
+    addrssLabel.font = smallFont;
+    addrssLabel.textColor = [UIColor grayColor];
+    [cell.contentView addSubview:addrssLabel];
+    
     
 //    UILabel *adressLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(dateLabel.frame), CGRectGetMaxY(dateLabel.frame), CGRectGetWidth(titleLabel.frame), 0.05*kScreenWidth)];
 //    adressLabel.text = [NSString stringWithFormat:@"地点：%@  %@",model.country ,model.city];
@@ -163,40 +171,54 @@
 //    adressLabel.textColor = [UIColor grayColor];
 //    [cell.contentView addSubview:adressLabel];
     
-    UIButton *bindBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    bindBtn.frame = CGRectMake(CGRectGetMinX(dateLabel.frame), CGRectGetMaxY(dateLabel.frame)+5, 0.15*kScreenWidth, 0.05*kScreenWidth);
-    bindBtn.backgroundColor = skinColor;
-    [bindBtn setTitle:@"绑定分享码" forState:UIControlStateNormal];
-    bindBtn.titleLabel.font = smallFont;
-    bindBtn.tag = indexPath.row;
-    [bindBtn addTarget:self action:@selector(bindBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-    [cell.contentView addSubview:bindBtn];
+//    UIButton *bindBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+//    bindBtn.frame = CGRectMake(CGRectGetMinX(dateLabel.frame), CGRectGetMaxY(dateLabel.frame)+5, 0.15*kScreenWidth, 0.05*kScreenWidth);
+//    bindBtn.backgroundColor = skinColor;
+//    [bindBtn setTitle:@"绑定分享码" forState:UIControlStateNormal];
+//    bindBtn.titleLabel.font = smallFont;
+//    bindBtn.tag = indexPath.row;
+//    [bindBtn addTarget:self action:@selector(bindBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+//    [cell.contentView addSubview:bindBtn];
+//
+//    UIButton *shareListBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+//    shareListBtn.frame = CGRectMake(CGRectGetMaxX(bindBtn.frame)+0.05*kScreenWidth, CGRectGetMaxY(dateLabel.frame)+5, 0.15*kScreenWidth, 0.05*kScreenWidth);
+//    shareListBtn.backgroundColor = [UIColor orangeColor];
+//    [shareListBtn setTitle:@"分享列表" forState:UIControlStateNormal];
+//    shareListBtn.titleLabel.font = smallFont;
+//    shareListBtn.tag = indexPath.row;
+//    [shareListBtn addTarget:self action:@selector(shareListBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+//    [cell.contentView addSubview:shareListBtn];
+//
+//    UIButton *shareBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+//    shareBtn.frame = CGRectMake(CGRectGetMaxX(shareListBtn.frame)+0.05*kScreenWidth, CGRectGetMaxY(dateLabel.frame)+5, 0.15*kScreenWidth, 0.05*kScreenWidth);
+//    shareBtn.backgroundColor = skinColor;
+//    [shareBtn setTitle:@"分享展商" forState:UIControlStateNormal];
+//    shareBtn.titleLabel.font = smallFont;
+//    shareBtn.tag = indexPath.row;
+//    [shareBtn addTarget:self action:@selector(shareBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+//    [cell.contentView addSubview:shareBtn];
+//
+//    [self setTheRoundedCorners:bindBtn];
+//    [self setTheRoundedCorners:shareListBtn];
+//    [self setTheRoundedCorners:shareBtn];
+    
     
     UIButton *shareListBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    shareListBtn.frame = CGRectMake(CGRectGetMaxX(bindBtn.frame)+0.05*kScreenWidth, CGRectGetMaxY(dateLabel.frame)+5, 0.15*kScreenWidth, 0.05*kScreenWidth);
+    shareListBtn.frame = CGRectMake(0.85*kScreenWidth, 0, 0.15*kScreenWidth, 0.065*kScreenWidth);
     shareListBtn.backgroundColor = [UIColor orangeColor];
     [shareListBtn setTitle:@"分享列表" forState:UIControlStateNormal];
-    shareListBtn.titleLabel.font = smallFont;
+    shareListBtn.titleLabel.font = boldSmallFont;
+    shareListBtn.titleLabel.numberOfLines = 0;
     shareListBtn.tag = indexPath.row;
     [shareListBtn addTarget:self action:@selector(shareListBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     [cell.contentView addSubview:shareListBtn];
     
-    UIButton *shareBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    shareBtn.frame = CGRectMake(CGRectGetMaxX(shareListBtn.frame)+0.05*kScreenWidth, CGRectGetMaxY(dateLabel.frame)+5, 0.15*kScreenWidth, 0.05*kScreenWidth);
-    shareBtn.backgroundColor = skinColor;
-    [shareBtn setTitle:@"分享展商" forState:UIControlStateNormal];
-    shareBtn.titleLabel.font = smallFont;
-    shareBtn.tag = indexPath.row;
-    [shareBtn addTarget:self action:@selector(shareBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-    [cell.contentView addSubview:shareBtn];
-    
-    [self setTheRoundedCorners:bindBtn];
     [self setTheRoundedCorners:shareListBtn];
-    [self setTheRoundedCorners:shareBtn];
+    
 }
 
 - (void)setTheRoundedCorners:(UIButton *)btn {
-    UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:btn.bounds byRoundingCorners:(UIRectCornerTopLeft | UIRectCornerBottomRight) cornerRadii:CGSizeMake(8,8)];//圆角大小
+    UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:btn.bounds byRoundingCorners:(UIRectCornerBottomLeft) cornerRadii:CGSizeMake(10,10)];//圆角大小
     CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
     maskLayer.frame = btn.bounds;
     maskLayer.path = maskPath.CGPath;
@@ -249,39 +271,39 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 0.15*kScreenWidth;
+    return 0.1;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     return 0.1;
 }
-- (nullable UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    
-    UIView *tool = [[UIView alloc]init];
-    tool.backgroundColor = zwGrayColor;
-    
-    UILabel *cumulative = [[UILabel alloc]initWithFrame:CGRectMake(20, 0.025*kScreenWidth, 0.5*kScreenWidth-15, 0.05*kScreenWidth)];
-    cumulative.text = [NSString stringWithFormat:@"累计分享码%@个",self.total];
-    cumulative.font = smallMediumFont;
-    [tool addSubview:cumulative];
-    
-    UILabel *remainLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(cumulative.frame), CGRectGetMaxY(cumulative.frame)+0.01*kScreenWidth, 0.5*kScreenWidth-15, CGRectGetHeight(cumulative.frame))];
-    remainLabel.text = [NSString stringWithFormat:@"剩余未绑定分享码%@个",self.unbindCount];
-    remainLabel.font = smallMediumFont;
-    [tool addSubview:remainLabel];
-    
-    UIButton *buyBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    buyBtn.frame = CGRectMake(0.8*kScreenWidth-15, 0.045*kScreenWidth, 0.2*kScreenWidth, 0.07*kScreenWidth);
-    [buyBtn setTitle:@"购买分享码" forState:UIControlStateNormal];
-    buyBtn.layer.cornerRadius = 5;
-    buyBtn.layer.masksToBounds = YES;
-    buyBtn.backgroundColor = skinColor;
-    buyBtn.titleLabel.font = smallMediumFont;
-    [buyBtn addTarget:self action:@selector(buyBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-    [tool addSubview:buyBtn];
-    
-    return tool;
-}
+//- (nullable UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+//
+//    UIView *tool = [[UIView alloc]init];
+//    tool.backgroundColor = zwGrayColor;
+//
+//    UILabel *cumulative = [[UILabel alloc]initWithFrame:CGRectMake(20, 0.025*kScreenWidth, 0.5*kScreenWidth-15, 0.05*kScreenWidth)];
+//    cumulative.text = [NSString stringWithFormat:@"累计分享码%@个",self.total];
+//    cumulative.font = smallMediumFont;
+//    [tool addSubview:cumulative];
+//
+//    UILabel *remainLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(cumulative.frame), CGRectGetMaxY(cumulative.frame)+0.01*kScreenWidth, 0.5*kScreenWidth-15, CGRectGetHeight(cumulative.frame))];
+//    remainLabel.text = [NSString stringWithFormat:@"剩余未绑定分享码%@个",self.unbindCount];
+//    remainLabel.font = smallMediumFont;
+//    [tool addSubview:remainLabel];
+//
+//    UIButton *buyBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+//    buyBtn.frame = CGRectMake(0.8*kScreenWidth-15, 0.045*kScreenWidth, 0.2*kScreenWidth, 0.07*kScreenWidth);
+//    [buyBtn setTitle:@"购买分享码" forState:UIControlStateNormal];
+//    buyBtn.layer.cornerRadius = 5;
+//    buyBtn.layer.masksToBounds = YES;
+//    buyBtn.backgroundColor = skinColor;
+//    buyBtn.titleLabel.font = smallMediumFont;
+//    [buyBtn addTarget:self action:@selector(buyBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+//    [tool addSubview:buyBtn];
+//
+//    return tool;
+//}
 
 - (void)buyBtnClick:(UIButton *)btn {
     __weak typeof (self) weakSelf = self;
@@ -415,13 +437,13 @@
     NSMutableDictionary *shareParams = [NSMutableDictionary dictionary];
     NSString *text;
     if (type == SSDKPlatformTypeSinaWeibo) {
-        text = [NSString stringWithFormat:@"%@?exhibitorId=%@",share_url,self.shareModel.exhibitorId];
+        text = [NSString stringWithFormat:@"%@/html/share_exhibitors.html?exhibitorId=%@",share_url,self.shareModel.exhibitorId];
     }else {
         text = self.shareModel.exhibitionName;
     }
     [shareParams SSDKSetupShareParamsByText:text
                                      images:[NSString stringWithFormat:@"%@%@",httpImageUrl,self.shareModel.coverImage]
-                                        url:[NSURL URLWithString:[NSString stringWithFormat:@"%@?exhibitorId=%@",share_url,self.shareModel.exhibitorId]]
+                                        url:[NSURL URLWithString:[NSString stringWithFormat:@"%@/html/share_exhibitors.html?exhibitorId=%@",share_url,self.shareModel.exhibitorId]]
                                       title:self.shareModel.merchantName
                                        type:SSDKContentTypeAuto];
     [ShareSDK share:type parameters:shareParams onStateChanged:^(SSDKResponseState state, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error) {

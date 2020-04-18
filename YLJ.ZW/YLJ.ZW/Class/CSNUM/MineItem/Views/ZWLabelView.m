@@ -60,15 +60,15 @@
             
             [btn addTarget:self action:@selector(BtnClick:) forControlEvents:UIControlEventTouchUpInside];
             
-            UIButton *deleteBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-            deleteBtn.frame = CGRectMake(CGRectGetWidth(btn.frame)-0.02*kScreenWidth, -0.01*kScreenWidth, 0.03*kScreenWidth, 0.03*kScreenWidth);
-            deleteBtn.layer.cornerRadius = 0.015*kScreenWidth;
-            deleteBtn.layer.masksToBounds = YES;
-            deleteBtn.backgroundColor = [UIColor whiteColor];
-            [deleteBtn setBackgroundImage:[UIImage imageNamed:@"delete_blue_icon"] forState:UIControlStateNormal];
-            deleteBtn.backgroundColor = skinColor;
-            [deleteBtn addTarget:self action:@selector(BtnClick:) forControlEvents:UIControlEventTouchUpInside];
-            [btn addSubview:deleteBtn];
+//            UIButton *deleteBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+//            deleteBtn.frame = CGRectMake(CGRectGetWidth(btn.frame)-0.02*kScreenWidth, -0.01*kScreenWidth, 0.03*kScreenWidth, 0.03*kScreenWidth);
+//            deleteBtn.layer.cornerRadius = 0.015*kScreenWidth;
+//            deleteBtn.layer.masksToBounds = YES;
+//            deleteBtn.backgroundColor = [UIColor whiteColor];
+//            [deleteBtn setBackgroundImage:[UIImage imageNamed:@"delete_blue_icon"] forState:UIControlStateNormal];
+//            deleteBtn.backgroundColor = skinColor;
+//            [deleteBtn addTarget:self action:@selector(BtnClick:) forControlEvents:UIControlEventTouchUpInside];
+//            [btn addSubview:deleteBtn];
             
             
         }

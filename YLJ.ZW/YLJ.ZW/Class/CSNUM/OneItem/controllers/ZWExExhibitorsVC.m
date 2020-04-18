@@ -20,7 +20,7 @@
 #import "ZWExExhibitorsDetailsVC.h"
 @interface ZWExExhibitorsVC ()<ZWTopSelectViewDelegate,UITableViewDelegate,UITableViewDataSource,ZWExhibitionMerchantCellDelegate>
 @property(nonatomic, strong)UITableView *leftTableView;
-@property(nonatomic, strong)UITableView *rightTableView;
+@property(nonatomic, strong)ZWBaseEmptyTableView *rightTableView;
 @property(nonatomic, assign)NSInteger selectType;
 
 @property(nonatomic, assign)NSInteger page;
@@ -42,7 +42,7 @@
 @implementation ZWExExhibitorsVC
 -(UITableView *)leftTableView {
     if (!_leftTableView) {
-        _leftTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0.08*kScreenWidth, 0.2*kScreenWidth, kScreenHeight-zwNavBarHeight-0.08*kScreenWidth) style:UITableViewStyleGrouped];
+        _leftTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0.09*kScreenWidth, 0.2*kScreenWidth, kScreenHeight-zwNavBarHeight-0.09*kScreenWidth) style:UITableViewStyleGrouped];
     }
     _leftTableView.dataSource = self;
     _leftTableView.delegate = self;
@@ -51,14 +51,15 @@
     _leftTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     return _leftTableView;
 }
--(UITableView *)rightTableView {
+-(ZWBaseEmptyTableView *)rightTableView {
     if (!_rightTableView) {
-        _rightTableView = [[UITableView alloc]initWithFrame:CGRectMake(0.2*kScreenWidth, 0.08*kScreenWidth, 0.8*kScreenWidth, kScreenHeight-zwNavBarHeight-0.08*kScreenWidth) style:UITableViewStyleGrouped];
+        _rightTableView = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0.2*kScreenWidth, 0.09*kScreenWidth, 0.8*kScreenWidth, kScreenHeight-zwNavBarHeight-0.09*kScreenWidth) style:UITableViewStyleGrouped];
     }
     _rightTableView.dataSource = self;
     _rightTableView.delegate = self;
     _rightTableView.sectionHeaderHeight = 0;
     _rightTableView.sectionFooterHeight = 0;
+    _rightTableView.backgroundColor = [UIColor whiteColor];
     _rightTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     return _rightTableView;
 }
@@ -112,7 +113,7 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 - (void)createUI {
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = zwTableBackColor;
     self.selectType = 0;
     self.exhibitorsType = 0;
     self.isRreadAll = 0;
@@ -251,7 +252,7 @@
     }
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 0.01*kScreenWidth;
+    return 0.1;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     return 0.1;
@@ -310,8 +311,9 @@
     
     ZWExExhibitorsDetailsVC *detailsVC = [[ZWExExhibitorsDetailsVC alloc]init];
     detailsVC.title = @"展商详情";
-    detailsVC.exhibitorId = model.exhibitorId;
-    detailsVC.merchantId = model.merchantId;
+//    detailsVC.exhibitorId = model.exhibitorId;
+//    detailsVC.merchantId = model.merchantId;
+    detailsVC.shareModel = model;
     [self.navigationController pushViewController:detailsVC animated:YES];
 }
 
@@ -384,7 +386,7 @@
         }
     } failureBlock:^(NSError * _Nonnull error) {
         
-    } showInView:self.view];
+    }];
 }
 
 - (void)createRequestIndustry {
@@ -413,7 +415,7 @@
         }
     } failureBlock:^(NSError * _Nonnull error) {
         
-    } showInView:self.view];
+    }];
 }
 
 @end

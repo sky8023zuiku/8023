@@ -44,6 +44,7 @@
     [self createVC:timelineVC Title:@"展会排期" imageName:@"exhibition_date_iocn" selectImage:@"exhibition_date_select"];
     
     ZWHallFloorPlanVC *planVC = [[ZWHallFloorPlanVC alloc]init];
+    planVC.hallId = model.hallId;
     [self createVC:planVC Title:@"展厅平面图" imageName:@"hall_plane_icon" selectImage:@"hall_plane_select"];
     
     ZWHallMapVC *mapVC = [[ZWHallMapVC alloc]init];

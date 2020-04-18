@@ -70,11 +70,18 @@
     NSLog(@"我的值在这里还剩下几个 = %@",self.selectArray);
     
     for (ZWChosenIndustriesModel *chosenModel in self.selectArray) {
-        if ([model.industryId isEqualToNumber:chosenModel.industries3Id]) {
+        if ([(NSNumber *)model.industryId isEqualToNumber:chosenModel.industries3Id]) {
             cell.selected = YES;
             [collectionView selectItemAtIndexPath:[NSIndexPath indexPathForRow:indexPath.row inSection:0] animated:YES scrollPosition:UICollectionViewScrollPositionNone];
         }
     }
+    
+//    for (ZWChosenIndustriesModel *chosenModel in self.selectArray) {
+//           if ([[NSString stringWithFormat:@"%@",model.industryId] isEqualToString:[NSString stringWithFormat:@"%@",chosenModel.industries3Name]]) {
+//               cell.selected = YES;
+//               [collectionView selectItemAtIndexPath:[NSIndexPath indexPathForRow:indexPath.row inSection:0] animated:YES scrollPosition:UICollectionViewScrollPositionNone];
+//           }
+//       }
     
     return cell;
     

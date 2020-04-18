@@ -160,8 +160,17 @@ NSString *const cityCell = @"CityCell";
 {
     if (_hotCityData == nil) {
         _hotCityData = [[NSMutableArray alloc] init];
+        GYZCity *city = [[GYZCity alloc]init];
+        city.cityID = @"120";
+        city.cityName = @"全部";
+        city.shortName = @"全部";
+        city.pinyin = @"";
+        city.initials = @"";
+        [_hotCityData addObject:city];
         for (NSString *str in self.hotCitys) {
             GYZCity *city = nil;
+            city.cityID = @"120";
+            city.cityName = @"全部";
             for (GYZCity *item in self.recordCityData) {
                 if ([item.cityID isEqualToString:str]) {
                     city = item;

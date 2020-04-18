@@ -167,6 +167,7 @@
 }
 
 - (void)createParametersWithIndex:(NSInteger)index {
+    
      if (index == 0) {
             self.firstIndustry = @"1";//会展设计
         }else if (index == 1) {
@@ -200,7 +201,6 @@
         [self.myParameter setValue:self.firstIndustry forKey:@"firstIndustry"];
     }
     [self createCompanyView];
-    
     
 }
 

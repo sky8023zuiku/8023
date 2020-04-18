@@ -30,7 +30,7 @@
 
 @interface ZWMyCollectionVC ()<UITableViewDelegate,UITableViewDataSource,ZWExhibitionListsCellDelegate,ZWIndustryMerchantCellDelegate,ZWExhibitionMerchantCellDelegate,ZWTopSelectViewDelegate,ZWExhibitionDelayCellDelegate>
 
-@property(nonatomic, strong)UITableView *tableView;
+@property(nonatomic, strong)ZWBaseEmptyTableView *tableView;
 
 @property(nonatomic, strong)UIView *lineBlue;
 
@@ -54,9 +54,9 @@
 
 @implementation ZWMyCollectionVC
 
--(UITableView *)tableView {
+-(ZWBaseEmptyTableView *)tableView {
     if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0.08*kScreenWidth, kScreenWidth, kScreenHeight-zwNavBarHeight-0.08*kScreenWidth) style:UITableViewStyleGrouped];
+        _tableView = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0, 0.08*kScreenWidth, kScreenWidth, kScreenHeight-zwNavBarHeight-0.08*kScreenWidth) style:UITableViewStyleGrouped];
     }
     _tableView.dataSource = self;
     _tableView.delegate = self;
@@ -223,8 +223,7 @@
         ZWExExhibitorsModel *model = self.exhibitorsDataSource[indexPath.row];
         ZWExExhibitorsDetailsVC *detailsVC = [[ZWExExhibitorsDetailsVC alloc]init];
         detailsVC.title = @"展商详情";
-        detailsVC.exhibitorId = model.exhibitorId;
-        detailsVC.merchantId = model.merchantId;
+        detailsVC.shareModel = model;
         [self.navigationController pushViewController:detailsVC animated:YES];
 
     }else {

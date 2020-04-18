@@ -83,6 +83,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic ,copy)NSArray *profileFiles;//公司简介图片
 @property(nonatomic, copy)NSString *coverFile;//公司Logo
 @property(nonatomic, copy)NSString *licenseFile;//公司Logo
+@property(nonatomic, copy)NSString *speciality;//服务商类型
+
+@property(nonatomic, copy)NSString *authenticationId;//认证id;
 
 @property(nonatomic, copy)NSString *country;//国家
 @property(nonatomic, copy)NSString *province;//省份

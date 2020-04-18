@@ -126,7 +126,7 @@
         
         titleLabel.text = @"公司简介：";
         NSString *detailStr = [NSString stringWithFormat:@"%@",model.profile];
-        CGFloat kHeight = [[ZWToolActon shareAction]adaptiveTextHeight:detailStr font:normalFont];
+        CGFloat kHeight = [[ZWToolActon shareAction]adaptiveTextHeight:detailStr textFont:normalFont textWidth:kScreenWidth-30];
         UILabel *detailLabel = [[UILabel alloc]initWithFrame:CGRectMake(15, 0.08*kScreenWidth, kScreenWidth-30, kHeight+50)];
         detailLabel.text = detailStr;
         detailLabel.font = normalFont;
@@ -149,7 +149,7 @@
         
         NSString *detailStr =[NSString stringWithFormat:@"%@",model.profile];
         
-        CGFloat kHeight = [[ZWToolActon shareAction]adaptiveTextHeight:detailStr font:normalFont];
+        CGFloat kHeight = [[ZWToolActon shareAction]adaptiveTextHeight:detailStr textFont:normalFont textWidth:kScreenWidth-30];
     
         return kHeight+0.23*kScreenWidth+50;
     }else {

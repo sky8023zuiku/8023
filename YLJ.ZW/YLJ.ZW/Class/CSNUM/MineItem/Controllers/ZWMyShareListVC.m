@@ -9,17 +9,17 @@
 #import "ZWMyShareListVC.h"
 #import "ZWMyShareExhibitionUserModel.h"
 @interface ZWMyShareListVC ()<UITableViewDelegate,UITableViewDataSource>
-@property(nonatomic, strong)UITableView *tableView;
+@property(nonatomic, strong)ZWBaseEmptyTableView *tableView;
 @property(nonatomic, strong)NSMutableArray *dataArray;
 @property(nonatomic, assign)NSInteger page;
 @end
 
 @implementation ZWMyShareListVC
 
--(UITableView *)tableView {
+-(ZWBaseEmptyTableView *)tableView {
     if (!_tableView) {
         
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
+        _tableView = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
         _tableView.dataSource = self;
         _tableView.delegate = self;
         _tableView.sectionHeaderHeight = 0;
@@ -77,13 +77,13 @@
     ZWMyShareExhibitionUserModel *model = self.dataArray[indexPath.row];
     
     UIImageView *headImage = [[UIImageView alloc]initWithFrame:CGRectMake(15, 0.02*kScreenWidth, 0.11*kScreenWidth, 0.11*kScreenWidth)];
-    [headImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",httpImageUrl,model.coverImage]] placeholderImage:[UIImage imageNamed:@"icon_no_60"]];
+    [headImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",httpImageUrl,model.headImage]] placeholderImage:[UIImage imageNamed:@"icon_no_60"]];
     headImage.layer.cornerRadius = 0.055*kScreenWidth;
     headImage.layer.masksToBounds = YES;
     [cell.contentView addSubview:headImage];
     
     UILabel *nameLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(headImage.frame)+0.02*kScreenWidth, CGRectGetMinY(headImage.frame), 0.5*kScreenWidth, 0.05*kScreenWidth)];
-    nameLabel.text = model.userName;
+    nameLabel.text = model.username;
     nameLabel.font = smallMediumFont;
     nameLabel.textColor = [UIColor colorWithRed:67/255.0 green:67/255.0 blue:67/255.0 alpha:1.0];
     [cell.contentView addSubview:nameLabel];
@@ -94,13 +94,14 @@
     phoneLabel.textColor = [UIColor colorWithRed:67/255.0 green:67/255.0 blue:67/255.0 alpha:1.0];
     [cell.contentView addSubview:phoneLabel];
     
-    
     UILabel *dateLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(nameLabel.frame), CGRectGetMinY(nameLabel.frame), 0.37*kScreenWidth-30, CGRectGetHeight(nameLabel.frame))];
-    dateLabel.text = model.bindTime;
+    NSLog(@"22222= %@",model.created);
+    dateLabel.text = [[ZWToolActon shareAction]getTimeFromTimestamp:model.created withDataStr:@"yyyy-MM-dd HH:mm:ss"];;
     dateLabel.textColor = [UIColor colorWithRed:67/255.0 green:67/255.0 blue:67/255.0 alpha:1.0];
     dateLabel.font = smallFont;
     dateLabel.textAlignment = NSTextAlignmentRight;
     [cell.contentView addSubview:dateLabel];
+
     
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -118,6 +119,8 @@
     self.dataArray = [NSMutableArray array];
     self.page = 1;
     [self dataRequestWithPage:self.page];
+    [self refreshHeader];
+    [self refreshFooter];
 }
 
 //刷新
@@ -147,11 +150,13 @@
         __weak typeof (self) weakSelf = self;
         [[ZWDataAction sharedAction]postReqeustWithURL:zwShareUserList parametes:myDic successBlock:^(NSDictionary * _Nonnull data) {
             __strong typeof (weakSelf) strongSelf = weakSelf;
+            [strongSelf.tableView.mj_header endRefreshing];
+            [strongSelf.tableView.mj_footer endRefreshing];
             if (zw_issuccess) {
                 if (page == 1) {
                     [strongSelf.dataArray removeAllObjects];
                 }
-                NSArray *myData = data[@"data"][@"result"];
+                NSArray *myData = data[@"data"][@"pageInfo"][@"list"];
                 NSMutableArray *myArray = [NSMutableArray array];
                 for (NSDictionary *myDic in myData) {
                     ZWMyShareExhibitionUserModel *model = [ZWMyShareExhibitionUserModel parseJSON:myDic];
@@ -161,7 +166,9 @@
                 [strongSelf.tableView reloadData];
             }
         } failureBlock:^(NSError * _Nonnull error) {
-            
+             __strong typeof (weakSelf) strongSelf = weakSelf;
+            [strongSelf.tableView.mj_header endRefreshing];
+            [strongSelf.tableView.mj_footer endRefreshing];
         }];
     }
 }

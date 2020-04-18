@@ -27,9 +27,15 @@ static ZWToolActon *shareAction = nil;
     return height;
 }
 
+-(CGFloat)adaptiveTextHeight:(NSString *)text textFont:(UIFont *)font textWidth:(CGFloat)width {
+    NSDictionary *dic = @{NSFontAttributeName: font};
+    CGFloat height = [text boundingRectWithSize:CGSizeMake(width, CGFLOAT_MAX) options:NSStringDrawingTruncatesLastVisibleLine |NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:dic context:nil].size.height;
+    return height;
+}
+
 -(CGFloat)adaptiveTextHeight:(NSString *)text font:(UIFont *)font {
     NSDictionary *dic = @{NSFontAttributeName: font};
-    CGFloat height = [text boundingRectWithSize:CGSizeMake(kScreenWidth-20, 5000) options:NSStringDrawingTruncatesLastVisibleLine |NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:dic context:nil].size.height;
+    CGFloat height = [text boundingRectWithSize:CGSizeMake(kScreenWidth, CGFLOAT_MAX) options:NSStringDrawingTruncatesLastVisibleLine |NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:dic context:nil].size.height;
     return height;
 }
 
@@ -153,6 +159,7 @@ static ZWToolActon *shareAction = nil;
 
 
 - (NSString *)getTimeFromTimestamp:(NSNumber *)stamp withDataStr:(NSString *)format{
+    NSLog(@"-------%@",stamp);
     NSString *str = [stamp stringValue];
     double time;
     if (str.length>10) {
@@ -186,6 +193,15 @@ static ZWToolActon *shareAction = nil;
     [attribute addAttribute:NSKernAttributeName value:number range:NSMakeRange(0,length)];
     return attribute;
     
+}
+
+/**
+ *  字符串转数组
+*/
+- (NSArray *)strTurnArrayWithString:(NSString *)string {
+    NSString *strUrl = [string stringByReplacingOccurrencesOfString:@"，" withString:@","];
+    NSArray  *array = [strUrl componentsSeparatedByString:@","];
+    return array;
 }
 
 

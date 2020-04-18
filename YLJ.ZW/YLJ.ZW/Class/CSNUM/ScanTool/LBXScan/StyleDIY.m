@@ -137,11 +137,11 @@
     //显示矩形框
     style.isNeedShowRetangle = NO;
     //动画类型：网格形式，模仿支付宝
-//    style.anmiationStyle = LBXScanViewAnimationStyle_NetGrid;
     style.anmiationStyle = LBXScanViewAnimationStyle_LineMove;
     
     style.animationImage = [UIImage imageNamed:@"CodeScan.bundle/qrcode_scan_light_green"];
-//    style.animationImage = [UIImage gradientColorImageFromColors:@[navLeftColor,navRightColor] gradientType:GradientTypeTopToBottom imgSize:CGSizeMake(0.7*kScreenWidth, 0.1*kScreenWidth)];
+//    style.animationImage = [UIImage imageNamed:@"scan_image"];
+//    style.animationImage = [UIImage gradientColorImageFromColors:@[navLeftColor,navRightColor] gradientType:GradientTypeTopToBottom imgSize:CGSizeMake(0.7*kScreenWidth, 0.5*kScreenWidth)];
     //码框周围4个角的颜色
     style.colorAngle = [UIColor colorWithRed:65.0/255.0 green:163.0/255.0 blue:255.0/255.0 alpha:0];
     //矩形框颜色

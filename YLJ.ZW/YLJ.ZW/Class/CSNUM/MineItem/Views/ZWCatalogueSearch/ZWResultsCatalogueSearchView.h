@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)refreshResultViewWithIsDouble:(BOOL)isDouble;
 
-@property (nonatomic, strong) UITableView *contentTableView;
+@property (nonatomic, strong) ZWBaseEmptyTableView *contentTableView;
 
 @property(nonatomic, strong)NSString *searchText;
 @end

@@ -16,7 +16,7 @@
 
 @interface ZWMyOrderVC ()<UITableViewDelegate,UITableViewDataSource>
 
-@property(nonatomic, strong)UITableView *tableView;
+@property(nonatomic, strong)ZWBaseEmptyTableView *tableView;
 
 @property(nonatomic, assign)NSInteger type;//记录0为未支付，1为已支付
 @property(nonatomic, assign)NSInteger status;//记录1为未支付，2为已支付
@@ -32,9 +32,9 @@
 
 @implementation ZWMyOrderVC
 
--(UITableView *)tableView {
+-(ZWBaseEmptyTableView *)tableView {
     if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, zwNavBarHeight+44, kScreenWidth, kScreenHeight-zwNavBarHeight-44) style:UITableViewStyleGrouped];
+        _tableView = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0, zwNavBarHeight+44, kScreenWidth, kScreenHeight-zwNavBarHeight-44) style:UITableViewStyleGrouped];
     }
     _tableView.dataSource = self;
     _tableView.delegate = self;

@@ -147,11 +147,20 @@
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    if (self.merchantStatus == 3) {
-        return self.httpImages.count+self.imageArray.count+1;
+    
+    NSInteger count = self.httpImages.count+self.imageArray.count;
+    
+    if (count<9) {
+        return count+1;
     }else {
-        return self.imageArray.count+1;
+        return count;
     }
+    
+//    if (self.merchantStatus == 3) {
+//        return self.httpImages.count+self.imageArray.count+1;
+//    }else {
+//        return self.imageArray.count+1;
+//    }
 }
 
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -200,6 +209,7 @@
     }
 }
 - (void)deleteHttpImage:(NSInteger )index {
+    
     ZWDeleteProfileImageRequest *request = [[ZWDeleteProfileImageRequest alloc]init];
     request.authenticationId = self.parameter[@"authenticationId"];
     request.profilesImageId = self.httpImages[index][@"id"];
@@ -216,6 +226,7 @@
             NSLog(@"删除失败");
         }
     }];
+    
 }
 
 //定义每一个cell的大小

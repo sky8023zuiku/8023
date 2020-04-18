@@ -12,6 +12,10 @@
 #import "ZWExhibitionNaviModel.h"
 #import "ZWImageBrowser.h"
 #import "UIView+Ext.h"
+#import "ZWShareManager.h"
+
+#import "ZWShareModel.h"
+
 @interface ZWExhibitionNaviVC ()<UITableViewDelegate,UITableViewDataSource,DCCycleScrollViewDelegate>
 
 @property(nonatomic, strong)UITableView *tableView;
@@ -55,10 +59,26 @@
 }
 - (void)createNavigationBar {
     [[YNavigationBar sharedInstance]createLeftBarWithImage:[UIImage imageNamed:@"zai_dao_icon_left"] barItem:self.navigationItem target:self action:@selector(goBack:)];
+    [[YNavigationBar sharedInstance]createRightBarWithImage:[UIImage imageNamed:@"share_forward_icon"] barItem:self.navigationItem target:self action:@selector(rightItemClick:)];
 }
 - (void)goBack:(UINavigationItem *)item {
     [self.navigationController popViewControllerAnimated:YES];
 }
+
+
+- (void)rightItemClick:(UIBarButtonItem *)item {
+    
+    NSLog(@"====%@",self.shareData);
+
+    ZWShareModel *model = [[ZWShareModel alloc]init];
+    model.shareUrl = [NSString stringWithFormat:@"%@/html/share_exhibition.html?exhibitionId=%@",share_url,self.shareData[@"exhibitionId"]];
+    model.shareTitleImage = [NSString stringWithFormat:@"%@%@",httpImageUrl,self.shareData[@"exhibitionTitleImage"]];
+    model.shareName = self.shareData[@"exhibitionName"];
+    model.shareDetail = @"查看详情";
+    [[ZWShareManager shareManager]shareWithData:model];
+    
+}
+        
 - (void)createUI {
     
     self.view.backgroundColor = [UIColor whiteColor];

@@ -15,7 +15,7 @@
 
 @interface ZWMyReleaseVC ()<UITableViewDelegate,UITableViewDataSource>
 
-@property(nonatomic, strong)UITableView *tableView;
+@property(nonatomic, strong)ZWBaseEmptyTableView *tableView;
 @property(nonatomic, strong)NSMutableArray *dataSource;
 @property(nonatomic, assign)NSInteger type;//记录值
 @property(nonatomic, assign)NSInteger page;//页面
@@ -24,9 +24,9 @@
 
 @implementation ZWMyReleaseVC
 
--(UITableView *)tableView {
+-(ZWBaseEmptyTableView *)tableView {
     if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
+        _tableView = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
     }
     _tableView.dataSource = self;
     _tableView.delegate = self;
@@ -88,6 +88,7 @@
     requst.pageSize = @"5";
     __weak typeof (self) weakSelf = self;
     [requst postRequestCompleted:^(YHBaseRespense *respense) {
+        
         __strong typeof (weakSelf) strongSelf = weakSelf;
         [strongSelf.tableView.mj_header endRefreshing];
         [strongSelf.tableView.mj_footer endRefreshing];
@@ -101,45 +102,13 @@
             }
             [strongSelf.dataSource addObjectsFromArray:myArray];
             [strongSelf.tableView reloadData];
-            if (strongSelf.dataSource == 0) {
-                [self showBlankPagesWithImage:blankPagesImageName withDitail:@"暂无发布" withType:1];
-            }
+
         }else {
-            NSLog(@"%@",respense.data);
-            [self showBlankPagesWithImage:requestFailedBlankPagesImageName withDitail:@"当前网络异常，请检查网络" withType:1];
+
         }
     }];
 }
 
-- (void)showBlankPagesWithImage:(NSString *)imageName withDitail:(NSString *)ditail withType:(NSInteger)type {
-    UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0.1*kScreenHeight, kScreenWidth, 0.5*kScreenWidth)];
-    imageView.image = [UIImage imageNamed:imageName];
-    [self.view addSubview:imageView];
-    
-    UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(imageView.frame)+20, kScreenWidth, 30)];
-    myLabel.text = ditail;
-    myLabel.font = bigFont;
-    myLabel.textColor = [UIColor lightGrayColor];
-    myLabel.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:myLabel];
-    
-//    if (type == 2) {
-//        UIButton *reloadBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-//        reloadBtn.frame = CGRectMake(0.3*kScreenWidth, CGRectGetMaxY(myLabel.frame)+25, 0.4*kScreenWidth, 0.1*kScreenWidth);
-//        [reloadBtn setTitle:@"重新加载" forState:UIControlStateNormal];
-//        reloadBtn.layer.borderColor = skinColor.CGColor;
-//        reloadBtn.titleLabel.font = normalFont;
-//        reloadBtn.layer.cornerRadius = 0.05*kScreenWidth;
-//        reloadBtn.layer.masksToBounds = YES;
-//        [reloadBtn setTitleColor:skinColor forState:UIControlStateNormal];
-//        reloadBtn.layer.borderWidth = 1;
-//        [reloadBtn addTarget:self action:@selector(reloadBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-//        [self.view addSubview:reloadBtn];
-//    }
-}
-//- (void)reloadBtnClick:(UIButton *)btn {
-//
-//}
 - (void)createUI {
     self.type = 0;
     self.view.backgroundColor = [UIColor whiteColor];

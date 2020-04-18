@@ -240,7 +240,6 @@
         [alert addAction:share];
         [self presentViewController:alert animated:YES completion:nil];
     }
-    
 }
 
 - (void)createImageShare:(SSDKPlatformType)type {

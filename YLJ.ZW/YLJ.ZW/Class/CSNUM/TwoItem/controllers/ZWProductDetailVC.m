@@ -104,7 +104,7 @@
         titleLabel.font = boldNormalFont;
         [cell.contentView addSubview:titleLabel];
         
-        CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.describe font:normalFont];
+        CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.describe textFont:normalFont textWidth:kScreenWidth-30];
         UILabel *detailLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(titleLabel.frame), CGRectGetMaxY(titleLabel.frame), kScreenWidth-30, height)];
         detailLabel.text =self.describe;
         detailLabel.font = normalFont;
@@ -119,7 +119,7 @@
     if (indexPath.section == 0) {
         return 0.13*kScreenWidth;
     }else {
-        CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.describe font:normalFont]+0.1*kScreenWidth;
+        CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.describe textFont:normalFont textWidth:kScreenWidth-30];
         return  0.15*kScreenWidth +height;
     }
     

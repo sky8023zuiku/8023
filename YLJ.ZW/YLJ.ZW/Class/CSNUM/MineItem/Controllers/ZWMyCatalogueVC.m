@@ -31,7 +31,7 @@
 @property(nonatomic, strong)NSArray *years;
 @property(nonatomic, strong)NSArray *months;
 
-@property(nonatomic, strong)UITableView *tableView;
+@property(nonatomic, strong)ZWBaseEmptyTableView *tableView;
 
 @property(nonatomic, strong)NSMutableArray *dataSource;
 @property(nonatomic, assign)NSInteger page;
@@ -40,18 +40,7 @@
 @property (nonatomic, strong) NSArray *mainKindArray;
 @property (nonatomic, strong) NSMutableArray *subKindArray;
 
-//@property (nonatomic, strong) NSMutableArray *countryModelArray;
-//@property (nonatomic, strong) NSMutableArray *cityModelArray;
-//@property (nonatomic, strong) NSMutableArray *industryModelArray;
-//@property (nonatomic, strong) NSMutableArray *countryArray;
-//@property (nonatomic, strong) NSMutableArray *cityArray;
-//@property (nonatomic, strong) NSMutableArray *industryArray;
-
 @property (nonatomic, strong) UIView *blankView;
-
-//@property(nonatomic, strong)NSMutableArray *conditions;//获取点击itme之后的值
-//@property(nonatomic, strong)NSMutableArray *itemsIndex;//获取点击itme的索引
-//@property(nonatomic, strong)NSString *industriesId;//
 
 @property(nonatomic, strong)NSArray *screenValues;//筛选数组
 
@@ -60,9 +49,9 @@
 @end
 
 @implementation ZWMyCatalogueVC
--(UITableView *)tableView {
+-(ZWBaseEmptyTableView *)tableView {
     if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, kScreenWidth, kScreenHeight-zwNavBarHeight-44) style:UITableViewStyleGrouped];
+        _tableView = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0, 44, kScreenWidth, kScreenHeight-zwNavBarHeight-44) style:UITableViewStyleGrouped];
     }
     _tableView.dataSource = self;
     _tableView.delegate = self;
@@ -83,8 +72,6 @@
     [self createUI];
     [self createNavigationBar];
     [self createSearchBar];
-//    self.page = 1;
-//    [self createRequst:self.page];
     [self refreshData];
     [self refreshHeader];
     [self refreshFooter];
@@ -287,40 +274,7 @@
     UIView *searchView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 44)];
     searchView.backgroundColor = skinColor;
     [self.view addSubview:searchView];
-//
-//    CSSearchBarStyle *searchBar = [[CSSearchBarStyle alloc] initWithFrame:CGRectMake(15, 5, CGRectGetWidth(searchView.frame)-30, 30)];
-//    searchBar.placeholder = @"请输入搜索内容";
-//    searchBar.backgroundImage = [UIImage new];
-//    searchBar.showsCancelButton = NO;
-//
-//    if ([[[UIDevice currentDevice]systemVersion] floatValue] >= 13.0) {
-//        searchBar.searchTextField.enabled = NO;
-//        searchBar.searchTextField.backgroundColor = [UIColor whiteColor];
-//        searchBar.searchTextField.font = smallMediumFont;
-//        searchBar.layer.cornerRadius = 15.0f;
-//        searchBar.layer.masksToBounds = YES;
-//    }else {
-//        UITextField *searchField = [searchBar valueForKey:@"_searchField"];
-//        searchField.backgroundColor = [UIColor whiteColor];
-//        searchField.enabled = NO;
-//        searchField.font = smallMediumFont;
-//        searchField.layer.cornerRadius = 15.0f;
-//        searchField.layer.masksToBounds = YES;
-//    }
-//
-//    [searchView addSubview:searchBar];
-//    self.searchBar = searchBar;
-//    [self.searchBar becomeFirstResponder];
-//    [searchView addSubview:self.searchBar];
-//    CGFloat height = searchBar.bounds.size.height;
-//    CGFloat top = (height - 30.0) / 2.0;
-//    CGFloat bottom = top;
-//    searchBar.contentInset = UIEdgeInsetsMake(top, 0, bottom, 0);
-//    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapItemClick:)];
-//    [self.searchBar addGestureRecognizer:tap];
-    
-    
-    
+
     ZWSearchBar *searchBar = [[ZWSearchBar alloc]initWithFrame:CGRectMake(15, 0, kScreenWidth-30, 44)];
     searchBar.layer.masksToBounds = YES;
     [searchView addSubview:searchBar];
@@ -342,10 +296,6 @@
     
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapItemClick:)];
     [searchBar.txtField addGestureRecognizer:tap];
-    
-    
-    
-    
     
 }
 - (void)tapItemClick:(UITapGestureRecognizer *)recognizer {
@@ -402,12 +352,9 @@
             }
             [strongSelf.dataSource addObjectsFromArray:myArray];
             [strongSelf.tableView reloadData];
-            if (strongSelf.dataSource.count == 0) {
-                [strongSelf showBlankPagesWithImage:blankPagesImageName withDitail:@"暂无展会" withType:1];
-            }
+            
         }else {
-            NSLog(@"%@",respense.data);
-//            [strongSelf showBlankPagesWithImage:requestFailedBlankPagesImageName withDitail:@"当前网络异常，请检查网络" withType:2];
+            
         }
     }];
 }
@@ -417,36 +364,4 @@
         self.blankView = nil;
     }
 }
-- (void)showBlankPagesWithImage:(NSString *)imageName withDitail:(NSString *)ditail withType:(NSInteger)type {
-    
-    self.blankView = [[UIView alloc]initWithFrame:CGRectMake(0, 44, kScreenWidth, kScreenHeight-44)];
-    [self.view addSubview:self.blankView];
-    
-    UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0.1*kScreenWidth, 0.1*kScreenHeight, 0.8*kScreenWidth, 0.5*kScreenWidth)];
-    imageView.image = [UIImage imageNamed:imageName];
-    [self.blankView addSubview:imageView];
-    
-    UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(imageView.frame)+20, kScreenWidth, 30)];
-    myLabel.text = ditail;
-    myLabel.font = bigFont;
-    myLabel.textColor = [UIColor lightGrayColor];
-    myLabel.textAlignment = NSTextAlignmentCenter;
-    [self.blankView addSubview:myLabel];
-    
-//    if (type == 2) {
-//        UIButton *reloadBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-//        reloadBtn.frame = CGRectMake(0.3*kScreenWidth, CGRectGetMaxY(myLabel.frame)+25, 0.4*kScreenWidth, 0.1*kScreenWidth);
-//        [reloadBtn setTitle:@"重新加载" forState:UIControlStateNormal];
-//        reloadBtn.layer.borderColor = skinColor.CGColor;
-//        reloadBtn.titleLabel.font = normalFont;
-//        reloadBtn.layer.cornerRadius = 0.05*kScreenWidth;
-//        reloadBtn.layer.masksToBounds = YES;
-//        [reloadBtn setTitleColor:skinColor forState:UIControlStateNormal];
-//        reloadBtn.layer.borderWidth = 1;
-//        [reloadBtn addTarget:self action:@selector(reloadBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-//        [self.blankView addSubview:reloadBtn];
-//    }
-    
-}
-     
 @end

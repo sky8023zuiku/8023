@@ -10,6 +10,7 @@
 #import "ZWDynamicDetailVC.h"
 #import "ZWNewDynamicModel.h"
 #import "ZWExExhibitorsDetailsVC.h"
+#import "ZWExExhibitorsModel.h"
 @interface ZWShowDynamicVC ()<UITableViewDelegate,UITableViewDataSource>
 
 @property(nonatomic, strong)UITableView *tableView;
@@ -111,14 +112,15 @@
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     ZWNewDynamicModel *model = self.dataArray[indexPath.row];
-//    ZWDynamicDetailVC *detailVC = [[ZWDynamicDetailVC alloc]init];
-//    detailVC.ID = model.ID;
-//    [self.navigationController pushViewController:detailVC animated:YES];
-    
+
+    ZWExExhibitorsModel *shareModel = [ZWExExhibitorsModel alloc];
+    shareModel.merchantId = model.merchantId;
+    shareModel.exhibitorId = model.exhibitorId;
+    shareModel.exhibitionId = model.exhibitionId;
+    shareModel.coverImages = model.images[@"url"];
     ZWExExhibitorsDetailsVC *detailsVC = [[ZWExExhibitorsDetailsVC alloc]init];
     detailsVC.title = @"展商详情";
-    detailsVC.exhibitorId = model.exhibitorId;
-    detailsVC.merchantId = model.merchantId;
+    detailsVC.shareModel = shareModel;
     [self.navigationController pushViewController:detailsVC animated:YES];
     
 }

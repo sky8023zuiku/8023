@@ -108,12 +108,14 @@
         self.website = myDic[@"website"];
         self.coverFile = myDic[@"coverFile"];
         self.profile = myDic[@"profile"];
-        self.profileFiles = myDic[@"profileFiles"];
         self.licenseFile = myDic[@"licenseFile"];
-        
-        self.country = myDic[@"country"];
-        self.province = myDic[@"province"];
-        self.city = myDic[@"city"];
+        self.speciality = myDic[@"speciality"];
+//        self.country = myDic[@"country"];
+//        self.province = myDic[@"province"];
+        self.profileFiles = myDic[@"profileList"];
+        self.industryIdList = myDic[@"industryVoList"];
+        self.authenticationId = myDic[@"authenticationId"];
+//        self.city = myDic[@"city"];
     }
     return self;
 }

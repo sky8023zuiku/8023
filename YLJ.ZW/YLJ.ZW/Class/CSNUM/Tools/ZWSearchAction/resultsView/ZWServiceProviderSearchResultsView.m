@@ -134,10 +134,10 @@
         }];
     }
 }
-- (UITableView *)contentTableView
+- (ZWBaseEmptyTableView *)contentTableView
 {
     if (!_contentTableView) {
-        self.contentTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
+        self.contentTableView = [[ZWBaseEmptyTableView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
         _contentTableView.delegate = self;
         _contentTableView.dataSource = self;
         _contentTableView.sectionHeaderHeight = 0;

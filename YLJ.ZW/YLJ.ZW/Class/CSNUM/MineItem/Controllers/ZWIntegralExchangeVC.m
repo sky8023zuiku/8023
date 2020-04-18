@@ -14,7 +14,7 @@
 
 @interface ZWIntegralExchangeVC ()<UITableViewDelegate,UITableViewDataSource>
 
-@property(nonatomic, strong)UITableView *tableView;
+@property(nonatomic, strong)ZWBaseEmptyTableView *tableView;
 @property(nonatomic, strong)NSMutableArray *dataSource;
 @property(nonatomic, assign)NSInteger page;
 
@@ -24,7 +24,7 @@
 
 -(UITableView *)tableView {
     if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
+        _tableView = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
     }
     _tableView.dataSource = self;
     _tableView.delegate = self;
@@ -85,45 +85,13 @@
             }
             [self.dataSource addObjectsFromArray:myArray];
             [self.tableView reloadData];
-            if (strongSelf.dataSource.count == 0) {
-                [strongSelf showBlankPagesWithImage:blankPagesImageName withDitail:@"暂无数据" withType:1];
-            }
+            
         }else {
-//           [strongSelf showBlankPagesWithImage:requestFailedBlankPagesImageName withDitail:@"当前网络异常，请检查网络" withType:2];
+
         }
     }];
 }
 
-- (void)showBlankPagesWithImage:(NSString *)imageName withDitail:(NSString *)ditail withType:(NSInteger)type {
-    
-    UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0.1*kScreenWidth, 0.1*kScreenHeight, 0.8*kScreenWidth, 0.45*kScreenWidth)];
-    imageView.image = [UIImage imageNamed:imageName];
-    [self.view addSubview:imageView];
-    
-    UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(imageView.frame)+20, kScreenWidth, 30)];
-    myLabel.text = ditail;
-    myLabel.font = bigFont;
-    myLabel.textColor = [UIColor lightGrayColor];
-    myLabel.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:myLabel];
-    
-//    if (type == 2) {
-//        UIButton *reloadBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-//        reloadBtn.frame = CGRectMake(0.3*kScreenWidth, CGRectGetMaxY(myLabel.frame)+25, 0.4*kScreenWidth, 0.1*kScreenWidth);
-//        [reloadBtn setTitle:@"重新加载" forState:UIControlStateNormal];
-//        reloadBtn.layer.borderColor = skinColor.CGColor;
-//        reloadBtn.titleLabel.font = normalFont;
-//        reloadBtn.layer.cornerRadius = 0.05*kScreenWidth;
-//        reloadBtn.layer.masksToBounds = YES;
-//        [reloadBtn setTitleColor:skinColor forState:UIControlStateNormal];
-//        reloadBtn.layer.borderWidth = 1;
-//        [reloadBtn addTarget:self action:@selector(reloadBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-//        [self.view addSubview:reloadBtn];
-//    }
-}
-//- (void)reloadBtnClick:(UIButton *)btn {
-//
-//}
 
 - (void)createNavigationBar {
     [[YNavigationBar sharedInstance]createLeftBarWithImage:[UIImage imageNamed:@"zai_dao_icon_left"] barItem:self.navigationItem target:self action:@selector(goBack:)];

@@ -12,6 +12,9 @@
 @interface ZWHallInfomationVC ()<UITableViewDataSource,UITableViewDelegate,SDCycleScrollViewDelegate>
 @property(nonatomic, strong)UITableView *tableView;
 @property(nonatomic, strong)ZWHallDetailModel *model;
+@property(nonatomic, strong)NSArray *httpImages;
+
+@property(nonatomic, strong)SDCycleScrollView *cycleScrollView;
 @end
 
 @implementation ZWHallInfomationVC
@@ -29,6 +32,18 @@
     _tableView.backgroundColor = [UIColor clearColor];
     return _tableView;
 }
+
+-(SDCycleScrollView *)cycleScrollView {
+    if (!_cycleScrollView) {
+        _cycleScrollView = [SDCycleScrollView cycleScrollViewWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 0.45*kScreenWidth) delegate:self placeholderImage:[UIImage imageNamed:@"fu_img_no_01"]];
+        _cycleScrollView.pageControlAliment = SDCycleScrollViewPageContolAlimentCenter;
+        _cycleScrollView.bannerImageViewContentMode = UIViewContentModeScaleToFill;
+        _cycleScrollView.showPageControl = YES;
+        _cycleScrollView.autoScrollTimeInterval = 3;
+    }
+    return _cycleScrollView;
+}
+
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -49,8 +64,8 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.tableView];
+    
 }
-
 
 #pragma UITableViewDataSource
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -90,19 +105,39 @@
             cell.textLabel.text = self.model.hallName;
         }else if (indexPath.row == 1) {
             
+            CGFloat titleWith = [[ZWToolActon shareAction]adaptiveTextWidth:@"网址：" labelFont:normalFont];
+            UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0, titleWith, 0.1*kScreenWidth)];
+            titleLabel.text = @"网址：";
+            titleLabel.font = normalFont;
+            [cell.contentView addSubview:titleLabel];
+            
+            UILabel *webset = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(titleLabel.frame), 0, 0.9*kScreenWidth-CGRectGetWidth(titleLabel.frame), 0.1*kScreenWidth)];
+            webset.font = normalFont;
             if (self.model.website.length == 0) {
-                cell.textLabel.text =@"暂无";
+                webset.text =@"暂无";
             }else {
-                cell.textLabel.text = [NSString stringWithFormat:@"网址：%@",self.model.website];
+                webset.text = self.model.website;
             }
+            [cell.contentView addSubview:webset];
             
         }else {
+            
+            CGFloat titleWith = [[ZWToolActon shareAction]adaptiveTextWidth:@"电话：" labelFont:normalFont];
+            UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0, titleWith, 0.1*kScreenWidth)];
+            titleLabel.text = @"电话：";
+            titleLabel.font = normalFont;
+            [cell.contentView addSubview:titleLabel];
+            
+            UILabel *webset = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(titleLabel.frame), 0, 0.9*kScreenWidth-CGRectGetWidth(titleLabel.frame), 0.1*kScreenWidth)];
+            webset.font = normalFont;
+            webset.textColor = skinColor;
             if (self.model.telephone.length == 0) {
-                cell.textLabel.text =@"暂无";
+                webset.text =@"暂无";
             }else {
-                cell.textLabel.text = [NSString stringWithFormat:@"电话：%@",self.model.telephone];
+                webset.text = self.model.telephone;
             }
-            lineView.backgroundColor = [UIColor whiteColor];
+            [cell.contentView addSubview:webset];
+            
         }
     }else {
         if (indexPath.row == 0) {
@@ -117,6 +152,7 @@
                 cell.textLabel.text =@"暂无";
             }else {
                 cell.textLabel.text =self.model.profile;
+                cell.textLabel.font = normalFont;
             }
             cell.textLabel.numberOfLines = 0;
         }
@@ -128,9 +164,8 @@
     
     if (indexPath.section == 1) {
         if (indexPath.row == 1) {
-            NSString *str = self.model.profile;
-            CGFloat rowHeight = [[ZWToolActon shareAction]adaptiveTextHeight:str font:normalFont]+0.1*kScreenWidth;
-            return rowHeight;
+            CGFloat rowHeight = [[ZWToolActon shareAction]adaptiveTextHeight:self.model.profile textFont:normalFont textWidth:0.9*kScreenWidth];
+            return rowHeight+20;
         }else {
            return 0.1*kScreenWidth;
         }
@@ -156,19 +191,37 @@
         [imageArray addObject:imageUrl];
     }
     if (section == 0) {
-//        NSArray *images = @[@"h1.jpg",@"h2.jpg",@"h3.jpg"];
-        SDCycleScrollView *cycleScrollView = [SDCycleScrollView cycleScrollViewWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 0.45*kScreenWidth) delegate:self placeholderImage:[UIImage imageNamed:@"fu_img_no_01"]];
-        cycleScrollView.pageControlAliment = SDCycleScrollViewPageContolAlimentCenter;
-        cycleScrollView.bannerImageViewContentMode = UIViewContentModeScaleToFill;
-        cycleScrollView.showPageControl = YES;
-        cycleScrollView.imageURLStringsGroup = imageArray;
-        cycleScrollView.autoScrollTimeInterval = 3;
-        [view addSubview:cycleScrollView];
+        self.cycleScrollView.imageURLStringsGroup = imageArray;
+        [view addSubview:self.cycleScrollView];
+        self.httpImages = imageArray;
     }else {
         view.backgroundColor = zwGrayColor;
     }
     return view;
 }
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == 0) {
+        if (indexPath.row == 2) {
+            if (self.model.telephone) {
+                [self takeCallWithValue:self.model.telephone];
+            }
+        }
+    }
+}
+- (void)takeCallWithValue:(NSString *)value {
+    NSLog(@"我的值是什么%@",value);
+    NSMutableString * str=[[NSMutableString alloc] initWithFormat:@"tel:%@",value];
+    UIApplication *application = [UIApplication sharedApplication];
+    NSURL *URL = [NSURL URLWithString:str];
+    [application openURL:URL];
+}
+
+//点击图片的代理
+- (void)cycleScrollView:(SDCycleScrollView *)cycleScrollView didSelectItemAtIndex:(NSInteger)index {
+   NSLog(@"index = %ld",(long)index);
+    [[ZWPhotoBrowserAction shareAction]showImageViewUrls:self.httpImages tapIndex:index];
+}
+
 
 - (void)initData {
     __weak typeof (self) weakSelf = self;

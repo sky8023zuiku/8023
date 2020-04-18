@@ -27,6 +27,9 @@
         UIImageView *titleImage = [[UIImageView alloc]init];
         titleImage.image = [UIImage imageNamed:@"h1.jpg"];
         titleImage.contentMode = UIViewContentModeScaleAspectFit;
+        titleImage.layer.cornerRadius = 4;
+        titleImage.layer.borderWidth = 1;
+        titleImage.layer.borderColor = zwGrayColor.CGColor;
         self.titleImage = titleImage;
         [self addSubview:titleImage];
         

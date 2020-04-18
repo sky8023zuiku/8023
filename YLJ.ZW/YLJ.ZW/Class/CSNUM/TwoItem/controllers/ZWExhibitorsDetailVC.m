@@ -123,7 +123,8 @@
         [cell.contentView addSubview:detailLabel];
     }else {
         
-        CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:model.profile font:smallMediumFont];
+        CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:model.profile textFont:smallMediumFont textWidth:kScreenWidth-30];
+        
         UILabel *introduction = [[UILabel alloc]initWithFrame:CGRectMake(15, CGRectGetMaxY(titleLabel.frame), kScreenWidth-30, height)];
         introduction.text = model.profile;
         introduction.font = smallMediumFont;

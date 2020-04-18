@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
  *轮播图
  */
 @interface ZWServiceLBTRequst : ZWServiceRequst
-
+@property(nonatomic, strong)NSString *type;
 @end
 /**
  * 主推列表

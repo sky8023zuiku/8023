@@ -14,6 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, assign)NSInteger merchantStatus;
 @property(nonatomic, assign)NSInteger status;//0.是从从主页进  1.是从编辑进
 
+@property(nonatomic, strong)NSString *identityId;
+
 //@property(nonatomic, strong)ZWCPCitiesModel *contriesModel;//国家id
 //@property(nonatomic, strong)ZWCPCitiesModel *provinceModel;//省份id
 //@property(nonatomic, strong)ZWCPCitiesModel *citesModel;//城市id

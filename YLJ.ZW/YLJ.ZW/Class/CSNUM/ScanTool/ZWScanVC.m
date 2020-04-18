@@ -19,6 +19,9 @@
 #import "ZWMainTabBarController.h"
 #import "ZWMainLoginVC.h"
 
+#import "ZWExExhibitorsDetailsVC.h"
+#import "ZWExExhibitorsModel.h"
+
 @interface ZWScanVC ()
 
 @property (nonatomic, strong) LBXScanVideoZoomView *zoomView;
@@ -77,14 +80,15 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
-    [self drawBottomItems];
+    [self createScan];
+}
+
+- (void)createScan {
+   [self drawBottomItems];
     [self drawTitle];
     [self.view bringSubviewToFront:_topTitle];
     [self.view bringSubviewToFront:_popBtn];
-    
     [[YNavigationBar sharedInstance]createNavigationBarWithStatusBarStyle:UIStatusBarStyleLightContent withType:0];
-    
 }
 
 //绘制扫描区域
@@ -217,12 +221,13 @@
     for (LBXScanResult *result in array) {
         NSLog(@"scanResult:%@",result.strScanned);
         
-        
         NSDictionary *myDic = [self dictionaryWithJsonString:result.strScanned];
-        if ([myDic[@"zw_status"] isEqualToString:@"0"]||[myDic[@"zw_status"] isEqualToString:@"1"]) {
+        if ([myDic[@"zw_status"] isEqualToString:@"0"]) {
             ZWScanResultVC *resultVC = [[ZWScanResultVC alloc]init];
             resultVC.QrCodeStr = result.strScanned;
             [self.navigationController pushViewController:resultVC animated:YES];
+        }else if ([myDic[@"zw_status"] isEqualToString:@"1"]) {
+            [self gotoExExhibitorDetailsWithData:myDic[@"zw_content"]];
         }else {
             ZWScanErrorVC *errorVC = [[ZWScanErrorVC alloc]init];
             errorVC.QrCodeStr = result.strScanned;
@@ -247,6 +252,56 @@
     [self showNextVCWithScanResult:scanResult];
    
 }
+
+- (void)gotoExExhibitorDetailsWithData:(NSDictionary *)data {
+    //进入展会展商详情
+    NSDictionary *userInfo = [[ZWSaveDataAction shareAction]takeUserInfoData];
+    NSLog(@"--------%@",userInfo);
+    if (userInfo) {
+        ZWExExhibitorsModel *model = [ZWExExhibitorsModel alloc];
+        model.exhibitionId = data[@"exhibitionId"];
+        model.exhibitorId = data[@"exhibitorId"];
+        model.merchantId = data[@"merchantId"];
+        model.coverImages = data[@"coverImages"];
+        ZWExExhibitorsDetailsVC *detailsVC = [[ZWExExhibitorsDetailsVC alloc]init];
+        detailsVC.title = @"展商详情";
+        detailsVC.shareModel = model;
+        [self.navigationController pushViewController:detailsVC animated:YES];
+        
+        __weak typeof (self) weakSelf = self;
+        [[ZWAlertAction sharedAction]showTwoAlertTitle:@"温馨提示" message:@"是否允许对方获取您的信息？" cancelTitle:@"否" confirmTitle:@"是" actionOne:^(UIAlertAction * _Nonnull actionOne) {
+            __strong typeof (weakSelf) strongSelf = weakSelf;
+            [strongSelf bindUserInfoWithModel:model withUserId:userInfo[@"userId"]];
+        } actionCancel:^(UIAlertAction * _Nonnull actionCancel) {
+            
+        } showInView:self];
+        
+    } else {
+        [self gotoLogin];
+    }
+}
+
+- (void)bindUserInfoWithModel:(ZWExExhibitorsModel *)model withUserId:(NSString *)userId {
+    if (userId) {
+        NSDictionary *myParametes = @{
+            @"exhibitionId":model.exhibitionId,
+            @"merchantId":model.merchantId,
+            @"userId":userId
+        };
+        if (myParametes) {
+            [[ZWDataAction sharedAction]postReqeustWithURL:zwShareExhibitorDetailBind parametes:myParametes successBlock:^(NSDictionary * _Nonnull data) {
+                if (zw_issuccess) {
+                    NSLog(@"用户绑定成功");
+                } else {
+                    NSLog(@"用户绑定失败");
+                }
+            } failureBlock:^(NSError * _Nonnull error) {
+                
+            }];
+        }
+    }
+}
+
 
 - (void)getChatMessageGoToSound
 {
@@ -330,23 +385,31 @@
         VC.userInfo = userInfo;
         [self.navigationController pushViewController:VC animated:YES];
     } else {
-        __weak typeof (self) weakSelf = self;
-        [[ZWAlertAction sharedAction]showTwoAlertTitle:@"提示" message:@"您还未登陆展网，是否前去登陆" cancelTitle:@"否" confirmTitle:@"是" actionOne:^(UIAlertAction * _Nonnull actionOne) {
-            __strong typeof (weakSelf) strongSelf = weakSelf;
-            UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:[[ZWMainLoginVC alloc] init]];
-            [strongSelf yc_bottomPresentController:nav presentedHeight:kScreenHeight completeHandle:^(BOOL presented) {
-                if (presented) {
-                    [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName : [UIColor whiteColor],
-                    NSFontAttributeName : [UIFont fontWithName:@"Helvetica-Bold" size:17]}];
-                }else {
-                    [[NSNotificationCenter defaultCenter]postNotificationName:@"changeTheStatusBarColor" object:nil];
-                }
-            }];
-        } actionCancel:^(UIAlertAction * _Nonnull actionCancel) {
-            
-        } showInView:self];
+        [self gotoLogin];
     }
+    
 }
+
+- (void)gotoLogin {
+    __weak typeof (self) weakSelf = self;
+    [[ZWAlertAction sharedAction]showTwoAlertTitle:@"提示" message:@"您还未登陆展网，是否前去登陆" cancelTitle:@"否" confirmTitle:@"是" actionOne:^(UIAlertAction * _Nonnull actionOne) {
+        __strong typeof (weakSelf) strongSelf = weakSelf;
+        UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:[[ZWMainLoginVC alloc] init]];
+        [strongSelf yc_bottomPresentController:nav presentedHeight:kScreenHeight completeHandle:^(BOOL presented) {
+            __strong typeof (weakSelf) strongSelf = weakSelf;
+            if (presented) {
+                [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName : [UIColor whiteColor],
+                NSFontAttributeName : [UIFont fontWithName:@"Helvetica-Bold" size:17]}];
+            }else {
+                [strongSelf createScan];
+                [[NSNotificationCenter defaultCenter]postNotificationName:@"changeTheStatusBarColor" object:nil];
+            }
+        }];
+    } actionCancel:^(UIAlertAction * _Nonnull actionCancel) {
+        
+    } showInView:self];
+}
+
 
 
 - (NSDictionary *)dictionaryWithJsonString:(NSString *)jsonString

@@ -34,6 +34,14 @@
 
 #import "UButton.h"
 
+#import "ZWShareModel.h"
+#import "ZWShareManager.h"
+
+#import "ZWExExhibitorsModel.h"
+
+
+
+
 @interface ZWExhibitorsDetailsVC ()<UITableViewDataSource,UITableViewDelegate,DCCycleScrollViewDelegate,UICollectionViewDelegate,UICollectionViewDataSource,QLPreviewControllerDataSource>
 @property(nonatomic, strong)UITableView *tableView;
 @property(nonatomic, strong)DCCycleScrollView *banner;
@@ -105,9 +113,20 @@
 }
 - (void)createNavigationBar {
     [[YNavigationBar sharedInstance]createLeftBarWithImage:[UIImage imageNamed:@"zai_dao_icon_left"] barItem:self.navigationItem target:self action:@selector(goBack:)];
+    [[YNavigationBar sharedInstance]createRightBarWithImage:[UIImage imageNamed:@"share_forward_icon"] barItem:self.navigationItem target:self action:@selector(rightItemClick:)];
 }
 - (void)goBack:(UINavigationItem *)item {
     [self.navigationController popViewControllerAnimated:YES];
+}
+- (void)rightItemClick:(UIBarButtonItem *)item {
+    
+    ZWShareModel *model = [[ZWShareModel alloc]init];
+    model.shareName = self.shareModel.name;
+    model.shareTitleImage = [NSString stringWithFormat:@"%@%@",httpImageUrl,self.shareModel.imageUrl];
+    model.shareUrl = [NSString stringWithFormat:@"%@/html/share_merchants.html?merchantId=%@",share_url,self.shareModel.merchantId];
+    model.shareDetail = @"查看详情";
+    [[ZWShareManager shareManager]shareWithData:model];
+    
 }
 - (void)createUI {
     
@@ -199,8 +218,8 @@
     }else if (indexPath.section == 1) {
         
         NSArray *titleArray = @[@"产品手册：",@"需求说明：",@"主营项目："];
-        CGFloat PHeight = [[ZWToolActon shareAction]adaptiveTextHeight:@"站位" font:smallMediumFont]+15;
-        UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.03*kScreenWidth, 0, 0.18*kScreenWidth, PHeight)];
+        CGFloat PHeight = [[ZWToolActon shareAction]adaptiveTextHeight:@"占位" textFont:smallMediumFont textWidth:0.18*kScreenWidth];
+        UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.03*kScreenWidth, 10, 0.18*kScreenWidth, PHeight)];
         titleLabel.font = smallMediumFont;
         titleLabel.text = titleArray[indexPath.row];
         titleLabel.attributedText = [[ZWToolActon shareAction]createBothEndsWithLabel:titleLabel textAlignmentWith:CGRectGetWidth(titleLabel.frame)];
@@ -209,7 +228,7 @@
         if (indexPath.row == 0) {
             
             UIButton *browseBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-            browseBtn.frame = CGRectMake(CGRectGetMaxX(titleLabel.frame), 0, 0.1*kScreenWidth, PHeight);
+            browseBtn.frame = CGRectMake(CGRectGetMaxX(titleLabel.frame), CGRectGetMinY(titleLabel.frame), 0.1*kScreenWidth, PHeight);
             browseBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
             [browseBtn setTitle:@"预览" forState:UIControlStateNormal];
             [browseBtn setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
@@ -227,17 +246,16 @@
             [cell.contentView addSubview:downloadBtn];
             
         }else if (indexPath.row == 1) {
-            
-            CGFloat demandHeight = [[ZWToolActon shareAction]adaptiveTextHeight:[self takeDemandValue] font:smallMediumFont]+15;
-            UILabel *demandValue = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(titleLabel.frame), 0, 0.76*kScreenWidth, demandHeight)];
+            CGFloat demandHeight = [[ZWToolActon shareAction]adaptiveTextHeight:[self takeDemandValue] textFont:smallMediumFont textWidth:0.76*kScreenWidth];
+            UILabel *demandValue = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(titleLabel.frame), CGRectGetMinY(titleLabel.frame), 0.76*kScreenWidth, demandHeight)];
             demandValue.text = [self takeDemandValue];
             demandValue.font = smallMediumFont;
             [cell.contentView addSubview:demandValue];
             
         }else {
             
-            CGFloat mainHeight = [[ZWToolActon shareAction]adaptiveTextHeight:[self takeMainValue] font:smallMediumFont]+15;
-            UILabel *mainValue = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(titleLabel.frame), 0, 0.76*kScreenWidth, mainHeight)];
+            CGFloat mainHeight = [[ZWToolActon shareAction]adaptiveTextHeight:[self takeMainValue] textFont:smallMediumFont textWidth:0.76*kScreenWidth];
+            UILabel *mainValue = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(titleLabel.frame), CGRectGetMinY(titleLabel.frame), 0.76*kScreenWidth, mainHeight)];
             mainValue.text = [self takeMainValue];
             mainValue.font = smallMediumFont;
             mainValue.numberOfLines = 0;
@@ -349,12 +367,11 @@
             titleLabel.text = model.exhibitionName;
             [cell.contentView addSubview:titleLabel];
             
-            
-            NSString *startTime =[[ZWToolActon shareAction] getTimeFromTimestamp:model.startTime withDataStr:@"YYYY-MM-DD"];
-            NSString *endTime =[[ZWToolActon shareAction] getTimeFromTimestamp:model.endTime withDataStr:@"YYYY-MM-DD"];
+            NSString *startTime =  [NSString stringWithFormat:@"%@",model.startTime];
+            NSString *endTime =  [NSString stringWithFormat:@"%@",model.endTime];
             UILabel *dateLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(titleLabel.frame), CGRectGetMidY(titleImage.frame)-0.03*kScreenWidth, CGRectGetWidth(titleLabel.frame), CGRectGetHeight(titleLabel.frame))];
             dateLabel.font = smallFont;
-            dateLabel.text = [NSString stringWithFormat:@"%@~%@",startTime,endTime];
+            dateLabel.text = [NSString stringWithFormat:@"%@~%@",[startTime substringToIndex:10],[endTime substringToIndex:10]];
             [cell.contentView addSubview:dateLabel];
             
             UILabel *detailLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(dateLabel.frame), CGRectGetMaxY(titleImage.frame)-0.06*kScreenWidth, CGRectGetWidth(dateLabel.frame), 0.06*kScreenWidth)];
@@ -542,13 +559,9 @@
             subString = [self takeIntroduceValue];
         }
     }
-    CGFloat introduceHeight = [[ZWToolActon shareAction]adaptiveTextHeight:subString font:smallMediumFont]+20;
+    CGFloat introduceHeight = [[ZWToolActon shareAction]adaptiveTextHeight:subString textFont:smallMediumFont textWidth:0.94*kScreenWidth];
     return introduceHeight;
 }
-
-
-
-
 
 - (void)phoneBtnClick:(UIButton *)btn {
     [self makePhoneCall:btn.titleLabel.text];
@@ -568,14 +581,14 @@
         return zw16B9ImageScale*kScreenWidth;
     }else if (indexPath.section == 1){
         if (indexPath.row == 0) {
-            CGFloat PHeight = [[ZWToolActon shareAction]adaptiveTextHeight:@"站位" font:smallMediumFont]+15;
-            return PHeight;
+            CGFloat PHeight = [[ZWToolActon shareAction]adaptiveTextHeight:@"占位" textFont:smallMediumFont textWidth:0.18*kScreenWidth];
+            return PHeight+20;
         }else if (indexPath.row == 1) {
-            CGFloat demandHeight = [[ZWToolActon shareAction]adaptiveTextHeight:[self takeDemandValue] font:smallMediumFont]+15;
-            return demandHeight;
+            CGFloat demandHeight = [[ZWToolActon shareAction]adaptiveTextHeight:[self takeDemandValue] textFont:smallMediumFont textWidth:0.76*kScreenWidth];
+            return demandHeight+20;
         }else {
-            CGFloat mainHeight = [[ZWToolActon shareAction]adaptiveTextHeight:[self takeMainValue] font:smallMediumFont]+15;
-            return mainHeight;
+            CGFloat mainHeight = [[ZWToolActon shareAction]adaptiveTextHeight:[self takeMainValue] textFont:smallMediumFont textWidth:0.76*kScreenWidth];
+            return mainHeight+20;
         }
         
     }else if (indexPath.section == 2) {
@@ -661,7 +674,11 @@
         if (self.dynamicsArray.count != 0) {
             ZWNewDynamicModel *model = self.dynamicsArray[indexPath.row];
             
-            NSLog(@"------%@",model.purchased?@"yes":@"no");
+            ZWExExhibitorsModel *shareModel = [ZWExExhibitorsModel alloc];
+            shareModel.coverImages = model.images[@"url"];
+            shareModel.exhibitionId = model.exhibitionId;
+            shareModel.exhibitorId = model.exhibitorId;
+            shareModel.merchantId = model.merchantId;
             
             if ([model.purchased boolValue] == false) {
                 __weak typeof (self) weakSelf = self;
@@ -679,8 +696,7 @@
             }else {
                 ZWExExhibitorsDetailsVC *detailsVC = [[ZWExExhibitorsDetailsVC alloc]init];
                 detailsVC.title = @"展商详情";
-                detailsVC.exhibitorId = model.exhibitorId;
-                detailsVC.merchantId = model.merchantId;
+                detailsVC.shareModel = shareModel;
                 [self.navigationController pushViewController:detailsVC animated:YES];
             }
         }

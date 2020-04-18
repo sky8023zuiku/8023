@@ -133,24 +133,10 @@
 }
 
 - (void)createNavigationBar {
-    
-    if (self.type == 1) {
-        
-        UIBarButtonItem *leftOne = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"zai_dao_icon_left"] style:UIBarButtonItemStylePlain target:self action:@selector(go1Back:)];
-        leftOne.tintColor = [UIColor whiteColor];
-        UIBarButtonItem *leftTwo = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"ren_bianji_icon_topshang"] style:UIBarButtonItemStylePlain target:self action:@selector(go1BackHome:)];
-        leftTwo.tintColor = [UIColor whiteColor];
-        self.navigationItem.leftBarButtonItems = @[leftOne,leftTwo];
-        [[YNavigationBar sharedInstance]createRightBarWithTitle:@"下一步" barItem:self.navigationItem target:self action:@selector(right1ItemClcik:)];
-        
-    }else {
-        
-        UIBarButtonItem *leftOne = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"zai_dao_icon_left"] style:UIBarButtonItemStylePlain target:self action:@selector(go1Back:)];
-        leftOne.tintColor = [UIColor whiteColor];
-        self.navigationItem.leftBarButtonItems = @[leftOne];
-        [[YNavigationBar sharedInstance]createRightBarWithTitle:@"提交" barItem:self.navigationItem target:self action:@selector(right2ItemClcik:)];
-        
-    }
+    UIBarButtonItem *leftOne = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"zai_dao_icon_left"] style:UIBarButtonItemStylePlain target:self action:@selector(go1Back:)];
+    leftOne.tintColor = [UIColor whiteColor];
+    self.navigationItem.leftBarButtonItems = @[leftOne];
+    [[YNavigationBar sharedInstance]createRightBarWithTitle:@"提交" barItem:self.navigationItem target:self action:@selector(right1ItemClcik:)];
 }
 - (void)go1Back:(UINavigationItem *)item {
     [self.navigationController popViewControllerAnimated:YES];
@@ -167,80 +153,9 @@
         [self showOneAlertWithMessage:@"请选择您所涉及到的行业"];
         return;
     }
-    ZWEditCompanyIntroductionVC *introductionVC = [[ZWEditCompanyIntroductionVC alloc]init];
-    introductionVC.title = @"公司简介上传";
-    introductionVC.model = self.model;
-    introductionVC.coverImage = self.coverImage;
-    introductionVC.merchantStatus = self.merchantStatus;
-    if (self.merchantStatus == 3) {
-        introductionVC.parameter = self.parameter;
-    }
-    [self.navigationController pushViewController:introductionVC animated:YES];
-    
+    [[NSNotificationCenter defaultCenter]postNotificationName:@"certTakeIndustryList" object:self.industriesArray];
+    [self.navigationController popViewControllerAnimated:YES];
 }
-
-- (void)right2ItemClcik:(UINavigationItem *)item {
-    
-    NSLog(@"%@",self.industriesIds);
-    if (self.industriesIds.count == 0) {
-        [self showOneAlertWithMessage:@"您所涉及到的行业不能为空，请选择后提交"];
-        return;
-    }
-    __weak typeof (self) weakSelf = self;
-    [[ZWAlertAction sharedAction]showTwoAlertTitle:@"提示" message:@"是否确提交所选择的行业" cancelTitle:@"否" confirmTitle:@"是" actionOne:^(UIAlertAction * _Nonnull actionOne) {
-        __strong typeof (weakSelf) strongSelf = weakSelf;
-        [strongSelf submitIndustriesInformation];
-    } actionCancel:^(UIAlertAction * _Nonnull actionCancel) {
-        
-    } showInView:self];
-    
-}
-- (void)submitIndustriesInformation {
-    
-    NSDictionary *parametes;
-    if (self.industriesIds) {
-//        parametes = @{@"industryList":self.industriesIds,
-//                      @"defaultIndustryId":self.industriesIds[0]};
-        parametes = @{
-            @"industryIdList":self.industriesIds
-        };
-    }
-    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    __weak typeof (self) weakSelf = self;
-    [[ZWDataAction sharedAction]postReqeustWithURL:zwUpdateMyIndustriesList parametes:parametes successBlock:^(NSDictionary * _Nonnull data) {
-        __strong typeof (weakSelf) strongSelf = weakSelf;
-        if (zw_issuccess) {
-            [strongSelf updateUserInfo];
-        }
-    } failureBlock:^(NSError * _Nonnull error) {
-        [MBProgressHUD hideHUDForView:self.view animated:YES];
-    }];
-
-}
-
-
-- (void)updateUserInfo {
-    __weak typeof (self) weakSelf = self;
-    [[ZWDataAction sharedAction]getReqeustWithURL:zwTakeUserInfo parametes:@{} successBlock:^(NSDictionary * _Nonnull data) {
-        __strong typeof (weakSelf) strongSelf = weakSelf;
-        [MBProgressHUD hideHUDForView:self.view animated:YES];
-        if (zw_issuccess) {
-            
-            NSDictionary *myDic = data[@"data"];
-            if (myDic) {
-                [[ZWSaveDataAction shareAction]saveUserInfoData:myDic];
-            }
-            [[ZWAlertAction sharedAction]showOneAlertTitle:@"提示" message:@"行业成功上传" confirmTitle:@"我知道了" actionOne:^(UIAlertAction * _Nonnull actionOne) {
-                __strong typeof (weakSelf) strongSelf = weakSelf;
-                [strongSelf.navigationController popViewControllerAnimated:YES];
-            } showInView:strongSelf];
-            
-        }
-    } failureBlock:^(NSError * _Nonnull error) {
-       [MBProgressHUD hideHUDForView:self.view animated:YES];
-    }];
-}
-
 - (void)createUI {
     
     self.view.backgroundColor = [UIColor whiteColor];
@@ -270,7 +185,7 @@
     [self.view addSubview:self.topView];
     
     UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(20, 0.3*kScreenWidth-30, kScreenWidth-40, 20)];
-    label.text = @"提示：最多只可以选择一个行业";
+    label.text = @"提示：会展服务商最多只可以选择一个行业";
     label.font = smallFont;
     label.textColor = [UIColor colorWithRed:153/255.0 green:153/255.0 blue:153/255.0 alpha:1.0];
     [self.topView addSubview:label];

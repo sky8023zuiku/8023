@@ -9,8 +9,8 @@
 #ifndef ZWDataUrl_h
 #define ZWDataUrl_h
 
-//#define share_url @"http://www.csnum.com/share/html/share_exhibitors.html"//测试分享
-#define share_url @"http://www.enet720.com/share/share_merchant/share/html/share_exhibitors.html"//正式分享
+//#define share_url @"http://www.csnum.com/share"//测试分享
+#define share_url @"http://www.enet720.com/share/share_merchant/share"//正式分享
 /**
  *  正式环境
  */
@@ -30,9 +30,14 @@
 
 //*********************************个人相关**************************************************/
 /**
- *  获取个人信息
+ *  获取个人中心的个人信息
  */
 #define zwTakeUserInfo PATH(@"%@/zwkj/user/user_core.json")
+/**
+ *  获取用户详细信息
+*/
+#define zwTakeMoreUserInfo PATH(@"%@/zwkj/user/details.json")
+
 //*********************************在线展会**************************************************/
 /**
  *  获取在线展会列表
@@ -256,6 +261,21 @@
  *      选择国家省份城市
  */
 #define zwSelectCPC PATH(@"%@/zwkj/pcs/city_screen/selectAreaList.json")
+/**
+ *      删除企业图片信息
+ */
+#define zwDeleteImageInfo PATH(@"%@/zwkj/user/authentication/delete_profile.json")
+/**
+ *      认证失败获取信息
+ */
+#define zwAuthenticationFailedInfo PATH(@"%@/zwkj/user/authentication/detail.json")
+/**
+ *      企业认证
+ */
+#define zwEnterpriseCertification PATH(@"%@/zwkj/user/authentication/insert_update.json")
+
+
+
 //**********************************************************展网首页**********************************************************/
 /**
  *      获取轮播图和热门展会
@@ -282,6 +302,11 @@
  *      展会排期
 */
 #define zwHallDateLineList PATH(@"%@/zwkj/exhibition/hall/plan_exhibition_list")
+/**
+ *      展厅平面图
+*/
+#define zwHallFloorPlan PATH(@"%@/zwkj/exhibition/hall/hall_number_list")
+
 //**********************************************************搜索**********************************************************/
 /**
  *      展馆搜索
@@ -314,7 +339,7 @@
 /**
  *      分享展会的用户列表
 */
-#define zwShareUserList PATH(@"%@/zwkj/invite/share_list.json")
+#define zwShareUserList PATH(@"%@/zwkj/user/get_shared_list.json")
 /**
  *      分享展会的用户列表
 */
@@ -335,6 +360,11 @@
  *      获取网页版展商详情
 */
 #define zwGetWebExhibitorDetail PATH(@"%@/zwkj/get_share_details.json")
+/**
+ *      扫码分享绑定用户
+*/
+#define zwShareExhibitorDetailBind PATH(@"%@/zwkj/share/bind_merchant_user.json")
+
 
 //**********************************************************会展服务商**********************************************************/
 /**

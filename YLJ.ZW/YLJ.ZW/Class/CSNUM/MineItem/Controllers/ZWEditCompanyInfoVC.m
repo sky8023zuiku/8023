@@ -26,6 +26,8 @@
 
 #import "ZWExhibitionServerSelectIndustriesVC.h"
 
+#import "ZWEditMainProjectVC.h"
+
 @interface ZWEditCompanyInfoVC ()<UIImagePickerControllerDelegate, UINavigationControllerDelegate,IQActionSheetPickerViewDelegate>{
     UIImagePickerController *_imagePickerController;
 }
@@ -39,7 +41,6 @@
 @property(nonatomic, strong)UITextField *mainProject;//公司主营
 @property(nonatomic, strong)UITextField *demandInstructions;//需求说明
 @property(nonatomic, strong)UITextField *identityText;//身份
-@property(nonatomic, strong)NSString *identityId;
 
 @property(nonatomic, strong)NSArray *industriesArray;
 
@@ -271,7 +272,6 @@
 
 - (void)takeExhibitionServerIndustries {
     
-    
     __weak typeof (self) weakSelf = self;
     [[ZWDataAction sharedAction]getReqeustWithURL:zwGetExhibitionServerIndustriesList parametes:@{} successBlock:^(NSDictionary * _Nonnull data) {
         __strong typeof (weakSelf) strongSelf = weakSelf;
@@ -292,7 +292,6 @@
     } failureBlock:^(NSError * _Nonnull error) {
         
     }];
-    
     
 }
 
@@ -454,9 +453,18 @@
     self.mainProject = [[UITextField alloc]initWithFrame:CGRectMake(CGRectGetMinX(lineSix.frame), CGRectGetMaxY(lineSix.frame), CGRectGetWidth(lineSix.frame), 0.12*kScreenWidth)];
     self.mainProject.leftView = titleSix;
     self.mainProject.leftViewMode = UITextFieldViewModeAlways;
-    self.mainProject.placeholder = @"请输入公司主营项目";
     self.mainProject.font = normalFont;
     [self.myScrollView addSubview:self.mainProject];
+    
+    if ([self.identityId isEqualToString:@"2"]) {
+        self.mainProject.placeholder = @"请输入公司主营项目";
+    }else {
+        self.mainProject.placeholder = @"点击编辑主营项目";
+        self.mainProject.enabled = NO;
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapMainProjetClick:)];
+        [self.mainProject addGestureRecognizer:tap];
+    }
+    
 
     //需求说明
     UIView *lineSeven = [[UIView alloc]initWithFrame:CGRectMake(CGRectGetMinX(self.mainProject.frame), CGRectGetMaxY(self.mainProject.frame), CGRectGetWidth(self.mainProject.frame), 1)];
@@ -475,74 +483,83 @@
     self.demandInstructions.font = normalFont;
     [self.myScrollView addSubview:self.demandInstructions];
     
-    //选择身份
-    UIView *lineEight = [[UIView alloc]initWithFrame:CGRectMake(CGRectGetMinX(self.demandInstructions.frame), CGRectGetMaxY(self.demandInstructions.frame), CGRectGetWidth(self.demandInstructions.frame), 1)];
-    lineEight.backgroundColor = [UIColor colorWithRed:231/255.0 green:231/255.0 blue:231/255.0 alpha:1.0];
-    [self.myScrollView addSubview:lineEight];
-    
-    UILabel *titleEight= [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 0.2*kScreenWidth, 0.12*kScreenWidth)];
-    titleEight.text = @"选择身份：";
-    titleEight.font = normalFont;
-    titleEight.textColor = [UIColor colorWithRed:51/255.0 green:51/255.0 blue:51/255.0 alpha:1.0];
-    
-    self.identityText = [[UITextField alloc]initWithFrame:CGRectMake(CGRectGetMinX(lineEight.frame), CGRectGetMaxY(lineEight.frame), CGRectGetWidth(lineEight.frame), CGRectGetHeight(self.demandInstructions.frame))];
-    self.identityText.leftView = titleEight;
-    self.identityText.leftViewMode = UITextFieldViewModeAlways;
-    self.identityText.font = normalFont;
-    self.identityText.placeholder = @"点击选择身份";
-    self.identityText.enabled = NO;
-    self.identityText.textColor = skinColor;
-    [self.myScrollView addSubview:self.identityText];
-    
-    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn.frame = CGRectMake(CGRectGetMinX(lineEight.frame), CGRectGetMaxY(lineEight.frame), CGRectGetWidth(lineEight.frame), CGRectGetHeight(self.demandInstructions.frame));
-    [btn addTarget:self action:@selector(btnClick:) forControlEvents:UIControlEventTouchUpInside];
-    [self.myScrollView addSubview:btn];
+//    //选择身份
+//    UIView *lineEight = [[UIView alloc]initWithFrame:CGRectMake(CGRectGetMinX(self.demandInstructions.frame), CGRectGetMaxY(self.demandInstructions.frame), CGRectGetWidth(self.demandInstructions.frame), 1)];
+//    lineEight.backgroundColor = [UIColor colorWithRed:231/255.0 green:231/255.0 blue:231/255.0 alpha:1.0];
+//    [self.myScrollView addSubview:lineEight];
+//
+//    UILabel *titleEight= [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 0.2*kScreenWidth, 0.12*kScreenWidth)];
+//    titleEight.text = @"选择身份：";
+//    titleEight.font = normalFont;
+//    titleEight.textColor = [UIColor colorWithRed:51/255.0 green:51/255.0 blue:51/255.0 alpha:1.0];
+//
+//    self.identityText = [[UITextField alloc]initWithFrame:CGRectMake(CGRectGetMinX(lineEight.frame), CGRectGetMaxY(lineEight.frame), CGRectGetWidth(lineEight.frame), CGRectGetHeight(self.demandInstructions.frame))];
+//    self.identityText.leftView = titleEight;
+//    self.identityText.leftViewMode = UITextFieldViewModeAlways;
+//    self.identityText.font = normalFont;
+//    self.identityText.placeholder = @"点击选择身份";
+//    self.identityText.enabled = NO;
+//    self.identityText.textColor = skinColor;
+//    [self.myScrollView addSubview:self.identityText];
+//
+//    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+//    btn.frame = CGRectMake(CGRectGetMinX(lineEight.frame), CGRectGetMaxY(lineEight.frame), CGRectGetWidth(lineEight.frame), CGRectGetHeight(self.demandInstructions.frame));
+//    [btn addTarget:self action:@selector(btnClick:) forControlEvents:UIControlEventTouchUpInside];
+//    [self.myScrollView addSubview:btn];
     
 }
 
-- (void)btnClick:(UIButton *)btn {
-    NSLog(@"能点吗");
-    [[ZWDataAction sharedAction]getReqeustWithURL:zwIdentitiesList parametes:@{} successBlock:^(NSDictionary * _Nonnull data) {
-        if (zw_issuccess) {
-            NSArray *array = data[@"data"];
-            NSMutableArray *myArray = [NSMutableArray array];
-            for (NSDictionary *myDic in array) {
-                ZWIdentityModel *model = [ZWIdentityModel parseJSON:myDic];
-                [myArray addObject:model];
-            }
-            NSMutableArray *indArray = [NSMutableArray array];
-            for (ZWIdentityModel *model in myArray) {
-                NSString *indStr = model.name;
-                [indArray addObject:indStr];
-            }
-            [indArray removeObjectAtIndex:0];
-            IQActionSheetPickerView *picker = [[IQActionSheetPickerView alloc] initWithTitle:@"请选择展台属性" delegate:self];
-            [picker setActionSheetPickerStyle:IQActionSheetPickerStyleTextPicker];
-            [picker setTitlesForComponents:@[indArray]];
-            [picker show];
-        }else {
-            [self showOneAlertWithTitle:@"获取身份失败，请稍后再试"];
-        }
-    } failureBlock:^(NSError * _Nonnull error) {
-        
-    } showInView:self.view];
+- (void)tapMainProjetClick:(UITapGestureRecognizer *)tap {
+    
+    NSLog(@"222222");
+    ZWEditMainProjectVC *mainProVC = [[ZWEditMainProjectVC alloc]init];
+    mainProVC.title = @"编辑主营项目";
+    [self.navigationController pushViewController:mainProVC animated:YES];
 }
 
-- (void)actionSheetPickerView:(nonnull IQActionSheetPickerView *)pickerView didSelectTitlesAtIndexes:(nonnull NSArray<NSNumber*>*)indexes {
-    NSLog(@"----%@",indexes[0]);
-    int a = [indexes[0] intValue];
-    if (a == 0) {
-        self.identityText.text = @"展商";
-        self.identityId = @"2";
-    }else if (a == 1) {
-        self.identityText.text = @"展会服务商";
-        self.identityId = @"3";
-    }else {
-        self.identityText.text = @"设计公司";
-        self.identityId = @"4";
-    }
-}
+
+//- (void)btnClick:(UIButton *)btn {
+//    NSLog(@"能点吗");
+//    [[ZWDataAction sharedAction]getReqeustWithURL:zwIdentitiesList parametes:@{} successBlock:^(NSDictionary * _Nonnull data) {
+//        if (zw_issuccess) {
+//            NSArray *array = data[@"data"];
+//            NSMutableArray *myArray = [NSMutableArray array];
+//            for (NSDictionary *myDic in array) {
+//                ZWIdentityModel *model = [ZWIdentityModel parseJSON:myDic];
+//                [myArray addObject:model];
+//            }
+//            NSMutableArray *indArray = [NSMutableArray array];
+//            for (ZWIdentityModel *model in myArray) {
+//                NSString *indStr = model.name;
+//                [indArray addObject:indStr];
+//            }
+//            [indArray removeObjectAtIndex:0];
+//            IQActionSheetPickerView *picker = [[IQActionSheetPickerView alloc] initWithTitle:@"请选择展台属性" delegate:self];
+//            [picker setActionSheetPickerStyle:IQActionSheetPickerStyleTextPicker];
+//            [picker setTitlesForComponents:@[indArray]];
+//            [picker show];
+//        }else {
+//            [self showOneAlertWithTitle:@"获取身份失败，请稍后再试"];
+//        }
+//    } failureBlock:^(NSError * _Nonnull error) {
+//
+//    } showInView:self.view];
+//}
+
+//- (void)actionSheetPickerView:(nonnull IQActionSheetPickerView *)pickerView didSelectTitlesAtIndexes:(nonnull NSArray<NSNumber*>*)indexes {
+//    NSLog(@"----%@",indexes[0]);
+//    int a = [indexes[0] intValue];
+//    if (a == 0) {
+//        self.identityText.text = @"展商";
+//        self.identityId = @"2";
+//    }else if (a == 1) {
+//        self.identityText.text = @"展会服务商";
+//        self.identityId = @"3";
+//    }else {
+//        self.identityText.text = @"设计公司";
+//        self.identityId = @"4";
+//    }
+//}
 
 
 - (void)createImagePicker {
@@ -645,6 +662,7 @@
         
     } showInView:self.view];
 }
+
 
 -(void)showOneAlertWithTitle:(NSString *)title {
     [[ZWAlertAction sharedAction]showOneAlertTitle:@"提示" message:title confirmTitle:@"我知道了" actionOne:^(UIAlertAction * _Nonnull actionOne) {

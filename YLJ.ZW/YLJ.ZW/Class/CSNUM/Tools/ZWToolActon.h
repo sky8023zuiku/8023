@@ -17,7 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
  *      Label自适应
  */
 -(CGFloat)adaptiveTextHeight:(NSString *)text;
--(CGFloat)adaptiveTextHeight:(NSString *)text font:(UIFont *)font;
+-(CGFloat)adaptiveTextHeight:(NSString *)text textFont:(UIFont *)font textWidth:(CGFloat)width;
+//-(CGFloat)adaptiveTextHeight:(NSString *)text font:(UIFont *)font;
 -(CGFloat)adaptiveTextWidth:(NSString *)text;
 -(CGFloat)adaptiveTextWidth:(NSString *)labelText labelFont:(UIFont *)font;
 /**
@@ -50,6 +51,10 @@ NS_ASSUME_NONNULL_BEGIN
  *  设置两端对齐
 */
 - (NSMutableAttributedString *)createBothEndsWithLabel:(UILabel *)label textAlignmentWith:(CGFloat)width;
+/**
+ *  字符串转数组
+*/
+- (NSArray *)strTurnArrayWithString:(NSString *)string;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -32,7 +32,9 @@
 #import "ZWExhibitionServerDetailVC.h"
 
 
-@interface ZWExhibitionServerVC ()<UITableViewDelegate,UITableViewDataSource,SDCycleScrollViewDelegate,GYZChooseCityDelegate,CLLocationManagerDelegate>
+
+
+@interface ZWExhibitionServerVC ()<UITableViewDelegate,UITableViewDataSource,SDCycleScrollViewDelegate,GYZChooseCityDelegate,CLLocationManagerDelegate,DZNEmptyDataSetSource,DZNEmptyDataSetDelegate>
 
 @property(nonatomic, strong)UITableView *tableView;
 @property(nonatomic, strong)NSArray *lbtAarry;
@@ -44,6 +46,8 @@
 @property(nonatomic, strong)NSArray *dataImages;
 
 @property(nonatomic, strong)NSString *firstIndustry;
+
+@property(nonatomic, strong)SDCycleScrollView *cycleScrollView;
 
 @end
 
@@ -61,6 +65,25 @@
     _tableView.backgroundColor = [UIColor whiteColor];
     return _tableView;
 }
+
+-(SDCycleScrollView *)cycleScrollView {
+    if (!_cycleScrollView) {
+        _cycleScrollView = [SDCycleScrollView cycleScrollViewWithFrame:CGRectMake(0.03*kScreenWidth, 0, 0.94*kScreenWidth, 0.23*kScreenWidth) delegate:self placeholderImage:[UIImage imageNamed:@"fu_img_no_01"]];
+        _cycleScrollView.pageControlAliment = SDCycleScrollViewPageContolAlimentCenter;
+        _cycleScrollView.delegate = self;
+        _cycleScrollView.layer.cornerRadius = 3;
+        _cycleScrollView.layer.masksToBounds = YES;
+        _cycleScrollView.bannerImageViewContentMode = UIViewContentModeScaleToFill;
+        _cycleScrollView.backgroundColor = [UIColor colorWithRed:226.0/255.0 green:226.0/255.0 blue:226.0/255.0 alpha:1];
+        _cycleScrollView.showPageControl = YES;
+        _cycleScrollView.autoScrollTimeInterval = 3;
+        _cycleScrollView.currentPageDotImage = [UIImage imageWithColor:[UIColor whiteColor] withCornerRadius:1.5 forSize:CGSizeMake(15, 3)];
+        _cycleScrollView.pageDotImage = [UIImage imageWithColor:[UIColor colorWithRed:206.0/255.0 green:206.0/255.0 blue:206.0/255.0 alpha:1] withCornerRadius:1.5 forSize:CGSizeMake(15, 3)];
+    }
+    return _cycleScrollView;
+}
+
+
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -80,6 +103,7 @@
 
 - (void)createRequstLBT {
     ZWServiceLBTRequst *requst = [[ZWServiceLBTRequst alloc]init];
+    requst.type = @"2";
     __weak typeof(self) weakSelf = self;
     [requst getRequestCompleted:^(YHBaseRespense *respense) {
         __strong typeof (self) strongSelf = weakSelf;
@@ -144,6 +168,10 @@
 //}
 
 - (void)createRequest:(NSInteger)page {
+    
+    if ([self.selectedCity isEqualToString:@"全部"]) {
+        self.selectedCity = @"";
+    }
     
     NSDictionary *myParametes = @{
         @"city":self.selectedCity,
@@ -243,6 +271,9 @@
     }
     city.shortName = shortCity;
     [self.LeftItem setTitle:city.cityName forState:UIControlStateNormal];
+    if ([city.shortName isEqualToString:@"全部"]) {
+        city.shortName = @"";
+    }
     self.selectedCity = city.shortName;
     [chooseCityController dismissViewControllerAnimated:YES completion:nil];
 
@@ -289,12 +320,12 @@
     return cell;
 }
 - (void)createBlankPagesWithCell:(UITableViewCell *)cell {
-    UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0.2*kScreenWidth, 0, 0.6*kScreenWidth, 0.3*kScreenWidth)];
+    UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0.2*kScreenWidth, 0.1*kScreenWidth, 0.6*kScreenWidth, 0.3*kScreenWidth)];
     imageView.image = [UIImage imageNamed:blankPagesImageName];
     [cell.contentView addSubview:imageView];
-    
+
     UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(imageView.frame)+20, kScreenWidth, 30)];
-    myLabel.text = @"暂无数据";
+    myLabel.text = @"暂无相关信息";
     myLabel.font = normalFont;
     myLabel.textColor = [UIColor lightGrayColor];
     myLabel.textAlignment = NSTextAlignmentCenter;
@@ -349,19 +380,8 @@
                 NSString *imageStr = [NSString stringWithFormat:@"%@%@",httpImageUrl,self.lbtAarry[i]];
                 [images addObject:imageStr];
             }
-
-            SDCycleScrollView *cycleScrollView = [SDCycleScrollView cycleScrollViewWithFrame:CGRectMake(0.03*kScreenWidth, 0, 0.94*kScreenWidth, 0.23*kScreenWidth) delegate:self placeholderImage:[UIImage imageNamed:@"fu_img_no_01"]];
-            cycleScrollView.pageControlAliment = SDCycleScrollViewPageContolAlimentCenter;
-            cycleScrollView.delegate = self;
-            cycleScrollView.layer.cornerRadius = 3;
-            cycleScrollView.layer.masksToBounds = YES;
-            cycleScrollView.bannerImageViewContentMode = UIViewContentModeScaleToFill;
-            cycleScrollView.showPageControl = YES;
-            cycleScrollView.imageURLStringsGroup = images;
-            cycleScrollView.autoScrollTimeInterval = 3;
-            cycleScrollView.currentPageDotImage = [UIImage imageWithColor:[UIColor whiteColor] withCornerRadius:1.5 forSize:CGSizeMake(15, 3)];
-            cycleScrollView.pageDotImage = [UIImage imageWithColor:[UIColor colorWithRed:206.0/255.0 green:206.0/255.0 blue:206.0/255.0 alpha:1] withCornerRadius:1.5 forSize:CGSizeMake(15, 3)];
-            [cell.contentView addSubview:cycleScrollView];
+            self.cycleScrollView.imageURLStringsGroup = images;
+            [cell.contentView addSubview:self.cycleScrollView];
             self.dataImages = images;
         }
     }else {
@@ -422,6 +442,7 @@
         ZWServiceProvidersListModel *model = self.dataArray[indexPath.row];
         ZWExhibitionServerDetailVC *VC = [[ZWExhibitionServerDetailVC alloc]init];
         VC.hidesBottomBarWhenPushed = YES;
+        VC.shareModel = model;
         VC.merchantId = [NSString stringWithFormat:@"%@",model.providersId];
         [self.navigationController pushViewController:VC animated:YES];
         

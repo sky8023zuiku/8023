@@ -13,7 +13,7 @@
 #import "ZWExhibitionListRequsetAction.h"
 @interface ZWPlanExhibitionSearchView()<UITableViewDelegate,UITableViewDataSource>
 
-@property (nonatomic, strong) UITableView *contentTableView;
+@property (nonatomic, strong)ZWBaseEmptyTableView *contentTableView;
 @property(nonatomic, strong)NSMutableArray *dataArray;
 @property(nonatomic, assign)NSInteger page;
 @property (nonatomic, strong) ZWExhibitionListRequsetAction *action;
@@ -37,9 +37,9 @@
     return _action;
 }
 
--(UITableView *)contentTableView {
+-(ZWBaseEmptyTableView *)contentTableView {
     if (!_contentTableView) {
-        _contentTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
+        _contentTableView = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
     }
     _contentTableView.dataSource = self;
     _contentTableView.delegate = self;

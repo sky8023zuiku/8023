@@ -22,7 +22,7 @@
 - (void)createUI {
     self.view.backgroundColor = [UIColor whiteColor];
     
-    CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.QrCodeStr font:normalFont];
+    CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.QrCodeStr textFont:normalFont textWidth:kScreenWidth-20];
     
     UILabel *textLabel = [[UILabel alloc]initWithFrame:CGRectMake(10, zwNavBarHeight+10, kScreenWidth-20, height)];
     textLabel.text = self.QrCodeStr;

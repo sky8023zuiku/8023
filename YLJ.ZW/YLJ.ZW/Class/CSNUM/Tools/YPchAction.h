@@ -22,7 +22,8 @@
 #import <TPKeyboardAvoidingScrollView.h>
 #import "ZWPhotoBrowserAction.h"
 #import "ZWSearchBar.h"
-
+#import <UIScrollView+EmptyDataSet.h>
+#import "ZWBaseEmptyTableView.h"
 #define httpImageUrl @"http://zhanwang.oss-cn-shanghai.aliyuncs.com/"
 #define blankPagesImageName @"qita_img_wu"
 #define requestFailedBlankPagesImageName @"qita_img_wang"

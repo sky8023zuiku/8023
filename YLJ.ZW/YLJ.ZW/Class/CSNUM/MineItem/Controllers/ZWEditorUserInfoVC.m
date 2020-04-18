@@ -183,7 +183,7 @@
     } else if (section == 2) {
         return 2;
     } else {
-        return 3;
+        return 2;
     }
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -260,23 +260,25 @@
          if (indexPath.row == 0) {
             cell.textLabel.text = @"公司名称";
             cell.detailTextLabel.text = self.userInfoModel.merchantName;
-        }else if (indexPath.row == 1) {
-            cell.textLabel.text = @"公司认证";
-            if (self.userInfoModel.merchantStatus == 0) {
-                cell.detailTextLabel.text = @"请上传营业执照认证";
-            }else if(self.userInfoModel.merchantStatus == 1) {
-                cell.detailTextLabel.text = @"审核中";
-            }else if (self.userInfoModel.merchantStatus == 2) {
-                cell.detailTextLabel.text = @"已认证";
-                cell.detailTextLabel.textColor = [UIColor greenColor];
-            }else {
-                cell.detailTextLabel.text = @"认证失败,请重新上传";
-            }
-            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         }else {
             cell.textLabel.text = @"公司邮箱";
             cell.detailTextLabel.text = self.userInfoModel.merchantEmail;
         }
+        
+//        else if (indexPath.row == 1) {
+//            cell.textLabel.text = @"公司认证";
+//            if (self.userInfoModel.merchantStatus == 0) {
+//                cell.detailTextLabel.text = @"请上传营业执照认证";
+//            }else if(self.userInfoModel.merchantStatus == 1) {
+//                cell.detailTextLabel.text = @"审核中";
+//            }else if (self.userInfoModel.merchantStatus == 2) {
+//                cell.detailTextLabel.text = @"已认证";
+//                cell.detailTextLabel.textColor = [UIColor greenColor];
+//            }else {
+//                cell.detailTextLabel.text = @"认证失败,请重新上传";
+//            }
+//            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+//        }
     }
     [cell.contentView addSubview:lineView];
 }
@@ -320,20 +322,20 @@
         }
     }
     
-    if (indexPath.section == 3) {
-        if (indexPath.row == 1) {
-            NSLog(@"------%ld",(long)self.userInfoModel.merchantStatus);
-            if (self.userInfoModel.merchantStatus == 1 || self.userInfoModel.merchantStatus == 2) {
-                NSLog(@"审核中和已通过进入这里");
-            }else {
-                ZWEditCompanyInfoVC *companyInfoVC = [[ZWEditCompanyInfoVC alloc]init];
-                companyInfoVC.title = @"企业信息上传";
-                companyInfoVC.status = 1;
-                companyInfoVC.merchantStatus = self.userInfoModel.merchantStatus;
-                [self.navigationController pushViewController:companyInfoVC animated:YES];
-            }
-        }
-    }
+//    if (indexPath.section == 3) {
+//        if (indexPath.row == 1) {
+//            NSLog(@"------%ld",(long)self.userInfoModel.merchantStatus);
+//            if (self.userInfoModel.merchantStatus == 1 || self.userInfoModel.merchantStatus == 2) {
+//                NSLog(@"审核中和已通过进入这里");
+//            }else {
+//                ZWEditCompanyInfoVC *companyInfoVC = [[ZWEditCompanyInfoVC alloc]init];
+//                companyInfoVC.title = @"企业信息上传";
+//                companyInfoVC.status = 1;
+//                companyInfoVC.merchantStatus = self.userInfoModel.merchantStatus;
+//                [self.navigationController pushViewController:companyInfoVC animated:YES];
+//            }
+//        }
+//    }
 }
 
 - (void)headBtnClcik:(UIButton *)btn {

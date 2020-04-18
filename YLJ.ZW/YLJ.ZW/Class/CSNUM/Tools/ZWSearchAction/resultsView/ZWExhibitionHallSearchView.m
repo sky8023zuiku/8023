@@ -11,7 +11,7 @@
 #import "ZWHallTabbarCTR.h"
 #import "ZWPavilionHallView.h"
 @interface ZWExhibitionHallSearchView()<UITableViewDelegate,UITableViewDataSource>
-@property(nonatomic, strong) UITableView *contentTableView;
+@property(nonatomic, strong)ZWBaseEmptyTableView *contentTableView;
 @property(nonatomic, strong)NSMutableArray *dataArray;
 @property(nonatomic, assign)NSInteger page;
 @property(nonatomic, strong)NSString *isSearchText;
@@ -28,9 +28,9 @@
     return self;
 }
 
--(UITableView *)contentTableView {
+-(ZWBaseEmptyTableView *)contentTableView {
     if (!_contentTableView) {
-        _contentTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
+        _contentTableView = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
     }
     _contentTableView.dataSource = self;
     _contentTableView.delegate = self;

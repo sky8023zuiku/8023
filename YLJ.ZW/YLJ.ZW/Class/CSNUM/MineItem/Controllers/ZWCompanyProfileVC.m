@@ -103,7 +103,7 @@
     }else {
         myText =self.companyIntroduction;
     }
-    CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:myText font:normalFont];
+    CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:myText textFont:normalFont textWidth:kScreenWidth-20];
     
     UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(10, 10, kScreenWidth-20, height+20)];
     myLabel.text = myText;

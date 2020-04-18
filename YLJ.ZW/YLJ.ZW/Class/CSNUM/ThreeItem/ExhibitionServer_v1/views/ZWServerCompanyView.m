@@ -13,7 +13,7 @@
 
 @interface ZWServerCompanyView()<UITableViewDelegate, UITableViewDataSource>
 @property(nonatomic, strong)UITableView *leftTableView;
-@property(nonatomic, strong)UITableView *rightTableVIew;
+@property(nonatomic, strong)ZWBaseEmptyTableView *rightTableVIew;
 @property(nonatomic, assign)NSInteger selectType;
 @property(nonatomic, strong)NSArray *industryArray;
 
@@ -38,9 +38,9 @@
     return _leftTableView;
 }
 
-- (UITableView *)rightTableVIew {
+- (ZWBaseEmptyTableView *)rightTableVIew {
     if (!_rightTableVIew) {
-        _rightTableVIew = [[UITableView alloc]initWithFrame:CGRectMake(0.2*self.frame.size.width, 0, 0.8*self.frame.size.width, self.frame.size.height) style:UITableViewStyleGrouped];
+        _rightTableVIew = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0.2*self.frame.size.width, 0, 0.8*self.frame.size.width, self.frame.size.height) style:UITableViewStyleGrouped];
     }
     _rightTableVIew.dataSource = self;
     _rightTableVIew.delegate = self;
@@ -49,6 +49,7 @@
     _rightTableVIew.separatorStyle = UITableViewCellSeparatorStyleNone;
     _rightTableVIew.showsHorizontalScrollIndicator = NO;
     _rightTableVIew.backgroundColor = [UIColor clearColor];
+    _rightTableVIew.tableFooterView = [UIView new];
     return _rightTableVIew;
 }
 
@@ -64,7 +65,7 @@
     return self;
 }
 
-
+#pragma UITableViewDataSource;
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
 }
@@ -173,6 +174,7 @@
         ZWServiceProvidersListModel *model = self.rightDataArray[indexPath.row];
         ZWExhibitionServerDetailVC *VC = [[ZWExhibitionServerDetailVC alloc]init];
         VC.merchantId = [NSString stringWithFormat:@"%@",model.providersId];
+        VC.shareModel = model;
         [self.ff_navViewController pushViewController:VC animated:YES];
     }
 }

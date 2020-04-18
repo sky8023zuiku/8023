@@ -40,7 +40,7 @@
 
 @interface ZWExhibitionVC ()<UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate,ZWExhibitionListsCellDelegate,ZWTopSelectViewDelegate,ZWExhibitionDelayCellDelegate>
 
-@property(nonatomic, strong)UITableView *tableView;
+@property(nonatomic, strong)ZWBaseEmptyTableView *tableView;
 @property(nonatomic, strong)UISearchBar *searchBar;
 @property(nonatomic, strong)NSMutableArray *titleBtns;
 @property(nonatomic, strong)UIView *lineView;
@@ -54,22 +54,9 @@
 @property (nonatomic, strong) NSArray *mainKindArray;
 @property (nonatomic, strong) NSMutableArray *subKindArray;
 
-//@property (nonatomic, strong) NSMutableArray *countryModelArray;
-//@property (nonatomic, strong) NSMutableArray *cityModelArray;
-//@property (nonatomic, strong) NSMutableArray *industryModelArray;
-//@property (nonatomic, strong) NSMutableArray *countryArray;
-//@property (nonatomic, strong) NSMutableArray *cityArray;
-//@property (nonatomic, strong) NSMutableArray *industryArray;
-
 @property (nonatomic, strong) UIView *blankView;
-
 @property (nonatomic, strong) ZWExhibitionListRequsetAction *action;
-
 @property (nonatomic, strong) REFrostedViewController *frostedVC;
-
-//@property(nonatomic, strong)NSMutableArray *conditions;//获取点击itme之后的值
-//@property(nonatomic, strong)NSMutableArray *itemsIndex;//获取点击itme的索引
-//@property(nonatomic, strong)NSString *industriesId;//行业id
 
 @property(nonatomic, strong)NSArray *screenValues;
 
@@ -84,9 +71,9 @@
     return _action;
 }
 
--(UITableView *)tableView {
+-(ZWBaseEmptyTableView *)tableView {
     if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwTabBarHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
+        _tableView = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwTabBarHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
     }
     _tableView.dataSource = self;
     _tableView.delegate = self;
@@ -104,8 +91,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self createNavigationBar];
-//    [self getCountryRequest];
-//    [self initArray];
     [self createUI];
     [self createSearchBar];
     [self createRequest];
@@ -128,11 +113,7 @@
     [dic setValue:notice.object[4][@"name"] forKey:@"monthTime"];
     
     self.page = 1;
-    if (self.cellType == 0) {
-        [self createArequestWithPage:self.page withParameter:dic];
-    }else {
-//        [self requestPianExhibitionList:dic withPage:self.page];
-    }
+    [self createArequestWithPage:self.page withParameter:dic];
 }
 
 -(void)dealloc {
@@ -149,31 +130,9 @@
     self.dataSource = [NSMutableArray array];
     [self.view addSubview:self.tableView];
         
-//    ZWTopSelectView *selectView = [[ZWTopSelectView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 0.08*kScreenWidth) withTitles:@[@"展会列表",@"计划列表"]];
-//    selectView.delegate = self;
-//    [self.view addSubview:selectView];
-    
 }
-- (void)clickItemWithIndex:(NSInteger)index {
-    if (index == 1) {
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        NSData *data = [defaults objectForKey:@"user"];
-        ZWUserInfo *user = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-        if ([user.uuid isEqualToString:@""]||!user.uuid) {
-            UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:[[ZWMainLoginVC alloc] init]];
-            [self yc_bottomPresentController:nav presentedHeight:kScreenHeight completeHandle:nil];
-            return;
-        }
-    }
-    NSLog(@"%ld",(long)index);
-    self.cellType = index;
-    self.page = 1;
-    if (index == 0) {
-        [self createArequestWithPage:self.page withParameter:self.action.mj_keyValues];
-    }else {
-//        [self requestPianExhibitionList:self.action.mj_keyValues withPage:self.page];
-    }
-}
+
+
 #pragma UITableViewDataSource
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
@@ -315,12 +274,20 @@
         return;
     }
     if (self.cellType == 0) {
+        
+        
         ZWExhibitionListModel *model = self.dataSource[indexPath.row];
+        NSDictionary *shareData = @{
+            @"exhibitionId":model.listId,
+            @"exhibitionName":model.name,
+            @"exhibitionTitleImage":model.imageUrl
+        };
         ZWExhibitionNaviVC *naviVC = [[ZWExhibitionNaviVC alloc]init];
         naviVC.hidesBottomBarWhenPushed = YES;
         naviVC.title = @"展会导航";
         naviVC.exhibitionId = model.listId;
         naviVC.price = model.price;
+        naviVC.shareData = shareData;
         [self.navigationController pushViewController:naviVC animated:YES];
     }else {
         ZWExhPlanListModel *model = self.dataSource[indexPath.row];
@@ -391,12 +358,7 @@
     self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
         __strong typeof (weakSelf) strongSelf = weakSelf;
         strongSelf.page = 1;
-        if (strongSelf.cellType == 0) {
-            [strongSelf createArequestWithPage:self.page withParameter:self.action.mj_keyValues];
-        }else {
-//            [strongSelf requestPianExhibitionList:self.action.mj_keyValues withPage:self.page];
-        }
-        
+        [strongSelf createArequestWithPage:self.page withParameter:self.action.mj_keyValues];
     }];
 }
 //加载
@@ -405,13 +367,7 @@
     self.tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
         __strong typeof (weakSelf) strongSelf = weakSelf;
         strongSelf.page += 1;
-        
-        if (strongSelf.cellType == 0) {
-            [strongSelf createArequestWithPage:self.page withParameter:self.action.mj_keyValues];
-        }else {
-//            [strongSelf requestPianExhibitionList:self.action.mj_keyValues withPage:self.page];
-        }
-        
+        [strongSelf createArequestWithPage:self.page withParameter:self.action.mj_keyValues];
     }];
 }
 
@@ -437,9 +393,6 @@
                 [myArray addObject:model];
             }
             [strongSelf.dataSource addObjectsFromArray:myArray];
-            if (strongSelf.dataSource.count == 0) {
-               [strongSelf showBlankPagesWithImage:blankPagesImageName withDitail:@"暂无展会" withType:1];
-            }
             [strongSelf.tableView reloadData];
         }else {
             
@@ -451,45 +404,8 @@
         [strongSelf.tableView.mj_header endRefreshing];
         [strongSelf.tableView.mj_footer endRefreshing];
         [strongSelf.tableView reloadData];
-        [strongSelf showBlankPagesWithImage:requestFailedBlankPagesImageName withDitail:@"当前网络异常，请检查网络" withType:2];
     } showInView:self.view];
 }
-///**
-// * 网络请求获取计划展会列表
-//*/
-//- (void)requestPianExhibitionList:(NSDictionary *)parametes withPage:(NSInteger)page {
-//    __weak typeof (self) weakSelf = self;
-//    [[ZWDataAction sharedAction]postReqeustWithURL:zwPlanExhibitionList parametes:[self takeParameters:parametes withPage:page] successBlock:^(NSDictionary * _Nonnull data) {
-//        __weak typeof (weakSelf) strongSelf = weakSelf;
-//        [strongSelf.tableView.mj_header endRefreshing];
-//        [strongSelf.tableView.mj_footer endRefreshing];
-//        if (zw_issuccess) {
-//            if (page == 1) {
-//                [strongSelf.dataSource removeAllObjects];
-//            }
-//            [strongSelf removeBlankView];
-//            NSArray *myData = data[@"data"];
-//            NSMutableArray *myArray = [NSMutableArray array];
-//            for (NSDictionary *myDic in myData) {
-//                ZWExhPlanListModel *model = [ZWExhPlanListModel parseJSON:myDic];
-//                [myArray addObject:model];
-//            }
-//            [strongSelf.dataSource addObjectsFromArray:myArray];
-//            if (strongSelf.dataSource.count == 0) {
-//               [strongSelf showBlankPagesWithImage:blankPagesImageName withDitail:@"暂无展会" withType:1];
-//            }
-//            [strongSelf.tableView reloadData];
-//        }
-//    } failureBlock:^(NSError * _Nonnull error) {
-//        __weak typeof (weakSelf) strongSelf = weakSelf;
-//        [strongSelf.dataSource removeAllObjects];
-//        [strongSelf removeBlankView];
-//        [strongSelf.tableView.mj_header endRefreshing];
-//        [strongSelf.tableView.mj_footer endRefreshing];
-//        [strongSelf.tableView reloadData];
-//        [strongSelf showBlankPagesWithImage:requestFailedBlankPagesImageName withDitail:@"当前网络异常，请检查网络" withType:2];
-//    } showInView:self.view];
-//}
 
 -(NSDictionary *)takeParameters:(NSDictionary *)dic withPage:(NSInteger)page  {
     self.action.city = dic[@"city"];
@@ -509,37 +425,37 @@
         self.blankView = nil;
     }
 }
-- (void)showBlankPagesWithImage:(NSString *)imageName withDitail:(NSString *)ditail withType:(NSInteger)type {
-    
-    self.blankView = [[UIView alloc]initWithFrame:CGRectMake(0, 44, kScreenWidth, kScreenHeight-44)];
-    [self.view addSubview:self.blankView];
-    
-    UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0.1*kScreenWidth, 0.1*kScreenHeight, 0.8*kScreenWidth, 0.45*kScreenWidth)];
-    imageView.image = [UIImage imageNamed:imageName];
-    [self.blankView addSubview:imageView];
-    
-    UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(imageView.frame)+20, kScreenWidth, 30)];
-    myLabel.text = ditail;
-    myLabel.font = bigFont;
-    myLabel.textColor = [UIColor lightGrayColor];
-    myLabel.textAlignment = NSTextAlignmentCenter;
-    [self.blankView addSubview:myLabel];
-    
-    if (type == 2) {
-        UIButton *reloadBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        reloadBtn.frame = CGRectMake(0.3*kScreenWidth, CGRectGetMaxY(myLabel.frame)+25, 0.4*kScreenWidth, 0.1*kScreenWidth);
-        [reloadBtn setTitle:@"重新加载" forState:UIControlStateNormal];
-        reloadBtn.layer.borderColor = skinColor.CGColor;
-        reloadBtn.titleLabel.font = normalFont;
-        reloadBtn.layer.cornerRadius = 0.05*kScreenWidth;
-        reloadBtn.layer.masksToBounds = YES;
-        [reloadBtn setTitleColor:skinColor forState:UIControlStateNormal];
-        reloadBtn.layer.borderWidth = 1;
-        [reloadBtn addTarget:self action:@selector(reloadBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-        [self.blankView addSubview:reloadBtn];
-    }
-    
-}
+//- (void)showBlankPagesWithImage:(NSString *)imageName withDitail:(NSString *)ditail withType:(NSInteger)type {
+//
+//    self.blankView = [[UIView alloc]initWithFrame:CGRectMake(0, 44, kScreenWidth, kScreenHeight-44)];
+//    [self.view addSubview:self.blankView];
+//
+//    UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0.1*kScreenWidth, 0.1*kScreenHeight, 0.8*kScreenWidth, 0.45*kScreenWidth)];
+//    imageView.image = [UIImage imageNamed:imageName];
+//    [self.blankView addSubview:imageView];
+//
+//    UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(imageView.frame)+20, kScreenWidth, 30)];
+//    myLabel.text = ditail;
+//    myLabel.font = bigFont;
+//    myLabel.textColor = [UIColor lightGrayColor];
+//    myLabel.textAlignment = NSTextAlignmentCenter;
+//    [self.blankView addSubview:myLabel];
+//
+//    if (type == 2) {
+//        UIButton *reloadBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+//        reloadBtn.frame = CGRectMake(0.3*kScreenWidth, CGRectGetMaxY(myLabel.frame)+25, 0.4*kScreenWidth, 0.1*kScreenWidth);
+//        [reloadBtn setTitle:@"重新加载" forState:UIControlStateNormal];
+//        reloadBtn.layer.borderColor = skinColor.CGColor;
+//        reloadBtn.titleLabel.font = normalFont;
+//        reloadBtn.layer.cornerRadius = 0.05*kScreenWidth;
+//        reloadBtn.layer.masksToBounds = YES;
+//        [reloadBtn setTitleColor:skinColor forState:UIControlStateNormal];
+//        reloadBtn.layer.borderWidth = 1;
+//        [reloadBtn addTarget:self action:@selector(reloadBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+//        [self.blankView addSubview:reloadBtn];
+//    }
+//
+//}
 - (void)reloadBtnClick:(UIButton *)btn {
     if (self.cellType == 0) {
         [self createArequestWithPage:self.page withParameter:self.action.mj_keyValues];

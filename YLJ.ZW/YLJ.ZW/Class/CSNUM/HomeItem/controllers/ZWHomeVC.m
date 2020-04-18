@@ -44,6 +44,7 @@
 #import "ZWMessageCenterVC.h"
 
 #import "ZWExhibitionServerListVC.h"
+#import "ZWSelectCertificationVC.h"
 
 @interface ZWHomeVC ()<UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate,SDCycleScrollViewDelegate,ZWHomeTuiExhibitorsViewDelegate>
 @property(nonatomic, strong)UITableView *tableView;
@@ -54,6 +55,8 @@
 @property(nonatomic, strong)NSArray *httpImages;
 
 @property(nonatomic, strong)NSDictionary *mainCdic;//C位公司
+
+@property(nonatomic, strong)SDCycleScrollView *cycleScrollView;
 
 @end
 
@@ -74,6 +77,23 @@
     _tableView.backgroundColor = zwGrayColor;
     return _tableView;
 }
+
+
+-(SDCycleScrollView *)cycleScrollView {
+    if (!_cycleScrollView) {
+        _cycleScrollView = [SDCycleScrollView cycleScrollViewWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 0.45*kScreenWidth) delegate:self placeholderImage:[UIImage imageNamed:@"fu_img_no_01"]];
+        _cycleScrollView.pageControlAliment = SDCycleScrollViewPageContolAlimentCenter;
+        _cycleScrollView.bannerImageViewContentMode = UIViewContentModeScaleToFill;
+        _cycleScrollView.showPageControl = YES;
+        _cycleScrollView.backgroundColor = [UIColor colorWithRed:226.0/255.0 green:226.0/255.0 blue:226.0/255.0 alpha:1];
+        _cycleScrollView.autoScrollTimeInterval = 3;
+        _cycleScrollView.currentPageDotImage = [UIImage imageWithColor:[UIColor whiteColor] withCornerRadius:1.5 forSize:CGSizeMake(15, 3)];
+        _cycleScrollView.pageDotImage = [UIImage imageWithColor:[UIColor colorWithRed:206.0/255.0 green:206.0/255.0 blue:206.0/255.0 alpha:1] withCornerRadius:1.5 forSize:CGSizeMake(15, 3)];
+    }
+    return _cycleScrollView;
+}
+
+
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -149,14 +169,18 @@
 }
 
 - (void)LeftBtnClick:(UIBarButtonItem *)item {
-    ZWScanVC *VC = [[ZWScanVC alloc]init];
-    VC.hidesBottomBarWhenPushed = YES;
-    VC.libraryType = [Global sharedManager].libraryType;
-    VC.scanCodeType = [Global sharedManager].scanCodeType;
-    VC.style = [StyleDIY customStyle];
-    //镜头拉远拉近功能
-    VC.isVideoZoom = YES;
-    [self.navigationController pushViewController:VC animated:YES];
+    
+    if ([self goToLogin] != YES) {
+        ZWScanVC *VC = [[ZWScanVC alloc]init];
+        VC.hidesBottomBarWhenPushed = YES;
+        VC.libraryType = [Global sharedManager].libraryType;
+        VC.scanCodeType = [Global sharedManager].scanCodeType;
+        VC.style = [StyleDIY customStyle];
+        //镜头拉远拉近功能
+        VC.isVideoZoom = YES;
+        [self.navigationController pushViewController:VC animated:YES];
+    }
+
 }
 
 - (void)rightBtnClick:(UIBarButtonItem *)btn {
@@ -186,7 +210,7 @@
 }
 
 - (void)postNotice:(NSInteger)type {
-    [[NSNotificationCenter defaultCenter]postNotificationName:@"homeTableViewRollLocation" object:[NSString stringWithFormat:@"%ld",type]];
+    [[NSNotificationCenter defaultCenter]postNotificationName:@"homeTableViewRollLocation" object:[NSString stringWithFormat:@"%ld",(long)type]];
 }
 
 - (void)createUI {
@@ -330,8 +354,6 @@
 //            companyDesignVC.type = @"4";
 //            [self.navigationController pushViewController:companyDesignVC animated:YES];
             
-            
-            
             NSMutableDictionary *myParameter = [[NSMutableDictionary alloc]init];
             [myParameter setValue:@"" forKey:@"city"];
             [myParameter setValue:@"" forKey:@"country"];
@@ -373,26 +395,17 @@
     [[ZWDataAction sharedAction]getReqeustWithURL:zwCompanyCertification parametes:@{} successBlock:^(NSDictionary * _Nonnull data) {
         __strong typeof (weakSelf) strongSelf = weakSelf;
         if (zw_issuccess) {
-            NSInteger merchantStatus = [data[@"data"] integerValue];
-            if (merchantStatus == 0) {
-                ZWEditCompanyInfoVC *companyInfoVC = [[ZWEditCompanyInfoVC alloc]init];
-                companyInfoVC.title = @"企业信息上传";
-                companyInfoVC.merchantStatus = merchantStatus;
-                companyInfoVC.status = 0;
-                companyInfoVC.hidesBottomBarWhenPushed = YES;
-                [strongSelf.navigationController pushViewController:companyInfoVC animated:YES];
-            }else {
-                ZWCertificationStatusVC *certificationStatusVC = [[ZWCertificationStatusVC alloc]init];
-                certificationStatusVC.title = @"认证结果";
-                certificationStatusVC.merchantStatus = merchantStatus;
-                certificationStatusVC.hidesBottomBarWhenPushed = YES;
-                [strongSelf.navigationController pushViewController:certificationStatusVC animated:YES];
-            }
+            NSDictionary *myData = data[@"data"];
+            ZWSelectCertificationVC *selectVC = [[ZWSelectCertificationVC alloc]init];
+            selectVC.title = @"选择企业类型";
+            selectVC.hidesBottomBarWhenPushed = YES;
+            selectVC.authenticationStatus = [myData[@"authenticationStatus"] integerValue];
+            selectVC.identityId = [myData[@"identityId"] integerValue];
+            [strongSelf.navigationController pushViewController:selectVC animated:YES];
         }
     } failureBlock:^(NSError * _Nonnull error) {
-        
+
     } showInView:self.view];
-    
 }
 
 
@@ -435,15 +448,8 @@
             [imageUrls addObject:urlStr];
         }
         self.httpImages = imageUrls;
-        SDCycleScrollView *cycleScrollView = [SDCycleScrollView cycleScrollViewWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 0.45*kScreenWidth) delegate:self placeholderImage:[UIImage imageNamed:@"fu_img_no_01"]];
-        cycleScrollView.pageControlAliment = SDCycleScrollViewPageContolAlimentCenter;
-        cycleScrollView.bannerImageViewContentMode = UIViewContentModeScaleToFill;
-        cycleScrollView.showPageControl = YES;
-        cycleScrollView.imageURLStringsGroup = imageUrls;
-        cycleScrollView.autoScrollTimeInterval = 3;
-        cycleScrollView.currentPageDotImage = [UIImage imageWithColor:[UIColor whiteColor] withCornerRadius:1.5 forSize:CGSizeMake(15, 3)];
-        cycleScrollView.pageDotImage = [UIImage imageWithColor:[UIColor colorWithRed:206.0/255.0 green:206.0/255.0 blue:206.0/255.0 alpha:1] withCornerRadius:1.5 forSize:CGSizeMake(15, 3)];
-        [view addSubview:cycleScrollView];
+        self.cycleScrollView.imageURLStringsGroup = imageUrls;
+        [view addSubview:self.cycleScrollView];
 
     }else if (section == 1) {
         UIImageView *titleImage = [[UIImageView alloc]initWithFrame:CGRectMake(0.025*kScreenWidth, 0, 0.05*kScreenWidth, 0.065*kScreenWidth)];

@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ZWServiceProviderSearchResultsView : UIView
 - (instancetype)initWithFrame:(CGRect)frame withParameter:(id)obj;
 
-@property (nonatomic, strong) UITableView *contentTableView;
+@property (nonatomic, strong) ZWBaseEmptyTableView *contentTableView;
 
 @property(nonatomic, strong)NSString *searchText;
 @end

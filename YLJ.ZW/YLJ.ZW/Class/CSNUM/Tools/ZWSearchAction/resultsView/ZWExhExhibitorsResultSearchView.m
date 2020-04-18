@@ -114,10 +114,10 @@
 
 
 
-- (UITableView *)contentTableView
+- (ZWBaseEmptyTableView *)contentTableView
 {
     if (!_contentTableView) {
-        self.contentTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
+        self.contentTableView = [[ZWBaseEmptyTableView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
         _contentTableView.delegate = self;
         _contentTableView.dataSource = self;
         _contentTableView.sectionHeaderHeight = 0;
@@ -200,17 +200,9 @@
         }];
     } else {
         ZWExExhibitorsModel *model = self.dataArray[indexPath.row];
-        
-//        ZWEditExhibitionVC *exhibitionVC = [[ZWEditExhibitionVC alloc]init];
-//        exhibitionVC.title = @"展商详情";
-//        exhibitionVC.exhibitorId = model.exhibitorId;
-//        exhibitionVC.enterType = 0;
-//        [self.ff_navViewController pushViewController:exhibitionVC animated:YES];
-        
         ZWExExhibitorsDetailsVC *detailsVC = [[ZWExExhibitorsDetailsVC alloc]init];
         detailsVC.title = @"展商详情";
-        detailsVC.exhibitorId = model.exhibitorId;
-        detailsVC.merchantId = model.merchantId;
+        detailsVC.shareModel = model;
         [self.ff_navViewController pushViewController:detailsVC animated:YES];
     }
 }

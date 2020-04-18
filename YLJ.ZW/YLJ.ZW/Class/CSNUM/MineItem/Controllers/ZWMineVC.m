@@ -37,6 +37,13 @@
 
 #import "ZWMyShareVC.h"
 
+#import "ZWEditCompanyInfoVC.h"
+#import "ZWCertificationStatusVC.h"
+
+#import "ZWSelectCertificationVC.h"
+
+#import "ZWMineResponse.h"
+
 #define IMAGE_HEIGHT 0.01*kScreenWidth
 #define SCROLL_DOWN_LIMIT 100
 #define LIMIT_OFFSET_Y -(IMAGE_HEIGHT + SCROLL_DOWN_LIMIT)
@@ -108,7 +115,7 @@
 }
 
 - (void)createNavigationBar {
-    [[YNavigationBar sharedInstance]createRightBarWithImage:[UIImage imageNamed:@"ren_icon_xiaoxi"] barItem:self.navigationItem target:self action:@selector(rightItemClick:)];
+    [[YNavigationBar sharedInstance]createRightBarWithImage:[UIImage imageNamed:@"main_message_icon"] barItem:self.navigationItem target:self action:@selector(rightItemClick:)];
 }
 - (void)rightItemClick:(UINavigationItem *)item {
     ZWMessageCenterVC *messageCenterVC = [[ZWMessageCenterVC alloc]init];
@@ -139,16 +146,17 @@
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 2;
 }
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (section==0) {
         NSDictionary *myDic = [[ZWSaveDataAction shareAction]takeUserInfoData];
         int roleId = [myDic[@"roleId"] intValue];
         if (roleId == 1||roleId == 5||roleId == 6||roleId == 7||roleId == 8||roleId == 12||roleId == 13) {
-            return 3;
-        } else if(roleId ==2||roleId==3 ||roleId ==4) {
-            return 6;
-        }else {
             return 4;
+        } else if(roleId ==2||roleId==3 ||roleId ==4) {
+            return 7;
+        }else {
+            return 5;
         }
     } else {
         return 1;
@@ -177,21 +185,26 @@
         if(roleId ==2||roleId==3 ||roleId ==4) {
             
             if (indexPath.row == 0) {
+                cell.textLabel.text = @"企业入驻";
+                cell.imageView.image = [UIImage imageNamed:@"mine_enterprises_icon"];
+            }else if (indexPath.row == 1) {
                 cell.textLabel.text = @"我的订单";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_dingdan"];
-            }else if (indexPath.row == 1) {
+            }else if (indexPath.row == 2) {
                 cell.textLabel.text = @"我的收藏";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_shouc"];
-            }else if (indexPath.row == 2) {
+            }else if (indexPath.row == 3) {
                 cell.textLabel.text = @"我的发布";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_fabu"];
-            }else if (indexPath.row == 3) {
+            }else if (indexPath.row == 4) {
                 cell.textLabel.text = @"我的行业";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_zi"];
-            }else if (indexPath.row == 4) {
+            }
+            else if (indexPath.row == 5) {
                 cell.textLabel.text = @"我的分享";
                 cell.imageView.image = [UIImage imageNamed:@"my_share_icon"];
-            }else {
+            }
+            else {
                 cell.textLabel.text = @"我的邀请";
                 cell.imageView.image = [UIImage imageNamed:@"my_invitation_icon"];
             }
@@ -199,12 +212,15 @@
         }else if (roleId==9 ||roleId ==10) {
             
             if (indexPath.row == 0) {
+                cell.textLabel.text = @"企业入驻";
+                cell.imageView.image = [UIImage imageNamed:@"mine_enterprises_icon"];
+            }else if (indexPath.row == 1) {
                 cell.textLabel.text = @"我的订单";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_dingdan"];
-            }else if (indexPath.row == 1) {
+            }else if (indexPath.row == 2) {
                 cell.textLabel.text = @"我的收藏";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_shouc"];
-            }else if (indexPath.row == 2) {
+            }else if (indexPath.row == 3) {
                 cell.textLabel.text = @"子用户管理";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_shouc"];
             }else {
@@ -215,9 +231,12 @@
         }else {
             
             if (indexPath.row == 0) {
+                cell.textLabel.text = @"企业入驻";
+                cell.imageView.image = [UIImage imageNamed:@"mine_enterprises_icon"];
+            }else if (indexPath.row == 1) {
                 cell.textLabel.text = @"我的订单";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_dingdan"];
-            }else if (indexPath.row == 1) {
+            }else if (indexPath.row == 2) {
                 cell.textLabel.text = @"我的收藏";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_shouc"];
             } else {
@@ -409,34 +428,40 @@
 
         if (roleId == 2||roleId == 3||roleId == 4) {
             if (indexPath.row == 0) {
-                [self gotoMyOrderVC];
+                [self zwGoToEnterprisesVC];
             }else if (indexPath.row == 1) {
-                [self gotoMyCollectionVC];
+                [self gotoMyOrderVC];
             }else if (indexPath.row == 2) {
+                [self gotoMyCollectionVC];
+            }else if (indexPath.row == 3) {
                 ZWMyReleaseVC *ReleaseVC = [[ZWMyReleaseVC alloc]init];
                 ReleaseVC.title = @"我的发布";
                 ReleaseVC.hidesBottomBarWhenPushed = YES;
                 [self.navigationController pushViewController:ReleaseVC animated:YES];
-            }else if (indexPath.row == 3) {
+            }else if (indexPath.row == 4) {
                 ZWMyIndustriesVC *industriesVC = [[ZWMyIndustriesVC alloc]init];
                 industriesVC.title = @"我的行业";
                 industriesVC.hidesBottomBarWhenPushed = YES;
                 [self.navigationController pushViewController:industriesVC animated:YES];
-            }else if (indexPath.row == 4) {
+            }
+            else if (indexPath.row == 5) {
                 ZWMyShareVC *shareVC = [[ZWMyShareVC alloc]init];
                 shareVC.title = @"我的分享";
                 shareVC.userId = myDic[@"userId"];
                 shareVC.hidesBottomBarWhenPushed = YES;
                 [self.navigationController pushViewController:shareVC animated:YES];
-            }else {
+            }
+            else {
                 [self gotoMyInvitationVC];
             }
         }else if (roleId==9||roleId==10) {
             if (indexPath.row == 0) {
+                [self zwGoToEnterprisesVC];
+            }else if (indexPath.row == 1) {
                 [self gotoMyOrderVC];
-            }else if (indexPath.row == 1) {
+            }else if (indexPath.row == 2) {
                 [self gotoMyCollectionVC];
-            }else if (indexPath.row == 1) {
+            }else if (indexPath.row == 3) {
                 ZWChildUserManagerVC *userManagerVC = [[ZWChildUserManagerVC alloc]init];
                 userManagerVC.title = @"子用户管理";
                 userManagerVC.hidesBottomBarWhenPushed = YES;
@@ -446,8 +471,10 @@
             }
         }else {
             if (indexPath.row == 0) {
-                [self gotoMyOrderVC];
+                [self zwGoToEnterprisesVC];
             }else if (indexPath.row == 1) {
+                [self gotoMyOrderVC];
+            }else if (indexPath.row == 2) {
                 [self gotoMyCollectionVC];
             }else{
                 [self gotoMyInvitationVC];
@@ -475,13 +502,11 @@
 }
 
 - (void)gotoMyInvitationVC {
-    
     ZWMyInvitationVC *invitationVC = [[ZWMyInvitationVC alloc]init];
     invitationVC.title = @"我的邀请";
     invitationVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:invitationVC animated:YES];
 }
-
 
 - (void)editorBtnClick:(UIButton *)btn {
     ZWEditorUserInfoVC *userInfoVC = [[ZWEditorUserInfoVC alloc]init];
@@ -489,12 +514,34 @@
     userInfoVC.title = @"个人资料";
     [self.navigationController pushViewController:userInfoVC animated:YES];
 }
+
 - (void)catalogueBtnClick:(UIButton *)btn {
     ZWMyCatalogueVC *catalogueVC = [[ZWMyCatalogueVC alloc]init];
     catalogueVC.title = @"我的展会";
     catalogueVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:catalogueVC animated:YES];
 }
+
+- (void)zwGoToEnterprisesVC {
+    
+    __weak typeof (self) weakSelf = self;
+    [[ZWDataAction sharedAction]getReqeustWithURL:zwCompanyCertification parametes:@{} successBlock:^(NSDictionary * _Nonnull data) {
+        __strong typeof (weakSelf) strongSelf = weakSelf;
+        if (zw_issuccess) {
+            NSDictionary *myData = data[@"data"];
+            ZWSelectCertificationVC *selectVC = [[ZWSelectCertificationVC alloc]init];
+            selectVC.title = @"选择企业类型";
+            selectVC.hidesBottomBarWhenPushed = YES;
+            selectVC.authenticationStatus = [myData[@"authenticationStatus"] integerValue];
+            selectVC.identityId = [myData[@"identityId"] integerValue];
+            [strongSelf.navigationController pushViewController:selectVC animated:YES];
+        }
+    } failureBlock:^(NSError * _Nonnull error) {
+
+    } showInView:self.view];
+    
+}
+
 - (void)integralBtnClick:(UIButton *)btn {
 
     [[ZWDataAction sharedAction]getReqeustWithURL:zwTopUpList parametes:@{@"type":@"0"} successBlock:^(NSDictionary * _Nonnull data) {
@@ -519,6 +566,7 @@
     } showInView:self.view];
     
 }
+
 - (void)tapImageClick:(UIGestureRecognizer *)tap {
     [ZWImageBrowser showImageV_img:self.headImage];
 }

@@ -11,10 +11,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ZWChosenIndustriesModel : NSObject
-@property(nonatomic, strong)NSNumber *industries2Id;//二级行业id
-@property(nonatomic, strong)NSString *industries2Name;//二级行业的名称
-@property(nonatomic, strong)NSNumber *industries3Id;//三级行业的id
-@property(nonatomic, strong)NSString *industries3Name;//三级行业的名称
+@property(nonatomic, copy)NSNumber *industries2Id;//二级行业id
+@property(nonatomic, copy)NSString *industries2Name;//二级行业的名称
+@property(nonatomic, copy)NSNumber *industries3Id;//三级行业的id
+@property(nonatomic, copy)NSString *industries3Name;//三级行业的名称
++ (id)parseJSON:(NSDictionary *)jsonDic;
 @end
 
 NS_ASSUME_NONNULL_END

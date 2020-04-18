@@ -22,7 +22,7 @@
 
 @interface ZWExhibitorsVC ()<ZWTopSelectViewDelegate,UITableViewDelegate,UITableViewDataSource,ZWIndustryMerchantCellDelegate>
 @property(nonatomic, strong)UITableView *leftTableView;
-@property(nonatomic, strong)UITableView *rightTableView;
+@property(nonatomic, strong)ZWBaseEmptyTableView *rightTableView;
 @property(nonatomic, assign)NSInteger selectType;
 @property(nonatomic, strong)NSMutableArray *dataSource;
 @property(nonatomic, assign)NSInteger page;
@@ -46,7 +46,7 @@
 
 -(UITableView *)leftTableView {
     if (!_leftTableView) {
-        _leftTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0.08*kScreenWidth, 0.2*kScreenWidth, kScreenHeight-zwNavBarHeight-zwTabBarHeight-0.08*kScreenWidth) style:UITableViewStyleGrouped];
+        _leftTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0.09*kScreenWidth, 0.2*kScreenWidth, kScreenHeight-zwNavBarHeight-zwTabBarHeight-0.09*kScreenWidth) style:UITableViewStyleGrouped];
     }
     _leftTableView.dataSource = self;
     _leftTableView.delegate = self;
@@ -56,15 +56,16 @@
     return _leftTableView;
 }
 
--(UITableView *)rightTableView {
+-(ZWBaseEmptyTableView *)rightTableView {
     if (!_rightTableView) {
-        _rightTableView = [[UITableView alloc]initWithFrame:CGRectMake(0.2*kScreenWidth, 0.08*kScreenWidth, 0.8*kScreenWidth, kScreenHeight-zwNavBarHeight-zwTabBarHeight-0.08*kScreenWidth) style:UITableViewStyleGrouped];
+        _rightTableView = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0.2*kScreenWidth, 0.09*kScreenWidth, 0.8*kScreenWidth, kScreenHeight-zwNavBarHeight-zwTabBarHeight-0.09*kScreenWidth) style:UITableViewStyleGrouped];
     }
     _rightTableView.dataSource = self;
     _rightTableView.delegate = self;
     _rightTableView.sectionHeaderHeight = 0;
     _rightTableView.sectionFooterHeight = 0;
     _rightTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    _rightTableView.backgroundColor = [UIColor whiteColor];
     return _rightTableView;
 }
 
@@ -80,7 +81,6 @@
     [self refreshData];
     [self refreshHeader];
     [self refreshFooter];
-    [self createScreening];
     [self createNotice];
 }
 
@@ -150,7 +150,7 @@
 
 - (void)createUI {
         
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = zwTableBackColor;
     
     self.title = @"行业展商";
     self.dataSource = [NSMutableArray array];
@@ -250,7 +250,7 @@
     }
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 0.01*kScreenWidth;
+    return 0.01;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     return 0.1;
@@ -269,6 +269,7 @@
         detailsVC.hidesBottomBarWhenPushed = YES;
         detailsVC.title = @"展商详情";
         detailsVC.merchantId = model.merchantId;
+        detailsVC.shareModel = model;
         [self.navigationController pushViewController:detailsVC animated:YES];
     }
 }
@@ -363,7 +364,7 @@
         }
     } failureBlock:^(NSError * _Nonnull error) {
 
-    }showInView:self.view];
+    }];
 }
 
 - (void)takeMyLevel3Industries {
@@ -396,30 +397,7 @@
         }
     } failureBlock:^(NSError * _Nonnull error) {
 
-    } showInView:self.view];
-}
-
-- (void)createScreening {
-//    __weak typeof (self) weakSelf = self;
-//    [[ZWDataAction sharedAction]getReqeustWithURL:zwTakeLevel3IndustriesList parametes:@{@"ParentId":@""} successBlock:^(NSDictionary * _Nonnull data) {
-//        __strong typeof (weakSelf) strongSelf = weakSelf;
-//        if (zw_issuccess) {
-//            NSArray *myData = data[@"data"][@"industryVos"];
-//            NSMutableArray *myArray = [NSMutableArray array];
-//            ZWExhibitorIndustryModel *model = [ZWExhibitorIndustryModel alloc];
-//            model.listId = @"";
-//            model.name = @"全部";
-//            [myArray addObject:model];
-//            for (NSDictionary *myDic in myData) {
-//                ZWExhibitorIndustryModel *model = [ZWExhibitorIndustryModel parseJSON:myDic];
-//                [myArray addObject:model];
-//            }
-//            strongSelf.industrys = myArray;
-//            [strongSelf.leftTableView reloadData];
-//        }
-//    } failureBlock:^(NSError * _Nonnull error) {
-//
-//    } showInView:self.view];
+    }];
 }
 
 @end

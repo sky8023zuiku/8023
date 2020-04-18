@@ -8,9 +8,11 @@
 
 #import "ZWPlansDetailVC.h"
 #import "ZWExhPlanDetailModel.h"
+#import "ZWImageBrowser.h"
 @interface ZWPlansDetailVC ()<UITableViewDelegate,UITableViewDataSource>
 @property(nonatomic, strong)UITableView *tableView;
 @property(nonatomic, strong)ZWExhPlanDetailModel *model;
+@property(nonatomic, strong)UIImageView *imageView;
 @end
 
 @implementation ZWPlansDetailVC
@@ -108,20 +110,24 @@
 - (void)createTableViewCell:(UITableViewCell *)cell cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0) {
         if (indexPath.row == 0) {
-            CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.model.name font:boldNormalFont]+0.03*kScreenWidth;
-            UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.035*kScreenWidth, 0.02*kScreenWidth, kScreenWidth-40, height)];
+            CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.model.name textFont:boldNormalFont textWidth:kScreenWidth-40];
+            UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.035*kScreenWidth, 10, kScreenWidth-40, height)];
             titleLabel.text = self.model.name;
             titleLabel.font = boldNormalFont;
             titleLabel.numberOfLines = 0;
             [cell.contentView addSubview:titleLabel];
         }else {
-            UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0.035*kScreenWidth, 0, 0.93*kScreenWidth, 0.93*kScreenWidth)];
-            imageView.layer.cornerRadius = 5;
-            imageView.layer.masksToBounds = YES;
-            [imageView sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",httpImageUrl,self.model.url]] placeholderImage:[UIImage imageNamed:@"zw_zfzw_icon"]];
-//            imageView.contentMode = UIViewContentModeScaleAspectFill;
-//            imageView.clipsToBounds = YES;
-            [cell.contentView addSubview:imageView];
+            self.imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0.035*kScreenWidth, 0, 0.93*kScreenWidth, 0.93*kScreenWidth)];
+            self.imageView.layer.cornerRadius = 5;
+            self.imageView.layer.masksToBounds = YES;
+            self.imageView.userInteractionEnabled = YES;
+            [self.imageView sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",httpImageUrl,self.model.url]] placeholderImage:[UIImage imageNamed:@"zw_zfzw_icon"]];
+            self.imageView.contentMode = UIViewContentModeScaleAspectFill;
+            self.imageView.clipsToBounds = YES;
+            [cell.contentView addSubview:self.imageView];
+            
+            UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapImageViewClick:)];
+            [self.imageView addGestureRecognizer:tap];
         }
     }else {
         UILabel *countriesLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.035*kScreenWidth, 0.035*kScreenWidth, kScreenWidth/2-20, 20)];
@@ -158,12 +164,15 @@
         [cell.contentView addSubview:unitLabel];
     }
 }
+- (void)tapImageViewClick:(UITapGestureRecognizer *)sender {
+    [ZWImageBrowser showImageV_img:self.imageView];
+}
 #pragma UITableViewDelegate
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0) {
         if (indexPath.row == 0) {
-            CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.model.name font:boldBigFont]+0.05*kScreenWidth;
-            return height;
+            CGFloat height = [[ZWToolActon shareAction]adaptiveTextHeight:self.model.name textFont:boldNormalFont textWidth:kScreenWidth-40];
+            return height+20;
         }else {
             return 0.965*kScreenWidth;
         }

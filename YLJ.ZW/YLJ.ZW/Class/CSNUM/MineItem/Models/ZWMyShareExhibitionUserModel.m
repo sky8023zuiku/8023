@@ -14,12 +14,11 @@
 }
 - (id)initWithJSON:(NSDictionary *)myDic {
     if (self = [super init]) {
-        self.exhibitionId = myDic[@"exhibitionId"];
-        self.coverImage = myDic[@"coverImage"];
+        self.userId = myDic[@"userId"];
+        self.headImage = myDic[@"headImage"];
         self.phone = myDic[@"phone"];
-        self.inviteCode = myDic[@"inviteCode"];
-        self.userName = myDic[@"userName"];
-        self.bindTime = myDic[@"bindTime"];
+        self.username = myDic[@"username"];
+        self.created = myDic[@"created"];
     }
     return self;
 }

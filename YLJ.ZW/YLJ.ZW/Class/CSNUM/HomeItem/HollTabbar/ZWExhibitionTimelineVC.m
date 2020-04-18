@@ -12,7 +12,7 @@
 #import <YYLabel.h>
 #import <YYText.h>
 @interface ZWExhibitionTimelineVC ()<UITableViewDataSource,UITableViewDelegate>
-@property(nonatomic, strong)UITableView *tableView;
+@property(nonatomic, strong)ZWBaseEmptyTableView *tableView;
 @property(nonatomic, assign)NSInteger page;
 @property(nonatomic, strong)NSMutableArray *dataArray;
 
@@ -21,9 +21,9 @@
 
 @implementation ZWExhibitionTimelineVC
 
--(UITableView *)tableView {
+-(ZWBaseEmptyTableView *)tableView {
     if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
+        _tableView = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
     }
     _tableView.dataSource = self;
     _tableView.delegate = self;

@@ -33,10 +33,13 @@ float firstY;
     imageView.tag=1;
     [backgroundView addSubview:imageView];
     [window addSubview:backgroundView];
+    
     UITapGestureRecognizer *tap=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hideImage:)];
     [backgroundView addGestureRecognizer: tap];
+    
     UIPinchGestureRecognizer *pinchRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(scale:)];
     [backgroundView addGestureRecognizer:pinchRecognizer];
+    
     UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(move:)];
     [panRecognizer setMinimumNumberOfTouches:1];
     [panRecognizer setMaximumNumberOfTouches:1];
@@ -48,7 +51,7 @@ float firstY;
     } completion:^(BOOL finished) {
     }];
     
-   
+
 }
 +(void)showImage:(UIImage *)avatarImage{
     UIImage *image=avatarImage;
@@ -100,21 +103,17 @@ float firstY;
 // 缩放
 +(void)scale:(UIPinchGestureRecognizer*)sender {
     
-    UIView *backgroundView=sender.view;
+//    UIView *backView=sender.view;
     UIImageView *imageView=(UIImageView*)[sender.view viewWithTag:1];
-
     if([sender state] == UIGestureRecognizerStateBegan) {
         lastScale = 1.0;
     }
-
     CGFloat scale = 1.0 - (lastScale - [(UIPinchGestureRecognizer*)sender scale]);
     CGAffineTransform currentTransform = imageView.transform;
     CGAffineTransform newTransform = CGAffineTransformScale(currentTransform, scale, scale);
-
     [imageView setTransform:newTransform];
-
     lastScale = [sender scale];
-
+    
 }
 // 移动
 +(void)move:(UIPanGestureRecognizer*)sender {

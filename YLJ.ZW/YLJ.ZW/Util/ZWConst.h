@@ -57,6 +57,8 @@ NS_ASSUME_NONNULL_BEGIN
 //create by renyi----------------
 //皮肤颜色
 #define skinColor [UIColor colorWithRed:65.0/255.0 green:163.0/255.0 blue:255.0/255.0 alpha:1]
+//表格背景颜色
+#define zwTableBackColor [UIColor colorWithRed:242.0/255.0 green:242.0/255.0 blue:247.0/255.0 alpha:1]
 //线条颜色
 #define zwGrayColor [UIColor colorWithRed:244.0/255.0 green:244.0/255.0 blue:244.0/255.0 alpha:1]
 #define zwDarkGrayColor [UIColor colorWithRed:222.0/255.0 green:222.0/255.0 blue:222.0/255.0 alpha:1]

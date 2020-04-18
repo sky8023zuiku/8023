@@ -44,4 +44,6 @@ pod 'LBXScan/LBXZXing','~> 2.3'
 pod 'LBXScan/LBXZBar','~> 2.3'
 pod 'LBXScan/UI','~> 2.3'
 
+pod 'DZNEmptyDataSet'
+
 end

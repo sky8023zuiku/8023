@@ -7,11 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "ZWServiceResponse.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ZWExhibitionServerDetailVC : UIViewController
 @property(nonatomic, strong)NSString *merchantId;
+@property(nonatomic, strong)ZWServiceProvidersListModel *shareModel;
 @end
 
 NS_ASSUME_NONNULL_END

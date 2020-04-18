@@ -15,7 +15,7 @@
 
 @interface ZWServerSpellListView()<UITableViewDelegate, UITableViewDataSource>
 @property(nonatomic, strong)UITableView *leftTableView;
-@property(nonatomic, strong)UITableView *rightTableVIew;
+@property(nonatomic, strong)ZWBaseEmptyTableView *rightTableVIew;
 @property(nonatomic, assign)NSInteger selectType;
 
 @property(nonatomic, strong)NSMutableArray *rightDataSource;
@@ -40,9 +40,9 @@
     return _leftTableView;
 }
 
-- (UITableView *)rightTableVIew {
+- (ZWBaseEmptyTableView *)rightTableVIew {
     if (!_rightTableVIew) {
-        _rightTableVIew = [[UITableView alloc]initWithFrame:CGRectMake(0.2*self.frame.size.width, 0, 0.8*self.frame.size.width, self.frame.size.height) style:UITableViewStyleGrouped];
+        _rightTableVIew = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0.2*self.frame.size.width, 0, 0.8*self.frame.size.width, self.frame.size.height) style:UITableViewStyleGrouped];
     }
     _rightTableVIew.dataSource = self;
     _rightTableVIew.delegate = self;

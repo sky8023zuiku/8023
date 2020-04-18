@@ -18,8 +18,10 @@
 -(id)initWithFrame:(CGRect)frame{
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor grayColor];
+        self.backgroundColor = zwGrayColor;
         self.mianImageView=[[UIImageView alloc]initWithFrame:CGRectMake(0, 0, frame.size.width, frame.size.height)];
+        self.mianImageView.contentMode = UIViewContentModeScaleAspectFill;
+        self.mianImageView.layer.masksToBounds = YES;
         [self addSubview:self.mianImageView];
     }
     

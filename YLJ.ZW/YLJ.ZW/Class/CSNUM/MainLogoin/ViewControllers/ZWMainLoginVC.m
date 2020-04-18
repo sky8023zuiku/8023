@@ -141,7 +141,6 @@
                                                     @"Z" , @"initial",
                                                     @"+86" , @"pretel", nil]];
     
-    
 }
 - (void)tapBtnClick:(UIButton *)btn {
     ZWAgreementVC *VC = [[ZWAgreementVC alloc]init];

@@ -61,7 +61,7 @@
         myTitle.font = boldBigFont;
         [self.view addSubview:myTitle];
         
-        CGFloat detailHeight = [[ZWToolActon shareAction]adaptiveTextHeight:@"这是失败原因这是失败原因这是失败原因这是失败原因这是失败原因这是失败原因这是失败原因这是失败原因这是失败原因" font:normalFont];
+        CGFloat detailHeight = [[ZWToolActon shareAction]adaptiveTextHeight:@"这是失败原因这是失败原因这是失败原因这是失败原因这是失败原因这是失败原因这是失败原因这是失败原因这是失败原因" textFont:normalFont textWidth:CGRectGetWidth(myTitle.frame)];
         
         UILabel *detailLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(myTitle.frame), CGRectGetMaxY(myTitle.frame), CGRectGetWidth(myTitle.frame), detailHeight)];
         detailLabel.text = @"这是失败原因这是失败原因这是失败原因这是失败原因这是失败原因这是失败原因这是失败原因这是失败原因这是失败原因";
