@@ -79,6 +79,7 @@
         [self.tableView setEditing:NO animated:YES];
         [self showEitingView:NO];
     }
+    
 }
 - (void)createNotice {
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(refreshData) name:@"ZWChildUserManagerVC" object:nil];

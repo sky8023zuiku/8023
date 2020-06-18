@@ -7,7 +7,12 @@
 		<key>YLJ.ZW.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>22</integer>
+			<integer>0</integer>
+		</dict>
+		<key>ZWShareExtension.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>45</integer>
 		</dict>
 	</dict>
 </dict>

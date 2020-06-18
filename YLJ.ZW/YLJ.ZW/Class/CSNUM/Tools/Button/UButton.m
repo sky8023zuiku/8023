@@ -95,6 +95,37 @@
 
 
 
+//**图片在左边选择btn**//
+@implementation ZWSelectBtn
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        self.titleLabel.textAlignment = NSTextAlignmentLeft;
+    }
+    return self;
+}
+
+- (CGRect)titleRectForContentRect:(CGRect)contentRect {
+    CGRect frame = contentRect;
+    frame.origin.x = frame.size.height+3;
+    frame.origin.y = 0;
+    frame.size.width = frame.size.width-frame.size.height;
+    frame.size.height = frame.size.height;
+    return frame;
+}
+
+- (CGRect)imageRectForContentRect:(CGRect)contentRect {
+    CGRect frame = contentRect;
+    frame.origin.x = 0;
+    frame.origin.y = 0;
+    frame.size.width = frame.size.height;
+    frame.size.height = frame.size.height;
+    return frame;
+}
+@end
+
+
+
 //**图片为原型**/
 @implementation UCButton
 

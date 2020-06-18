@@ -87,7 +87,7 @@
     return 1;
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 3;
+    return 2;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
@@ -107,9 +107,9 @@
 }
 - (void)createTableViewCell:(UITableViewCell *)cell cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    NSArray *titles = @[@"展商",@"会展服务商",@"设计公司"];
+    NSArray *titles = @[@"展商",@"会展服务商"];
     
-    NSArray *details = @[@"产品，展示",@"服务，道具",@"设计，搭建"];
+    NSArray *details = @[@"产品，展示",@"服务，道具，设计，搭建"];
     
     cell.textLabel.text = titles[indexPath.row];
     cell.textLabel.font = normalFont;
@@ -163,12 +163,9 @@
     if (indexPath.row == 0) {
         str = @"展商";
         self.demandID = @"2";
-    }else if (indexPath.row == 1) {
+    }else {
         str = @"会展服务商";
         self.demandID = @"3";
-    }else {
-        str = @"设计公司";
-        self.demandID = @"4";
     }
     if (self.authenticationStatus == 1) {
         [self showOneAlertWithMessage:@"您提交的认证信息正在审核中，请耐心等待"];
@@ -178,10 +175,8 @@
                 
             }else if (self.identityId == 2) {
                 [self showOneAlertWithMessage:[NSString stringWithFormat:@"您的展商认证已通过审核，不能再认证%@信息",str]];
-            }else if (self.identityId == 3) {
-                [self showOneAlertWithMessage:[NSString stringWithFormat:@"您的会展服务商认证已通过审核，不能再认证%@信息",str]];
             }else {
-                [self showOneAlertWithMessage:[NSString stringWithFormat:@"您的设计公司认证已通过审核，不能再认证%@信息",str]];
+                [self showOneAlertWithMessage:[NSString stringWithFormat:@"您的会展服务商认证已通过审核，不能再认证%@信息",str]];
             }
         }else {
             [self showOneAlertWithMessage:[NSString stringWithFormat:@"您的%@认证已通过审核，无需再次提交",str]];
@@ -192,10 +187,8 @@
                 
             }else if (self.identityId == 2) {
                 [self showTwoAlertWithMessage:[NSString stringWithFormat:@"您之前提交的是展商审核资料，是否确认变更为%@",str]];
-            }else if (self.identityId == 3) {
-                [self showTwoAlertWithMessage:[NSString stringWithFormat:@"您之前提交的是服务商审核资料，是否确认变更为%@",str]];
             }else {
-                [self showTwoAlertWithMessage:[NSString stringWithFormat:@"您之前提交的是设计公司审核资料，是否确认变更为%@",str]];
+                [self showTwoAlertWithMessage:[NSString stringWithFormat:@"您之前提交的是服务商审核资料，是否确认变更为%@",str]];
             }
         }else {
             [self gotoCertification:1];
@@ -205,10 +198,8 @@
         enterpriseInfoVC.title = @"编辑企业信息";
         if (indexPath.row == 0) {
             enterpriseInfoVC.identityId = @"2";
-        }else if (indexPath.row == 1) {
-            enterpriseInfoVC.identityId = @"3";
         }else {
-            enterpriseInfoVC.identityId = @"4";
+            enterpriseInfoVC.identityId = @"3";
         }
         [self.navigationController pushViewController:enterpriseInfoVC animated:YES];
     }  

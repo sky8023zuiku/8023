@@ -16,7 +16,6 @@ typedef NS_ENUM(NSInteger,GestureOperation) {
 
 
 @interface MPGestureLayout ()<UIGestureRecognizerDelegate>
-@property (nonatomic, strong) UILongPressGestureRecognizer * longPress;
 @property (nonatomic, strong) NSIndexPath * currentIndexPath;
 @property (nonatomic, strong) UIView * snapImageView;
 @property (nonatomic, assign) GestureOperation operation;
@@ -72,6 +71,7 @@ typedef NS_ENUM(NSInteger,GestureOperation) {
 
 - (void)handleLongPress:(UILongPressGestureRecognizer*)longPress
 {
+    self.collectionIndex = longPress.view.tag;
     UIView *touchView = [self getMoveMainView];
     switch (longPress.state) {
         case UIGestureRecognizerStateBegan:

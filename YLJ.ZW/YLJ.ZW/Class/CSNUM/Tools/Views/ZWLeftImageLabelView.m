@@ -23,7 +23,7 @@
         self.imageView = imageView;
         [self addSubview:imageView];
         
-        UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(imageView.frame)+10, 0, frame.size.width-CGRectGetMaxX(imageView.frame)-5, frame.size.height)];
+        UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(imageView.frame)+3, 0, frame.size.width-CGRectGetMaxX(imageView.frame)-5, frame.size.height)];
         self.titleLabel = titleLabel;
         [self addSubview:titleLabel];
     }

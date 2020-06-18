@@ -16,6 +16,10 @@
 #import "ZWLogOutRequest.h"
 #import "ZWMainTabBarController.h"
 
+#import <JPUSHService.h>
+
+#import "ZWMineSaveSpellListAction.h"
+
 @interface ZWSetVC ()<UITableViewDelegate,UITableViewDataSource>
 
 @property(nonatomic, strong)UITableView *tableView;
@@ -41,7 +45,7 @@
 
 -(NSArray *)titles {
     if (!_titles) {
-        _titles = [NSArray arrayWithObjects:@"修改密码",@"联系我们",@"关于我们",@"分享此APP",@"填写邀请码", nil];
+        _titles = [NSArray arrayWithObjects:@"修改密码",@"联系我们",@"关于我们",@"分享此APP",@"当前版本", nil];
     }
     return _titles;
 }
@@ -114,7 +118,10 @@
     }else if (indexPath.row == 3) {
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }else {
-       cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+        NSString *app_Version = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
+        cell.detailTextLabel.text = [NSString stringWithFormat:@"V %@",app_Version];
+//        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     
 }
@@ -164,9 +171,9 @@
         shareVC.title = @"分享";
         [self.navigationController pushViewController:shareVC animated:YES];
     }else if (indexPath.row == 4) {
-        ZWInviteCodeVC *inviteCodeVC = [[ZWInviteCodeVC alloc]init];
-        inviteCodeVC.title = @"填写邀请码";
-        [self.navigationController pushViewController:inviteCodeVC animated:YES];
+//        ZWInviteCodeVC *inviteCodeVC = [[ZWInviteCodeVC alloc]init];
+//        inviteCodeVC.title = @"填写邀请码";
+//        [self.navigationController pushViewController:inviteCodeVC animated:YES];
     }else {
         //站位
     }
@@ -203,16 +210,21 @@
     }];
     //删除本地数据
     [self clearAllUserDefaultsData];
+    //删除本地所有拼单数据
+    [[ZWMineSaveSpellListAction shareAction]removeAllSpellList];
     
 }
 
 - (void)clearAllUserDefaultsData{
     
     [[ZWSaveDataAction shareAction]removeLocation];
-
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults removeObjectForKey:@"user"];
     [defaults synchronize];
+    
+    [JPUSHService deleteAlias:^(NSInteger iResCode, NSString *iAlias, NSInteger seq) {
+               
+    } seq:120];
     
 }
 

@@ -16,13 +16,6 @@
 #import "ZWMineRqust.h"
 #import "DCCycleScrollView.h"
 
-
-#import "JhScrollActionSheetView.h"
-#import "JhPageItemModel.h"
-#import <ShareSDK/ShareSDK.h>
-#import <ShareSDKUI/ShareSDK+SSUI.h>
-
-
 @interface ZWEditExhibitionVC ()<UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate,DCCycleScrollViewDelegate>
 
 @property(nonatomic, strong)UITableView *tableView;
@@ -79,115 +72,7 @@
     [self setupChildViewController];
     [self requestData];
     [self createNotice];
-    
-    UIButton *shareBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    shareBtn.frame = CGRectMake(10, 80, 100, 100);
-    shareBtn.backgroundColor = [UIColor redColor];
-    [shareBtn addTarget:self action:@selector(shareBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:shareBtn];
 }
-
-- (void)shareBtnClick:(UIButton *)btn {
-    
-    [JhScrollActionSheetView showShareActionSheetWithTitle:@"分享" shareDataArray:self.shareArray handler:^(JhScrollActionSheetView *actionSheet, NSInteger index) {
-        NSLog(@" 点击分享 index %ld ",(long)index);
-        switch (index) {
-            case 0:
-                [self createShare:SSDKPlatformTypeWechat];
-                break;
-            case 1:
-                [self createShare:SSDKPlatformSubTypeWechatTimeline];
-                break;
-            case 2:
-                [self createShare:SSDKPlatformTypeSinaWeibo];
-                break;
-            case 3:
-                [self createShare:SSDKPlatformSubTypeQQFriend];
-                break;
-            case 4:
-                [self createShare:SSDKPlatformSubTypeQZone];
-                break;
-            default:
-                break;
-        }
-        
-    }];
-   
-}
-
-- (void)createShare:(SSDKPlatformType)type {
-        
-    NSMutableDictionary *shareParams = [NSMutableDictionary dictionary];
-    NSString *text;
-    if (type == SSDKPlatformTypeSinaWeibo) {
-//        text = @"http://www.csnum.com/share/html/share_exhibitors.html";
-        text = [NSString stringWithFormat:@"http://www.csnum.com/share/html/share_exhibitors.html?exhibitorId=%@",self.exhibitorId];
-    }else {
-        text = self.shareData[@"exhibitionName"];
-    }
-    [shareParams SSDKSetupShareParamsByText:text
-                                     images:[NSString stringWithFormat:@"%@%@",httpImageUrl,self.shareData[@"coverImages"]]
-                                        url:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.csnum.com/share/html/share_exhibitors.html?exhibitorId=%@",self.exhibitorId]]
-                                      title:self.merchantName
-                                       type:SSDKContentTypeAuto];
-    [ShareSDK share:type parameters:shareParams onStateChanged:^(SSDKResponseState state, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error) {
-        switch (state) {
-            case SSDKResponseStateSuccess:
-            {
-                NSLog(@"分享成功");
-                break;
-            }
-            case SSDKResponseStateFail:
-            {
-                NSLog(@"分享失败");
-                break;
-            }
-            default:
-                break;
-        }
-    }];
-}
-
-
-
-
--(NSMutableArray *)shareArray{
-    if (!_shareArray) {
-        _shareArray = [NSMutableArray new];
-        
-        NSArray *data = @[
-                          @{
-                              @"text" : @"微信",
-                              @"img" : @"weixing",
-                              },
-                          @{
-                              @"text" : @"朋友圈",
-                              @"img" : @"friends",
-                              },
-                          @{
-                              @"text" : @"微博",
-                              @"img" : @"sina",
-                              },
-                          @{
-                              @"text" : @"QQ",
-                              @"img" : @"qq",
-                              },
-                          @{
-                              @"text" : @"QQ空间",
-                              @"img" : @"kongjian",
-                              }];
-        
-        for (NSDictionary *mydic in data) {
-            JhPageItemModel *model = [JhPageItemModel parseJSON:mydic];
-            [self.shareArray addObject:model];
-        }
-    }
-    return _shareArray;
-}
-
-//**********************************************************以上是分享********************************************************************/
-    
-
 - (void)createNotice {
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(refreshData) name:@"ZWEditExhibitionVC" object:nil];
 }
@@ -293,7 +178,6 @@
 //        UIImageView *imageV = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 0.55*kScreenWidth)];
 //        imageV.image = [UIImage imageNamed:@"h1.jpg"];
 //        [cell.contentView addSubview:imageV];
-        
         
         
         self.banner = [DCCycleScrollView cycleScrollViewWithFrame:CGRectMake(0, 0, kScreenWidth, 0.55*kScreenWidth) shouldInfiniteLoop:YES imageGroups:@[]];

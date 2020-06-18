@@ -159,12 +159,26 @@
     NSString *endTime = [model.endTime stringByReplacingOccurrencesOfString:@"-" withString:@"/"];
     self.dateLabel.text = [NSString stringWithFormat:@"%@-%@",startTime,endTime];
     self.locationLabel.text = [NSString stringWithFormat:@"%@  %@",model.country,model.city];
-    self.priceLabel.text = [NSString stringWithFormat:@"%@0会展币",model.price];
+    
+//    NSNumber *price =(NSNumber *)model.price;
+    
+    if ([model.price isEqualToString:@"0"]) {
+        self.priceLabel.text = @"限时免费";
+    }else {
+        self.priceLabel.text = [NSString stringWithFormat:@"%@0会展币",model.price];
+    }
+    
+//    if ([price isEqualToNumber:@0]) {
+//
+//    }else {
+//
+//    }
+    
     self.numberLabel.text = [NSString stringWithFormat:@"%@",model.merchantCount];
     
     NSLog(@"---%@",model.collection);
     
-    if ([model.collection isEqualToNumber: @1]) {
+    if ([model.collection isEqualToString:@"1"]) {
         self.collectionBtnBackImageName = @"zhanlist_icon_xin_xuan";
     }else {
         self.collectionBtnBackImageName = @"zhanlist_icon_xin_wei";

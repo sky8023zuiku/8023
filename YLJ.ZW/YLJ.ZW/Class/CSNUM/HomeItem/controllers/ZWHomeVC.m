@@ -12,7 +12,7 @@
 #import "ZWHomeTuiExhibitorsView.h"
 #import <UIView+MJExtension.h>
 #import "CSSearchVC.h"
-#import "ZWCompanyDesignVC.h"
+//#import "ZWCompanyDesignVC.h"
 #import "ZWVisitListVC.h"
 #import "ZWPageContorller.h"
 #import <SDCycleScrollView.h>
@@ -22,7 +22,7 @@
 
 #import "ZWPavilionHallVC.h"
 
-#import "ZWMineResponse.h"
+#import "ZWExhibitionServerListModel.h"
 #import "ZWInduExhibitorsModel.h"
 
 #import "ZWEditCompanyInfoVC.h"
@@ -39,12 +39,18 @@
 #import "Global.h"
 #import "StyleDIY.h"
 
-#import "ZWCompanyDetailVC.h"
+//#import "ZWCompanyDetailVC.h"
 
 #import "ZWMessageCenterVC.h"
 
 #import "ZWExhibitionServerListVC.h"
 #import "ZWSelectCertificationVC.h"
+
+#import "ZWMessageCenterV2VC.h"
+
+#import "ZWExhibitionServerDetailVC.h"
+
+#import "ZWMineResponse.h"
 
 @interface ZWHomeVC ()<UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate,SDCycleScrollViewDelegate,ZWHomeTuiExhibitorsViewDelegate>
 @property(nonatomic, strong)UITableView *tableView;
@@ -99,6 +105,7 @@
     [super viewWillAppear:animated];
     
     [[YNavigationBar sharedInstance]createNavigationBarWithStatusBarStyle:UIStatusBarStyleLightContent withType:1];
+    [self createNavigationBar];
     self.tabBarController.tabBar.hidden = NO;
     [self.navigationController setNavigationBarHidden:NO animated:YES];
     [self createRequst];
@@ -110,7 +117,6 @@
     [self createNotice];
     [self createNavigationBar];
     [self createSearchBar];
-
 }
 
 - (void)createNotice {
@@ -130,8 +136,20 @@
 }
 
 - (void)createNavigationBar {
-    [[YNavigationBar sharedInstance]createRightBarWithImage:[UIImage imageNamed:@"main_message_icon"] barItem:self.navigationItem target:self action:@selector(rightBtnClick:) withColor:[UIColor whiteColor]];
+//    [[YNavigationBar sharedInstance]createRightBarWithImage:[UIImage imageNamed:@"main_message_icon"] barItem:self.navigationItem target:self action:@selector(rightBtnClick:) withColor:[UIColor whiteColor]];
     [[YNavigationBar sharedInstance]createLeftBarWithImage:[UIImage imageNamed:@"scan_icon"] barItem:self.navigationItem target:self action:@selector(LeftBtnClick:)];
+    
+    NSDictionary *messageNum = [[ZWSaveDataAction shareAction]takeMessageNum];
+    NSInteger number = [messageNum[@"total"] integerValue];
+    if (number >= 99) {
+        number = 99;
+    }
+    [[ZWBadgeAction shareAction]createBadge:number
+                               withImageStr:@"main_message_icon"
+                         withNavigationItem:self.navigationItem
+                                     target:self
+                                     action:@selector(rightBtnClick:)];
+    
 }
 
 - (void)createSearchBar{
@@ -184,10 +202,17 @@
 }
 
 - (void)rightBtnClick:(UIBarButtonItem *)btn {
-    ZWMessageCenterVC *messageCenterVC = [[ZWMessageCenterVC alloc]init];
-    messageCenterVC.title = @"消息中心";
-    messageCenterVC.hidesBottomBarWhenPushed = YES;
-    [self.navigationController pushViewController:messageCenterVC animated:YES];
+//    ZWMessageCenterVC *messageCenterVC = [[ZWMessageCenterVC alloc]init];
+//    messageCenterVC.title = @"消息中心";
+//    messageCenterVC.hidesBottomBarWhenPushed = YES;
+//    [self.navigationController pushViewController:messageCenterVC animated:YES];
+    
+    if ([self goToLogin] != YES) {
+        ZWMessageCenterV2VC *messageCenterV2VC = [[ZWMessageCenterV2VC alloc]init];
+        messageCenterV2VC.title = @"消息中心";
+        messageCenterV2VC.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:messageCenterV2VC animated:YES];
+    }
 }
 
 - (void)rollingTableView:(NSNotification *)notice {
@@ -372,12 +397,11 @@
             
             ZWExhibitionServerListVC *ServerListVC = [[ZWExhibitionServerListVC alloc]init];
             ServerListVC.hidesBottomBarWhenPushed = YES;
-            ServerListVC.currentIndex = 3;
+            ServerListVC.currentIndex = 1;
             ServerListVC.myParameter = myParameter;
             ServerListVC.mySpellParameter = mySpellParameter;
             ServerListVC.selectedCity = @"";
             [self.navigationController pushViewController:ServerListVC animated:YES];
-            
             
         }else if (btn.tag == 1003) {
             [self takeCompanyCertificationStatus];
@@ -486,10 +510,13 @@
                 detailsVC.title = @"展商详情";
                 detailsVC.merchantId = self.mainCdic[@"id"];
                 [self.navigationController pushViewController:detailsVC animated:YES];
-            }else {
-                ZWCompanyDetailVC *companyDetailVC = [[ZWCompanyDetailVC alloc]init];
-                companyDetailVC.serviceId = [NSString stringWithFormat:@"%@",self.mainCdic[@"id"]];
-                [self.navigationController pushViewController:companyDetailVC animated:YES];
+            }else {                
+                ZWExhibitionServerListModel *model = [ZWExhibitionServerListModel mj_objectWithKeyValues:self.mainCdic];
+                ZWExhibitionServerDetailVC *VC = [[ZWExhibitionServerDetailVC alloc]init];
+                VC.hidesBottomBarWhenPushed = YES;
+                VC.shareModel = model;
+                VC.merchantId = [NSString stringWithFormat:@"%@",model.providersId];
+                [self.navigationController pushViewController:VC animated:YES];
             }
         }else {
             ZWInduExhibitorsModel *model = self.recommentArray[indexPath.row];
@@ -568,7 +595,7 @@
             NSArray *myData = data[@"data"][@"exhibitionVoList"];
             NSMutableArray *myArray = [NSMutableArray array];
             for (NSDictionary *myDic in myData) {
-                ZWExhibitionListModel *model = [ZWExhibitionListModel parseJSON:myDic];
+                ZWExhibitionListModel *model = [ZWExhibitionListModel mj_objectWithKeyValues:myDic];
                 [myArray addObject:model];
             }
             strongSelf.exhibitionArray = myArray;
@@ -593,7 +620,7 @@
             strongSelf.mainCdic = data[@"data"][@"recommendMerchant"];
             NSMutableArray *myArray = [NSMutableArray array];
             for (NSDictionary *myDic in myData) {
-                ZWInduExhibitorsModel *model = [ZWInduExhibitorsModel parseJSON:myDic];
+                ZWInduExhibitorsModel *model = [ZWInduExhibitorsModel mj_objectWithKeyValues:myDic];
                 [myArray addObject:model];
             }
             [strongSelf.recommentArray addObjectsFromArray:myArray];

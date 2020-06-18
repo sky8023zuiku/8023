@@ -319,13 +319,15 @@
 //    NSLog(@"选择");
     NSArray *myArray = [self takeMyDataWithIndex:collectionView.tag];
     
+    NSLog(@"--- %@",myArray);
+    
     if (collectionView.tag == 0) {
         CSDrawerIndustiesModel *model = myArray[indexPath.item];
-        NSDictionary *myDic = @{@"myId":model.industriesId,@"name":model.name};
+        NSDictionary *myDic = @{@"id":model.industriesId,@"name":model.name};
         [self.selectData replaceObjectAtIndex:0 withObject:myDic];
     }else if (collectionView.tag == 1) {
         CSDrawerCountriesModel *model = myArray[indexPath.item];
-        NSDictionary *myDic = @{@"myId":model.countriesId,@"name":model.name};
+        NSDictionary *myDic = @{@"id":model.countriesId,@"name":model.name};
         [self.selectData replaceObjectAtIndex:1 withObject:myDic];
         
         if ([model.name isEqualToString:@"中国"]) {
@@ -335,7 +337,7 @@
         }
     }else {
         CSDrawerCitiesModel *model = myArray[indexPath.item];
-        NSDictionary *myDic = @{@"myId":model.citiesId,@"name":model.name};
+        NSDictionary *myDic = @{@"id":model.citiesId,@"name":model.name};
         [self.selectData replaceObjectAtIndex:2 withObject:myDic];
     }
     [self refreshCellWithIndex:collectionView.tag];
@@ -343,6 +345,7 @@
 }
 
 - (void)refreshTheCitiesShow:(BOOL)isShow {
+    
     if (isShow == YES) {
         NSArray *cityArray = [[ZWMainSaveLocation shareAction]takeCitiesListData];
         NSMutableArray *myArray = [NSMutableArray array];
@@ -355,7 +358,7 @@
         NSIndexPath *myIndex = [NSIndexPath indexPathForRow:1 inSection:2];
         [self reloadRowsAtIndexPaths:@[myIndex] withRowAnimation:UITableViewRowAnimationNone];
     }else {
-        NSDictionary *myDic = @{@"myId":@"",@"name":@""};
+        NSDictionary *myDic = @{@"id":@"",@"name":@""};
         [self.selectData replaceObjectAtIndex:2 withObject:myDic];
         [self refreshCellWithIndex:2];
         
@@ -375,7 +378,7 @@
 - (BOOL)collectionView:(UICollectionView *)collectionView shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath {
 //    NSLog(@"彻底取消");
     if([collectionView cellForItemAtIndexPath:indexPath].selected) {
-        NSDictionary *myDic = @{@"myId":@"",@"name":@""};
+        NSDictionary *myDic = @{@"id":@"",@"name":@""};
         if (collectionView.tag == 0) {
             [self.selectData replaceObjectAtIndex:0 withObject:myDic];
         }else if (collectionView.tag == 1) {
@@ -390,13 +393,14 @@
         return false;
     }
     return true;
+    
 }
 
 - (void)refreshCellWithIndex:(NSInteger)index {
     NSIndexPath *myIndex = [NSIndexPath indexPathForRow:0 inSection:index];
     [self reloadRowsAtIndexPaths:@[myIndex] withRowAnimation:UITableViewRowAnimationNone];
     
-    NSLog(@"%@",self.selectData);
+    NSLog(@"选择 = %@",self.selectData);
 }
 
 @end

@@ -76,7 +76,7 @@
             NSArray *myData = respense.data;
             NSMutableArray *myArray = [NSMutableArray array];
             for (NSDictionary *myDic in myData) {
-                ZWProductListModel *model = [ZWProductListModel parseJSON:myDic];
+                ZWProductListModel *model = [ZWProductListModel mj_objectWithKeyValues:myDic];
                 [myArray addObject:model];
             }
             self.dataArray = myArray;

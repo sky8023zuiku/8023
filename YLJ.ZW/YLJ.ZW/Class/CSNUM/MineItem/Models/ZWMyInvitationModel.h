@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ZWMyInvitationModel : NSObject
 @property(nonatomic, copy)NSString *phone;
 @property(nonatomic, copy)NSString *headImage;
-@property(nonatomic, copy)NSString *recommendTime;
+@property(nonatomic, copy)NSNumber *recommendTime;
 @property(nonatomic, copy)NSString *userName;
 @property(nonatomic, copy)NSString *listId;
 + (id)parseJSON:(NSDictionary *)jsonDic;

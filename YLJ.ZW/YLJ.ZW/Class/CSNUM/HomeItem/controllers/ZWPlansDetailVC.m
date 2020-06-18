@@ -38,18 +38,22 @@
 //    [super viewWillDisappear:animated];
 //    [self.navigationController setNavigationBarHidden:NO animated:YES];
 //}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self createUI];
     [self createNavigationBar];
     [self requestPlanData];
 }
+
 - (void)createNavigationBar {
     [[YNavigationBar sharedInstance]createLeftBarWithImage:[UIImage imageNamed:@"zai_dao_icon_left"] barItem:self.navigationItem target:self action:@selector(backBtn:)];
 }
+
 - (void)backBtn:(UIButton *)btn {
     [self.navigationController popViewControllerAnimated:YES];
 }
+
 - (void)createUI {
     self.view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.tableView];
@@ -66,6 +70,7 @@
     [self.view addSubview:bottomBtn];
     
 }
+
 - (void)bottomBtnClick:(UIButton *)btn {
     
     if (self.model.sponsorUrl.length != 0) {
@@ -148,7 +153,7 @@
         NSString *startTime = [self.model.startTime stringByReplacingOccurrencesOfString:@"-" withString:@"/"];
         NSString *endTime = [self.model.endTime stringByReplacingOccurrencesOfString:@"-" withString:@"/"];
         UILabel *dateLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(pavilionLabel.frame), CGRectGetMaxY(pavilionLabel.frame)+15, CGRectGetWidth(pavilionLabel.frame), CGRectGetHeight(pavilionLabel.frame))];
-        dateLabel.text = [NSString stringWithFormat:@"开展时间：%@-%@",startTime,endTime];
+        dateLabel.text = [NSString stringWithFormat:@"开展时间：%@-%@",[startTime substringWithRange:NSMakeRange(0, 10)],[endTime substringWithRange:NSMakeRange(0, 10)]];
         dateLabel.font = normalFont;
         [cell.contentView addSubview:dateLabel];
         
@@ -164,9 +169,11 @@
         [cell.contentView addSubview:unitLabel];
     }
 }
+
 - (void)tapImageViewClick:(UITapGestureRecognizer *)sender {
     [ZWImageBrowser showImageV_img:self.imageView];
 }
+
 #pragma UITableViewDelegate
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0) {
@@ -179,8 +186,8 @@
     }else {
         return 0.8*kScreenWidth;
     }
-    
 }
+
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     if (section == 0) {
         return 0.1;
@@ -188,6 +195,7 @@
         return 0.02*kScreenWidth;
     }
 }
+
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     if (section == 1) {
         return 0.035*kScreenWidth+zwTabBarHeight;
@@ -210,7 +218,6 @@
         
     } showInView:self.view];
 }
-
 
 - (void)showOneAlertWithMessage:(NSString *)message {
     [[ZWAlertAction sharedAction]showOneAlertTitle:@"提示" message:message confirmTitle:@"我知道了" actionOne:^(UIAlertAction * _Nonnull actionOne) {

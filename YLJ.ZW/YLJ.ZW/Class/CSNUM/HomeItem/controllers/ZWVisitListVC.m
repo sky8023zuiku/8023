@@ -17,14 +17,24 @@
 #import "ZWAnnouncementVC.h"
 #import "ZWPlanDelayCell.h"
 
-@interface ZWVisitListVC ()<UITableViewDataSource,UITableViewDelegate,ZWPlansListCellDelegate,ZWPlanDelayCellDelegate>
-@property(nonatomic, strong)UITableView *tableView;
+#import "DFSegmentView.h"
+
+#import "ZWBaseEmptyTableView.h"
+
+@interface ZWVisitListVC ()<UITableViewDataSource,UITableViewDelegate,ZWPlansListCellDelegate,ZWPlanDelayCellDelegate,DFSegmentViewDelegate>
+@property(nonatomic, strong)ZWBaseEmptyTableView *tableView;
 @property(nonatomic, strong)NSMutableArray *dataSource;
 @property(nonatomic, assign)NSInteger page;
 
 @property (nonatomic, strong) UIView *blankView;
 @property (nonatomic, strong) ZWExhibitionListRequsetAction *action;
-@property(nonatomic, strong)NSArray *screenValues;
+@property (nonatomic, strong)NSArray *screenValues;
+
+@property (nonatomic, strong)DFSegmentView *segmentYear;
+@property (nonatomic, strong)DFSegmentView *segmentMonth;
+
+@property (nonatomic, strong)NSMutableDictionary *parameterDic;
+
 @end
 
 @implementation ZWVisitListVC
@@ -36,9 +46,9 @@
     return _action;
 }
 
--(UITableView *)tableView {
+-(ZWBaseEmptyTableView *)tableView {
     if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
+        _tableView = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0, 0.2*kScreenWidth+5, kScreenWidth, kScreenHeight-zwNavBarHeight-0.15*kScreenWidth) style:UITableViewStylePlain];
     }
     _tableView.dataSource = self;
     _tableView.delegate = self;
@@ -46,6 +56,13 @@
     _tableView.sectionFooterHeight = 0;
     _tableView.separatorInset = UIEdgeInsetsMake(0, 10, 0, 0 );
     return _tableView;
+}
+
+-(NSMutableDictionary *)parameterDic {
+    if (!_parameterDic) {
+        _parameterDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    }
+    return _parameterDic;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -72,21 +89,132 @@
     [[NSNotificationCenter defaultCenter]removeObserver:self name:@"takePlanScreenDrawerValue" object:nil];
 }
 - (void)takePlanScreenValue:(NSNotification *)notice {
+    
     self.screenValues = notice.object;
-    NSMutableDictionary *dic = [NSMutableDictionary dictionaryWithCapacity:0];
-    [dic setValue:notice.object[0][@"name"] forKey:@"country"];
-    [dic setValue:notice.object[1][@"name"] forKey:@"city"];
-    [dic setValue:notice.object[2][@"myId"] forKey:@"industryId"];
-    [dic setValue:notice.object[3][@"name"] forKey:@"yearTime"];
-    [dic setValue:notice.object[4][@"name"] forKey:@"monthTime"];
-    self.page = 1;
-    [self requestPianExhibitionList:dic withPage:self.page];
+    [self.parameterDic setValue:notice.object[0][@"myId"] forKey:@"industryId"];
+    [self.parameterDic setValue:notice.object[1][@"name"] forKey:@"country"];
+    [self.parameterDic setValue:notice.object[2][@"name"] forKey:@"city"];
+    [self createPianExhibitionList:self.parameterDic];
+    
 }
 
 - (void)createUI {
     self.view.backgroundColor = [UIColor whiteColor];
     self.dataSource = [NSMutableArray array];
+    
+    [self createTopScreen];
+
     [self.view addSubview:self.tableView];
+}
+
+- (void)createTopScreen {
+    
+    NSDate *nowDate = [NSDate date];
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSUInteger unitFlags = NSCalendarUnitYear | NSCalendarUnitMonth; //月份
+    NSDateComponents *dateComponent = [calendar components:unitFlags fromDate:nowDate];
+    NSInteger year = [dateComponent year];
+    NSInteger month = [dateComponent month];
+    NSLog(@"%ld-%ld",(long)year,(long)month);
+    NSArray *years = @[[NSString stringWithFormat:@"%ld年",(year-1)],
+                       [NSString stringWithFormat:@"%ld年",year],
+                       [NSString stringWithFormat:@"%ld年",(year+1)]];
+    
+    if (years.count>0) {
+        _segmentYear = [[DFSegmentView alloc] initWithFrame:CGRectZero andDelegate:self andTitlArr:years];
+        _segmentYear.headViewHeight = 0.1*kScreenWidth;
+        _segmentYear.selectIndex = 1;
+        _segmentYear.tag = 0;
+        _segmentYear.headViewLinelColor = [UIColor whiteColor];
+        _segmentYear.headViewTextLabelColor = skinColor;
+        [self.view addSubview:_segmentYear];
+        [_segmentYear mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.view).offset(0.02*kScreenWidth);
+            make.left.right.bottom.equalTo(self.view);
+        }];
+    }else {
+        return;
+    }
+    
+    if (month) {
+        _segmentMonth = [[DFSegmentView alloc] initWithFrame:CGRectZero andDelegate:self andTitlArr:@[@"1月",@"2月",@"3月",@"4月",@"5月",@"6月",@"7月",@"8月",@"9月",@"10月",@"11月",@"12月"]];
+        _segmentMonth.headViewHeight = 0.1*kScreenWidth;
+        _segmentMonth.selectIndex = month-1;
+        _segmentMonth.tag = 1;
+        _segmentMonth.headViewLinelColor = skinColor;
+        _segmentMonth.headViewTextLabelColor = skinColor;
+        [self.view addSubview:_segmentMonth];
+        [_segmentMonth mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.view).offset(0.1*kScreenWidth);
+            make.left.right.bottom.equalTo(self.view);
+        }];
+        [_segmentMonth reloadData];
+    }else {
+        return;
+    }
+    
+    UIView *lineView = [[UIView alloc]initWithFrame:CGRectMake(0, 0.2*kScreenWidth+1, kScreenWidth, 5)];
+    lineView.backgroundColor = zwGrayColor;
+    [self.view addSubview:lineView];
+    
+    [self.parameterDic setValue:[NSString stringWithFormat:@"%ld",year] forKey:@"yearTime"];
+    [self.parameterDic setValue:[NSString stringWithFormat:@"%ld",month] forKey:@"monthTime"];
+    [self createPianExhibitionList:self.parameterDic];
+}
+
+- (void)createPianExhibitionList:(NSMutableDictionary *)dic {
+    self.page = 1;
+    [self requestPianExhibitionList:self.parameterDic withPage:self.page];
+}
+
+
+- (UIViewController *)superViewController {
+    
+    return self;
+}
+
+- (UIViewController *)subViewControllerWithIndex:(NSInteger)index {
+    UIViewController *baseVC = [UIViewController new];
+    baseVC.view.backgroundColor = [UIColor clearColor];
+    return baseVC;
+}
+
+- (void)didSelectSegmentView:(DFSegmentView *)segmentView selectTitleWithIndex:(NSInteger)index {
+    
+    if (segmentView.tag == 0) {
+        NSInteger year = [self takeYear];
+        if (index == 0) {
+            year = year-1;
+        }else if (index == 1) {
+            year = year;
+        }else {
+            year = year+1;
+        }
+        [self.parameterDic setValue:[NSString stringWithFormat:@"%ld",year] forKey:@"yearTime"];
+        [self createPianExhibitionList:self.parameterDic];
+    }else {
+        NSLog(@"===%ld",index);
+        [self.parameterDic setValue:[NSString stringWithFormat:@"%ld",index+1] forKey:@"monthTime"];
+        [self createPianExhibitionList:self.parameterDic];
+    }
+}
+
+- (NSInteger)takeYear {
+    NSDate *nowDate = [NSDate date];
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSUInteger unitFlags = NSCalendarUnitYear;//年
+    NSDateComponents *dateComponent = [calendar components:unitFlags fromDate:nowDate];
+    NSInteger year = [dateComponent year];
+    return year;
+}
+
+- (NSInteger)takeMonth {
+    NSDate *nowDate = [NSDate date];
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSUInteger unitFlags = NSCalendarUnitMonth;//年
+    NSDateComponents *dateComponent = [calendar components:unitFlags fromDate:nowDate];
+    NSInteger month = [dateComponent month];
+    return month;
 }
 
 - (void)createNavigationBar {
@@ -123,7 +251,6 @@
     frostedVC.liveBlurBackgroundStyle = REFrostedViewControllerLiveBackgroundStyleLight;
     self.view.window.rootViewController = frostedVC;
     [self.frostedViewController presentMenuViewController];
-    
     self.tabBarController.tabBar.hidden = YES;
 }
 
@@ -147,12 +274,12 @@
     }
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     [self createTableViewCell:cell cellForRowAtIndexPath:indexPath];
-    
+
     return cell;
 }
 - (void)createTableViewCell:(UITableViewCell *)cell cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     ZWExhPlanListModel *model = self.dataSource[indexPath.row];
-    
+
     if ([model.developingState isEqualToString:@"1"]) {
         ZWPlanDelayCell *delayCell = [[ZWPlanDelayCell alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 0.3*kScreenWidth)];
         delayCell.tag = indexPath.row;
@@ -166,7 +293,7 @@
         plansListCell.delegate = self;
         [cell.contentView addSubview:plansListCell];
     }
-    
+
 }
 -(void)respondToEventsWithIndex:(NSInteger)index {
     [self gotoAnnouncementWithIndex:index];
@@ -204,11 +331,7 @@
     return 0.01;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
-    if (section == self.dataSource.count-1) {
-        return 0.01*kScreenWidth;
-    } else {
-        return 0.1;
-    }
+    return 0.1;
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     ZWExhPlanListModel *model = self.dataSource[indexPath.row];
@@ -219,10 +342,10 @@
     [self.navigationController pushViewController:detailVC animated:YES];
 }
 - (void)createRequest {
-    
+
     NSDictionary *myDic = @{@"myId":@"",@"name":@""};
     self.screenValues = @[myDic,myDic,myDic,myDic,myDic];
-    
+
     self.page = 1;
     [self requestPianExhibitionList:self.action.mj_keyValues withPage:self.page];
     [self refreshHeader];
@@ -261,7 +384,6 @@
             if (page == 1) {
                 [strongSelf.dataSource removeAllObjects];
             }
-            [strongSelf removeBlankView];
             NSArray *myData = data[@"data"];
             NSMutableArray *myArray = [NSMutableArray array];
             for (NSDictionary *myDic in myData) {
@@ -269,19 +391,12 @@
                 [myArray addObject:model];
             }
             [strongSelf.dataSource addObjectsFromArray:myArray];
-            if (strongSelf.dataSource.count == 0) {
-               [strongSelf showBlankPagesWithImage:blankPagesImageName withDitail:@"暂无展会" withType:1];
-            }
             [strongSelf.tableView reloadData];
         }
     } failureBlock:^(NSError * _Nonnull error) {
         __weak typeof (weakSelf) strongSelf = weakSelf;
-        [strongSelf.dataSource removeAllObjects];
-        [strongSelf removeBlankView];
         [strongSelf.tableView.mj_header endRefreshing];
         [strongSelf.tableView.mj_footer endRefreshing];
-        [strongSelf.tableView reloadData];
-        [strongSelf showBlankPagesWithImage:requestFailedBlankPagesImageName withDitail:@"当前网络异常，请检查网络" withType:2];
     } showInView:self.view];
 }
 
@@ -296,52 +411,9 @@
     return self.action.mj_keyValues;
 }
 
-
-- (void)removeBlankView {
-    if (self.blankView) {
-        [self.blankView removeFromSuperview];
-        self.blankView = nil;
-    }
-}
-- (void)showBlankPagesWithImage:(NSString *)imageName withDitail:(NSString *)ditail withType:(NSInteger)type {
-    
-    self.blankView = [[UIView alloc]initWithFrame:CGRectMake(0, 44, kScreenWidth, kScreenHeight-44)];
-    [self.view addSubview:self.blankView];
-    
-    UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0.1*kScreenWidth, 0.1*kScreenHeight, 0.8*kScreenWidth, 0.45*kScreenWidth)];
-    imageView.image = [UIImage imageNamed:imageName];
-    [self.blankView addSubview:imageView];
-    
-    UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(imageView.frame)+20, kScreenWidth, 30)];
-    myLabel.text = ditail;
-    myLabel.font = bigFont;
-    myLabel.textColor = [UIColor lightGrayColor];
-    myLabel.textAlignment = NSTextAlignmentCenter;
-    [self.blankView addSubview:myLabel];
-    
-    if (type == 2) {
-        UIButton *reloadBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        reloadBtn.frame = CGRectMake(0.3*kScreenWidth, CGRectGetMaxY(myLabel.frame)+25, 0.4*kScreenWidth, 0.1*kScreenWidth);
-        [reloadBtn setTitle:@"重新加载" forState:UIControlStateNormal];
-        reloadBtn.layer.borderColor = skinColor.CGColor;
-        reloadBtn.titleLabel.font = normalFont;
-        reloadBtn.layer.cornerRadius = 0.05*kScreenWidth;
-        reloadBtn.layer.masksToBounds = YES;
-        [reloadBtn setTitleColor:skinColor forState:UIControlStateNormal];
-        reloadBtn.layer.borderWidth = 1;
-        [reloadBtn addTarget:self action:@selector(reloadBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-        [self.blankView addSubview:reloadBtn];
-    }
-}
-
-- (void)reloadBtnClick:(UIButton *)btn {
-    [self requestPianExhibitionList:self.action.mj_keyValues withPage:self.page];
-}
-
-
 -(void)showOneAlertWithMessage:(NSString *)message {
     [[ZWAlertAction sharedAction]showOneAlertTitle:@"提示" message:message confirmTitle:@"我知道了" actionOne:^(UIAlertAction * _Nonnull actionOne) {
-        
+
     } showInView:self];
 }
 

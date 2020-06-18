@@ -94,7 +94,7 @@
             NSArray *myData = respense.data[@"merchantList"];
             NSMutableArray *myArray = [NSMutableArray array];
             for (NSDictionary *myDic in myData) {
-                ZWInduExhibitorsModel *model = [ZWInduExhibitorsModel parseJSON:myDic];
+                ZWInduExhibitorsModel *model = [ZWInduExhibitorsModel mj_objectWithKeyValues:myDic];
                 [myArray addObject:model];
             }
             [strongSelf.dataArray addObjectsFromArray:myArray];
@@ -171,6 +171,7 @@
     ZWInduExhibitorsModel *model = [self.dataArray objectAtIndex:indexPath.row];
     ZWExhibitorsDetailsVC *VC = [[ZWExhibitorsDetailsVC alloc] init];
     VC.merchantId = model.merchantId;
+    VC.shareModel = model;
     [self.ff_navViewController pushViewController:VC animated:YES];
     
 }

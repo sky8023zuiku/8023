@@ -160,7 +160,8 @@
                 NSArray *myData = data[@"data"];
                 NSMutableArray *myArray = [NSMutableArray array];
                 for (NSDictionary *myDic in myData) {
-                    ZWTopUpModel *model = [ZWTopUpModel parseJSON:myDic];
+//                    ZWTopUpModel *model = [ZWTopUpModel parseJSON:myDic];
+                    ZWTopUpModel *model = [ZWTopUpModel mj_objectWithKeyValues:myDic];
                     [myArray addObject:model];
                 }
                 ZWMyAccountVC *VC = [[ZWMyAccountVC alloc]init];

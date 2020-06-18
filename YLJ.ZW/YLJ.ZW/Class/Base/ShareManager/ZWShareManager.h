@@ -9,18 +9,14 @@
 #import <Foundation/Foundation.h>
 #import "ZWShareModel.h"
 NS_ASSUME_NONNULL_BEGIN
-@protocol ZWShareManagerDelegate <NSObject>
 
-- (void)clickItemWithIndex:(NSInteger)index;
-
-@end
 @interface ZWShareManager : NSObject
-
-@property(nonatomic, strong)id<ZWShareManagerDelegate> delegate;
-
 + (instancetype)shareManager;
-- (void)shareWithData:(ZWShareModel *)model;
-- (void)shareTwoActionSheetWithData:(ZWShareModel *)model;
+- (void)configurationShare;
+- (void)showShareAlertWithViewController:(UIViewController *)viewController
+                           withDataModel:(ZWShareModel *)model
+                           withExtension:(id)extension
+                                withType:(NSInteger)type;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -16,8 +16,18 @@
         
         [self.pzx_delegate PZXTextFieldDeleteBackward:self];
     }
-    
-    
 }
+
+//- (BOOL)canBecomeFirstResponder {
+//    return YES;
+//}
+//- (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
+//    return (action == @selector(paste:));
+//}
+//-(void)paste:(id)sender{
+//    UIPasteboard* pasteboard = [UIPasteboard generalPasteboard];
+//    self.text = pasteboard.string;
+//    NSLog(@"您点击的是粘贴==%@",self.text);
+//}
 
 @end

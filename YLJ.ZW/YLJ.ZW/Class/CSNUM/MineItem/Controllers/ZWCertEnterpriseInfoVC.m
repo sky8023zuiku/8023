@@ -28,10 +28,16 @@
 
 #import <MBProgressHUD.h>
 
+#import "ZWExbihitorsIndustriesModel.h"
+
+#import "ZWIndustriesItemView.h"
+
+#import "ZWAreaManager.h"
+
 
 #define magin 0.05*kScreenWidth
 
-@interface ZWCertEnterpriseInfoVC ()<UITableViewDelegate,UITableViewDataSource,UICollectionViewDataSource,UICollectionViewDelegate,TZImagePickerControllerDelegate,UIImagePickerControllerDelegate, UINavigationControllerDelegate,YYTextViewDelegate,UITextFieldDelegate>{
+@interface ZWCertEnterpriseInfoVC ()<UITableViewDelegate,UITableViewDataSource,UICollectionViewDataSource,UICollectionViewDelegate,TZImagePickerControllerDelegate,UIImagePickerControllerDelegate, UINavigationControllerDelegate,YYTextViewDelegate,UITextFieldDelegate,ZWAreaManagerDelegate>{
     UIImagePickerController *_imagePickerController;
 }
 @property(nonatomic, strong)TPKeyboardAvoidingTableView *tableView;
@@ -128,57 +134,40 @@
     [self createUI];
     [self createNotice];
 }
+-(void)textViewDidChangeNotification:(NSNotification *)obj{
+    YYTextView *textView = (YYTextView *)obj.object;
+    NSString *string = textView.text;
+    NSLog(@"%ld",(long)textView.tag);
+    
+    NSInteger maxLength;
+    if (textView.tag == 2) {
+        maxLength = 500;
+    }else {
+        maxLength = 30;
+    }
+    //获取高亮部分
+    YYTextRange *selectedRange = [textView valueForKey:@"_markedTextRange"];
+    NSRange range = [selectedRange asRange];
+    NSString *realString = [string substringWithRange:NSMakeRange(0, string.length - range.length)];
+    if (realString.length >= maxLength){
+        textView.text = [realString substringWithRange:NSMakeRange(0, maxLength)];
+    }
+}
+
+
 - (void)createNavigationBar {
     [[YNavigationBar sharedInstance]createLeftBarWithImage:[UIImage imageNamed:@"zai_dao_icon_left"] barItem:self.navigationItem target:self action:@selector(goBack:)];
     [[YNavigationBar sharedInstance]createRightBarWithTitle:@"提交" barItem:self.navigationItem target:self action:@selector(rightItemClick:)];
 }
 
-- (void)refreshCityStateItem:(NSNotification *)notice {
-    NSArray *selectArray = notice.object;
-    NSLog(@"我的国家省份和城市对象 = %@",selectArray);
-    NSString *str = @"";
-    ZWCPCitiesModel *model0 = selectArray[0];
-    for (int i = 0 ; i<selectArray.count ; i++) {
-        ZWCPCitiesModel *model = selectArray[i];
-        str = [str stringByAppendingString:[NSString stringWithFormat:@"%@  ",model.value]];
-        if ([model0.value isEqualToString:@"中国"]) {
-            if (i == 0) {
-                self.countriesModel = model;
-                self.model.country = self.countriesModel.value;
-            }else if (i== 1) {
-                self.provincesModel = model;
-                self.model.province = model.value;
-            }else {
-                self.citiesModel = model;
-                self.model.city = model.value;
-            }
-        }else {
-            if (i == 0) {
-                self.countriesModel = model;
-                self.model.country = model.value;
-                
-            }else {
-                self.citiesModel = model;
-                self.model.city = model.value;
-                
-            }
-        }
-    }
-    NSLog(@"我的国家省份和城市字段 = %@",str);
-    NSLog(@"我的省份 = %@",self.model.province);
-    NSLog(@"我的城市 = %@",self.model.city);
-    self.areaName = str;
-    [self.tableView reloadData];
-}
-
 - (void)createNotice {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textViewDidChangeNotification:) name:YYTextViewTextDidChangeNotification object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(certTakeIndustryList:) name:@"certTakeIndustryList" object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(refreshCityStateItem:) name:@"refreshCityStateItem" object:nil];
 }
 
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:YYTextViewTextDidChangeNotification object:nil];
     [[NSNotificationCenter defaultCenter]removeObserver:self name:@"certTakeIndustryList" object:nil];
-    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"refreshCityStateItem" object:nil];
 }
 
 - (void)certTakeIndustryList:(NSNotification *)notice {
@@ -239,9 +228,11 @@
         [self showOneAlertWithTitle:@"主营项目不能为空"];
         return;
     }
-    if (self.model.requirement.length == 0) {
-        [self showOneAlertWithTitle:@"需求说明不能为空"];
-        return;
+    if ([self.identityId isEqualToString:@"2"]) {
+        if (self.model.requirement.length == 0) {
+            [self showOneAlertWithTitle:@"需求说明不能为空"];
+            return;
+        }
     }
     if (self.httpImages.count + self.imageInfoArray.count<1) {
         [self showOneAlertWithTitle:@"图片信息不能少于一张"];
@@ -340,7 +331,6 @@
         }
         
     }
- 
     return [dic copy];
 }
 
@@ -398,7 +388,12 @@
 
 #pragma UITableViewDataSource
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 8;
+    if ([self.identityId isEqualToString:@"2"]) {
+        return 8;
+    }else {
+        return 7;
+    }
+    
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     
@@ -423,7 +418,12 @@
         }
     }
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    [self createTableViewCell:cell cellForRowAtIndexPath:indexPath];
+    
+    if ([self.identityId isEqualToString:@"2"]) {
+        [self createTableViewCell:cell cellForRowAtIndexPath:indexPath];
+    }else {
+        [self createServiceTableViewCell:cell cellForRowAtIndexPath:indexPath];
+    }
     
     return cell;
 }
@@ -497,6 +497,7 @@
         YYTextView *textView = [[YYTextView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0.05*kScreenWidth, 0.9*kScreenWidth, 0.3*kScreenWidth)];
         textView.placeholderText = @"请输入公司简介";
         textView.text = self.model.profile;
+        textView.tag = indexPath.section;
         textView.font = normalFont;
         textView.placeholderFont = normalFont;
         textView.tag = indexPath.section;
@@ -516,20 +517,41 @@
         
         UIView *toolView = [[UIView alloc]initWithFrame:CGRectMake(0, 0.075*kScreenWidth, kScreenWidth, 0.275*kScreenWidth)];
         [cell.contentView addSubview:toolView];
-
-        self.labelView = [[ZWLabelView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 0.275*kScreenWidth) dataArr:self.certIndustries];
-        [self.labelView btnClickBlock:^(NSInteger index) {
+        
+        
+        CGFloat itemWidth = 0.82*kScreenWidth/5;
+        CGFloat itemMargin = 0.03*kScreenWidth;
+        NSMutableArray *myArray = [NSMutableArray array];
+        for (ZWChosenIndustriesModel *model in self.certIndustries) {
+            ZWExbihitorsIndustriesModel *modelO = [[ZWExbihitorsIndustriesModel alloc]init];
+            modelO.secondIndustryId = [NSString stringWithFormat:@"%@",model.industries2Id];
+            modelO.secondIndustryName = [NSString stringWithFormat:@"%@",model.industries2Name];
+            modelO.thirdIndustryId = [NSString stringWithFormat:@"%@",model.industries3Id];
+            modelO.thirdIndustryName = [NSString stringWithFormat:@"%@",model.industries3Name];
+            [myArray addObject:modelO];
             
-        }];
-        [toolView addSubview:self.labelView];
+        }
         
         
+        for (int i = 0; i<myArray.count; i++) {
+            
+            ZWExbihitorsIndustriesModel *model = myArray[i];
+            ZWIndustriesItemView *industriesItemView = [[ZWIndustriesItemView alloc]initWithFrame:CGRectMake(itemMargin+(itemMargin+itemWidth)*i, 0.05*kScreenWidth, itemWidth, itemWidth)];
+            industriesItemView.backgroundColor = zwGrayColor;
+            industriesItemView.layer.cornerRadius = 3;
+            industriesItemView.layer.masksToBounds = YES;
+            industriesItemView.model = model;
+            [toolView addSubview:industriesItemView];
+
+        }
+
     }else if (indexPath.section == 4) {
         
         if ([self.identityId isEqualToString:@"2"]) {
             YYTextView *textView = [[YYTextView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0.05*kScreenWidth, 0.9*kScreenWidth, 0.3*kScreenWidth)];
             textView.placeholderText = @"请输入主营项目";
             textView.font = normalFont;
+            textView.tag = indexPath.section;
             textView.placeholderFont = normalFont;
             textView.text = self.model.product;
             textView.tag = indexPath.section;
@@ -548,6 +570,17 @@
         textView.delegate = self;
         [cell.contentView addSubview:textView];
     }else if (indexPath.section == 6) {
+        NSInteger cuont = self.httpImages.count +self.imageInfoArray.count;
+        CGFloat with;
+        if (cuont>=3 && cuont<6) {
+            with =  (0.5*kScreenWidth)/3*2;
+        }else if (cuont>=6) {
+            with =  0.5*kScreenWidth;;
+        }else {
+            with =  (0.5*kScreenWidth)/3;
+        }
+        self.collectView.frame = CGRectMake(0.05*kScreenWidth, 0.05*kScreenWidth, 0.9*kScreenWidth, with);
+        self.collectView.backgroundColor = [UIColor redColor];
         [cell.contentView addSubview:self.collectView];
     }else {
         UIImageView *licenseImageV = [[UIImageView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0.05*kScreenWidth, 0.24*kScreenWidth, 0.3*kScreenWidth)];
@@ -569,6 +602,171 @@
     
 }
 
+- (void)createServiceTableViewCell:(UITableViewCell *)cell cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == 0) {
+            
+            UIImageView *logoImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0.05*kScreenWidth, 0.25*kScreenWidth, 0.25*kScreenWidth)];
+            if (self.logoImage) {
+                logoImageView.image = self.logoImage;
+            }else {
+                logoImageView.image = [UIImage imageNamed:@"add_placeholder_image"];
+            }
+            logoImageView.userInteractionEnabled = YES;
+            logoImageView.layer.cornerRadius = 2;
+            logoImageView.layer.masksToBounds = YES;
+            [cell.contentView addSubview:logoImageView];
+            
+            UITapGestureRecognizer *tapLogo = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapLogoClick:)];
+            [logoImageView addGestureRecognizer:tapLogo];
+            
+            UILabel *noticeLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(logoImageView.frame), CGRectGetMaxY(logoImageView.frame), 0.84*kScreenWidth, 30)];
+            noticeLabel.text = @"注：此处为企业LOGO图片上传";
+            noticeLabel.font = smallFont;
+            noticeLabel.textColor = [UIColor colorWithRed:153/255.0 green:153/255.0 blue:153/255.0 alpha:1.0];
+            [cell.contentView addSubview:noticeLabel];
+            
+        }else if (indexPath.section == 1) {
+            
+            NSArray *titles = @[@"公司名称：",@"公司电话：",@"公司邮箱：",@"公司网址：",@"所属区域：",@"详细地址："];
+            UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(magin, 0, 0.2*kScreenWidth, 0.1*kScreenWidth)];
+            titleLabel.text = titles[indexPath.row];
+            titleLabel.font = normalFont;
+            [cell.contentView addSubview:titleLabel];
+            
+            NSArray *values = @[@"请输入公司名称",@"请输入公司电话",@"请输入公司邮箱",@"请输入公司网址",@"",@"请输入详细地址"];
+            UITextField *valueText = [[UITextField alloc]initWithFrame:CGRectMake(CGRectGetMaxX(titleLabel.frame), 0, kScreenWidth-CGRectGetMaxX(titleLabel.frame)-magin-0.05*kScreenWidth, 0.1*kScreenWidth)];
+            valueText.placeholder = values[indexPath.row];
+            valueText.tag = indexPath.row;
+            if (indexPath.row == 0) {
+                valueText.text = self.model.name;
+            }else if (indexPath.row == 1) {
+                valueText.text = self.model.telephone;
+            }else if (indexPath.row == 2) {
+                valueText.text = self.model.email;
+            }else if (indexPath.row == 3) {
+                valueText.text = self.model.website;
+            }else if (indexPath.row == 4) {
+    //            self.areaName =
+                if (self.areaName) {
+                    valueText.text = self.areaName;
+                }else {
+                    valueText.text = @"请选择所属区域";
+                }
+                valueText.enabled = NO;
+                valueText.textColor = skinColor;
+            }else {
+                valueText.text = self.model.address;
+            }
+            valueText.font = normalFont;
+            [valueText addTarget:self action:@selector(takeTextValue:) forControlEvents:UIControlEventAllEditingEvents];
+            [cell.contentView addSubview:valueText];
+            UIImageView *accImage = [[UIImageView alloc]initWithFrame:CGRectMake(CGRectGetMaxX(valueText.frame)+magin/2, 0.025*kScreenWidth, 0.05*kScreenWidth, 0.05*kScreenWidth)];
+            accImage.image = [UIImage imageNamed:@"certification_edit_icon"];
+            if (indexPath.row == 4) {
+                accImage.image = [UIImage imageNamed:@"certification_right_arrow"];
+            }
+            [cell.contentView addSubview:accImage];
+            
+        }else if (indexPath.section == 2) {
+            YYTextView *textView = [[YYTextView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0.05*kScreenWidth, 0.9*kScreenWidth, 0.3*kScreenWidth)];
+            textView.placeholderText = @"请输入公司简介";
+            textView.text = self.model.profile;
+            textView.tag = indexPath.section;
+            textView.font = normalFont;
+            textView.placeholderFont = normalFont;
+            textView.tag = indexPath.section;
+            textView.delegate = self;
+            [cell.contentView addSubview:textView];
+        }else if (indexPath.section == 3) {
+            
+            
+            UIButton *addIndustry = [UIButton buttonWithType:UIButtonTypeCustom];
+            addIndustry.frame = CGRectMake(0.85*kScreenWidth, 0, 0.15*kScreenWidth, 0.065*kScreenWidth);
+            [addIndustry setTitle:@"添加" forState:UIControlStateNormal];
+            addIndustry.backgroundColor = skinColor;
+            addIndustry.titleLabel.font = smallMediumFont;
+            [addIndustry addTarget:self action:@selector(addIndustryClick:) forControlEvents:UIControlEventTouchUpInside];
+            [cell.contentView addSubview:addIndustry];
+            [self setTheRoundedCorners:addIndustry];
+            
+            UIView *toolView = [[UIView alloc]initWithFrame:CGRectMake(0, 0.075*kScreenWidth, kScreenWidth, 0.275*kScreenWidth)];
+            [cell.contentView addSubview:toolView];
+            
+            
+            CGFloat itemWidth = 0.82*kScreenWidth/5;
+            CGFloat itemMargin = 0.03*kScreenWidth;
+            NSMutableArray *myArray = [NSMutableArray array];
+            for (ZWChosenIndustriesModel *model in self.certIndustries) {
+                ZWExbihitorsIndustriesModel *modelO = [[ZWExbihitorsIndustriesModel alloc]init];
+                modelO.secondIndustryId = [NSString stringWithFormat:@"%@",model.industries2Id];
+                modelO.secondIndustryName = [NSString stringWithFormat:@"%@",model.industries2Name];
+                modelO.thirdIndustryId = [NSString stringWithFormat:@"%@",model.industries3Id];
+                modelO.thirdIndustryName = [NSString stringWithFormat:@"%@",model.industries3Name];
+                [myArray addObject:modelO];
+                
+            }
+            
+            
+            for (int i = 0; i<myArray.count; i++) {
+                
+                ZWExbihitorsIndustriesModel *model = myArray[i];
+                ZWIndustriesItemView *industriesItemView = [[ZWIndustriesItemView alloc]initWithFrame:CGRectMake(itemMargin+(itemMargin+itemWidth)*i, 0.05*kScreenWidth, itemWidth, itemWidth)];
+                industriesItemView.backgroundColor = zwGrayColor;
+                industriesItemView.layer.cornerRadius = 3;
+                industriesItemView.layer.masksToBounds = YES;
+                industriesItemView.model = model;
+                [toolView addSubview:industriesItemView];
+
+            }
+
+        }else if (indexPath.section == 4) {
+            
+            if ([self.identityId isEqualToString:@"2"]) {
+                YYTextView *textView = [[YYTextView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0.05*kScreenWidth, 0.9*kScreenWidth, 0.3*kScreenWidth)];
+                textView.placeholderText = @"请输入主营项目";
+                textView.font = normalFont;
+                textView.tag = indexPath.section;
+                textView.placeholderFont = normalFont;
+                textView.text = self.model.product;
+                textView.tag = indexPath.section;
+                textView.delegate = self;
+                [cell.contentView addSubview:textView];
+            } else {
+                [self createBusinessInformationWith:cell];
+            }
+            
+        }else if (indexPath.section == 5) {
+            NSInteger cuont = self.httpImages.count +self.imageInfoArray.count;
+            CGFloat with;
+            if (cuont>=3 && cuont<6) {
+                with =  (0.5*kScreenWidth)/3*2;
+            }else if (cuont>=6) {
+                with =  0.5*kScreenWidth;;
+            }else {
+                with =  (0.5*kScreenWidth)/3;
+            }
+            self.collectView.frame = CGRectMake(0.05*kScreenWidth, 0.05*kScreenWidth, 0.9*kScreenWidth, with);
+            self.collectView.backgroundColor = [UIColor redColor];
+            [cell.contentView addSubview:self.collectView];
+        }else {
+            UIImageView *licenseImageV = [[UIImageView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0.05*kScreenWidth, 0.24*kScreenWidth, 0.3*kScreenWidth)];
+            if (self.licenseImage) {
+                licenseImageV.image = self.licenseImage;
+            }else {
+                licenseImageV.image = [UIImage imageNamed:@"add_placeholder_image"];
+            }
+            licenseImageV.layer.cornerRadius = 2;
+            licenseImageV.layer.masksToBounds = YES;
+            licenseImageV.userInteractionEnabled = YES;
+            licenseImageV.backgroundColor = [UIColor colorWithRed:232.0/255.0 green:232.0/255.0 blue:232.0/255.0 alpha:1];
+            [cell.contentView addSubview:licenseImageV];
+            
+            UITapGestureRecognizer *tapLicense = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapLicenseClick:)];
+            [licenseImageV addGestureRecognizer:tapLicense];
+            
+        }
+}
+
 - (void)createBusinessInformationWith:(UITableViewCell *)cell {
     
     UIView *topView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 0.3*kScreenWidth)];
@@ -582,7 +780,7 @@
     
     UIButton *setBtn = [UIButton buttonWithType:UIButtonTypeSystem];
     setBtn.frame = CGRectMake(CGRectGetMaxX(serverTitle.frame), 0, 0.2*kScreenWidth, 0.1*kScreenWidth);
-    [setBtn setTitle:@"设置" forState:UIControlStateNormal];
+    [setBtn setTitle:@"添加" forState:UIControlStateNormal];
     setBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
     [setBtn addTarget:self action:@selector(setBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     [cell.contentView addSubview:setBtn];
@@ -615,20 +813,20 @@
     
     self.model.product = [self.serverLabels componentsJoinedByString:@","];
     
-    UILabel *serverType = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, CGRectGetMaxY(middleView.frame)+0.025*kScreenWidth, 0.2*kScreenWidth, 0.1*kScreenWidth)];
-    serverType.text = @"服务类型：";
-    serverType.font = normalFont;
-    [cell.contentView addSubview:serverType];
-    
-    UITextField * serverText = [[UITextField alloc]initWithFrame:CGRectMake(CGRectGetMaxX(serverType.frame), CGRectGetMinY(serverType.frame), 0.65*kScreenWidth, CGRectGetHeight(serverType.frame))];
-    serverText.placeholder = @"请输入服务类型";
-    serverText.font = normalFont;
-    [serverText addTarget:self action:@selector(takeServerTextValue:) forControlEvents:UIControlEventAllEditingEvents];
-    [cell.contentView addSubview:serverText];
-    
-    UIImageView *accImage = [[UIImageView alloc]initWithFrame:CGRectMake(CGRectGetMaxX(serverText.frame)+0.025*kScreenWidth, CGRectGetMinY(serverText.frame)+0.025*kScreenWidth, 0.05*kScreenWidth, 0.05*kScreenWidth)];
-    accImage.image = [UIImage imageNamed:@"certification_edit_icon"];
-    [cell.contentView addSubview:accImage];
+//    UILabel *serverType = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, CGRectGetMaxY(middleView.frame)+0.025*kScreenWidth, 0.2*kScreenWidth, 0.1*kScreenWidth)];
+//    serverType.text = @"服务类型：";
+//    serverType.font = normalFont;
+//    [cell.contentView addSubview:serverType];
+//
+//    UITextField * serverText = [[UITextField alloc]initWithFrame:CGRectMake(CGRectGetMaxX(serverType.frame), CGRectGetMinY(serverType.frame), 0.65*kScreenWidth, CGRectGetHeight(serverType.frame))];
+//    serverText.placeholder = @"请输入服务类型";
+//    serverText.font = normalFont;
+//    [serverText addTarget:self action:@selector(takeServerTextValue:) forControlEvents:UIControlEventAllEditingEvents];
+//    [cell.contentView addSubview:serverText];
+//
+//    UIImageView *accImage = [[UIImageView alloc]initWithFrame:CGRectMake(CGRectGetMaxX(serverText.frame)+0.025*kScreenWidth, CGRectGetMinY(serverText.frame)+0.025*kScreenWidth, 0.05*kScreenWidth, 0.05*kScreenWidth)];
+//    accImage.image = [UIImage imageNamed:@"certification_edit_icon"];
+//    [cell.contentView addSubview:accImage];
     
 }
 
@@ -709,17 +907,21 @@
     }else if (textView.tag == 4) {
         self.model.product = textView.text;
     }else if (textView.tag == 5) {
-        self.model.requirement = textView.text;
+        if ([self.identityId isEqualToString:@"2"]) {
+            self.model.requirement = textView.text;
+        }else {
+            self.model.speciality = textView.text;
+        }
     }else {
         
     }
    NSLog(@"%@",textView.text);
 }
 
-- (void)takeServerTextValue:(UITextField *)textField {
-    NSLog(@"----%@",textField.text);
-    self.model.speciality = textField.text;
-}
+//- (void)takeServerTextValue:(UITextField *)textField {
+//    NSLog(@"----%@",textField.text);
+//    self.model.speciality = textField.text;
+//}
 
 - (void)setTheRoundedCorners:(UIButton *)btn {
     UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:btn.bounds byRoundingCorners:(UIRectCornerBottomLeft) cornerRadii:CGSizeMake(5,5)];//圆角大小
@@ -777,15 +979,55 @@
 
 #pragma UITableViewDelegate
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == 0) {
-        return 0.4*kScreenWidth;
-    }else if (indexPath.section == 1) {
-        return 0.1*kScreenWidth;
-    }else if (indexPath.section == 6) {
-        return 0.6*kScreenWidth;
+    
+    if ([self.identityId isEqualToString:@"2"]) {
+        if (indexPath.section == 0) {
+            return 0.4*kScreenWidth;
+        }else if (indexPath.section == 1) {
+            return 0.1*kScreenWidth;
+        }else if (indexPath.section == 4) {
+            if ([self.identityId isEqualToString:@"2"]) {
+                return 0.4*kScreenWidth;
+            }else {
+                return 0.3*kScreenWidth;
+            }
+        }else if (indexPath.section == 6) {
+            NSInteger cuont = self.httpImages.count +self.imageInfoArray.count;
+            if (cuont>=3 && cuont<6) {
+                return (0.5*kScreenWidth/3)*2+0.1*kScreenWidth;
+            }else if (cuont>=6) {
+                return 0.6*kScreenWidth;
+            }else {
+                return (0.5*kScreenWidth/3)+0.1*kScreenWidth;
+            }
+        }else {
+            return 0.4*kScreenWidth;
+        }
     }else {
-        return 0.4*kScreenWidth;
+       if (indexPath.section == 0) {
+            return 0.4*kScreenWidth;
+        }else if (indexPath.section == 1) {
+            return 0.1*kScreenWidth;
+        }else if (indexPath.section == 4) {
+            if ([self.identityId isEqualToString:@"2"]) {
+                return 0.4*kScreenWidth;
+            }else {
+                return 0.3*kScreenWidth;
+            }
+        }else if (indexPath.section == 5) {
+            NSInteger cuont = self.httpImages.count +self.imageInfoArray.count;
+            if (cuont>=3 && cuont<6) {
+                return (0.5*kScreenWidth/3)*2+0.1*kScreenWidth;
+            }else if (cuont>=6) {
+                return 0.6*kScreenWidth;
+            }else {
+                return (0.5*kScreenWidth/3)+0.1*kScreenWidth;
+            }
+        }else {
+            return 0.4*kScreenWidth;
+        }
     }
+    
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     if (section == 0) {
@@ -800,11 +1042,12 @@
 }
 - (nullable UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     UIView *view = [[UIView alloc]init];
+    
     NSArray *arraies;
     if ([self.identityId isEqualToString:@"2"]) {
-        arraies = @[@"",@"基本信息",@"公司简介",@"所属行业",@"主营项目",@"需求说明",@"图片信息",@"认证资料（营业执照）"];
+        arraies = @[@"",@"基本信息",@"公司简介（限500个字）",@"所属行业",@"主营项目（限制30个字）",@"需求说明（限30个字）",@"企业宣传图片（限9张，长按图片可删除）",@"营业执照（只作审核凭证不对外展示）"];
     } else {
-        arraies = @[@"",@"基本信息",@"公司简介",@"所属行业",@"服务信息",@"需求说明",@"图片信息",@"认证资料（营业执照）"];
+        arraies = @[@"",@"基本信息",@"公司简介（限500个字）",@"所属行业",@"服务信息",@"企业宣传图片（限9张，长按图片可删除）",@"营业执照（只作审核凭证不对外展示）"];
     }
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.04*kScreenWidth, 0, 0.82*kScreenWidth, 0.08*kScreenWidth)];
     titleLabel.text = arraies[section];
@@ -817,33 +1060,28 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 1) {
         if (indexPath.row == 4) {
-            [self takeSelectData:@{@"areaId":@"",@"level":@"0"} withType:0];
+            [[ZWAreaManager shareManager]areaSelectionShow:self];
+            [ZWAreaManager shareManager].delegate = self;
         }
     }
 }
-
-- (void)takeSelectData:(NSDictionary *)parametes withType:(NSInteger)type {
-    __weak typeof (self) weakSelf = self;
-    [[ZWDataAction sharedAction]postReqeustWithURL:zwSelectCPC parametes:parametes successBlock:^(NSDictionary * _Nonnull data) {
-        __strong typeof (weakSelf) strongSelf = weakSelf;
-        if (zw_issuccess) {
-            NSArray *myData = data[@"data"];
-            NSMutableArray *myArray = [NSMutableArray array];
-            for (NSDictionary *myDic in myData) {
-                ZWCPCitiesModel *model = [ZWCPCitiesModel parseJSON:myDic];
-                [myArray addObject:model];
-            }
-            ZWAgentCountriesVC *VC = [[ZWAgentCountriesVC alloc]init];
-            VC.dataArray = myArray;
-            VC.title = @"选择国家";
-            VC.status = 1;
-            [strongSelf.navigationController pushViewController:VC animated:YES];
-        }
-    } failureBlock:^(NSError * _Nonnull error) {
-        
-    } showInView:self.view];
+- (void)accessToAreas:(NSDictionary *)dic {
+    
+    self.model.country = dic[@"country"][@"value"];
+    if (dic[@"province"][@"value"]) {
+        self.model.province = dic[@"province"][@"value"];
+    }else {
+        self.model.province = @"";
+    }
+    if (dic[@"city"][@"value"]) {
+        self.model.city = dic[@"city"][@"value"];
+    }else {
+        self.model.city = @"";
+    }
+    self.areaName = [NSString stringWithFormat:@"%@ %@ %@",self.model.country,self.model.province,self.model.city];
+    [self.tableView reloadData];
+    
 }
-
 /*UICollectionView*/
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
     return 1;
@@ -893,9 +1131,10 @@
             
         }else {
             [strongSelf.imageInfoArray removeObjectAtIndex:press.view.tag-self.httpImages.count];
+            [strongSelf.tableView reloadData];
             [strongSelf.collectView reloadData];
+            
         }
-        
     }];
     [alertController addAction:actionOne];
     UIAlertAction *actionThree = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
@@ -912,15 +1151,19 @@
         @"profilesImageId":self.httpImages[index][@"id"]
     };
     if (myParametes) {
+        __weak typeof (self) weakSelf = self;
         [[ZWDataAction sharedAction]postReqeustWithURL:zwDeleteImageInfo parametes:myParametes successBlock:^(NSDictionary * _Nonnull data) {
+            __strong typeof (weakSelf) strongSelf = weakSelf;
             if (zw_issuccess) {
                [ZWOSSConstants syncDeleteImage:self.httpImages[index][@"url"] complete:^(DeleteImageState state) {
                     if (state == 1) {
                         NSLog(@"网络图片删除成功");
+                        
                     }
                 }];
-                [self.httpImages removeObjectAtIndex:index];
-                [self.collectView reloadData];
+                [strongSelf.httpImages removeObjectAtIndex:index];
+                [strongSelf.tableView reloadData];
+                [strongSelf.collectView reloadData];
             }else {
                 NSLog(@"删除失败");
             }
@@ -981,14 +1224,13 @@
     
     if (self.tapType == 1) {
         self.logoImage = photos[0];
-        [self.tableView reloadData];
     }else if (self.tapType == 2) {
         [self.imageInfoArray addObjectsFromArray:photos];
         [self.collectView reloadData];
     }else {
         self.licenseImage = photos[0];
-        [self.tableView reloadData];
     }
+    [self.tableView reloadData];
 }
 
 - (void)createImagePicker {
@@ -1017,15 +1259,17 @@
     UIImage *ima = info[UIImagePickerControllerEditedImage];
     if (self.tapType == 1) {
         self.logoImage = ima;
-        [self.tableView reloadData];
     }else if (self.tapType == 2) {
         [self.imageInfoArray addObject:ima];
         [self.collectView reloadData];
     }else {
         self.logoImage = ima;
-        [self.tableView reloadData];
     }
+    NSLog(@"-----%@",self.imageInfoArray);
+    [self.tableView reloadData];
     [self dismissViewControllerAnimated:YES completion:nil];
+    
+   
     
 }
 //进入拍摄页面点击取消按钮
@@ -1109,15 +1353,15 @@
     self.model.licenseFile = licenseImage;
     self.model.identityId = self.identityId;
     NSDictionary *myDic= [self dicFromObject:self.model];
-    NSLog(@"--------我的参数-------===---===%@",myDic);
-
+    
+    NSLog(@"--------我的参数-------===---===%@",myDic[@"profileFiles"]);
     if (myDic) {
         __weak typeof (self) weakSelf = self;
         [[ZWDataAction sharedAction]postReqeustWithURL:zwEnterpriseCertification parametes:myDic successBlock:^(NSDictionary * _Nonnull data) {
             __strong typeof (weakSelf) strongSelf = weakSelf;
             [MBProgressHUD hideHUDForView:self.view animated:YES];
             if (zw_issuccess) {
-                
+
                     [[ZWAlertAction sharedAction]showOneAlertTitle:@"提示" message:@"企业认证信息上传成功，我们将在两个工作日内为您审核，请耐心等待" confirmTitle:@"我知道了" actionOne:^(UIAlertAction * _Nonnull actionOne) {
                         __strong typeof (weakSelf) strongSelf = weakSelf;
                         [[NSNotificationCenter defaultCenter]postNotificationName:@"refreshTheCertification" object:nil];
@@ -1125,24 +1369,24 @@
                     } showInView:strongSelf];
 
                     if (self.merchantStatus == 3) {
-                        
+
                         NSArray *oldImages = @[self.oldLogo,self.oldLicense];
                         [self deleteImages:oldImages where:@"老logo和老图片删除成功"];
-                        
+
                     }
-                
+
             }else {
-                
+
                 [strongSelf showOneAlertWithTitle:@"企业认证资料提交失败，请检查网络或稍后再试"];
                 NSMutableArray *myArray = [NSMutableArray array];
                 [myArray addObjectsFromArray:images];
                 [myArray addObject:logoImage];
                 [myArray addObject:licenseImage];
                 [strongSelf deleteImages:myArray where:@"全部图片"];
-                
+
             }
         } failureBlock:^(NSError * _Nonnull error) {
-            
+
             __strong typeof (weakSelf) strongSelf = weakSelf;
             [strongSelf showOneAlertWithTitle:@"企业认证资料提交失败，请检查网络或稍后再试"];
             [MBProgressHUD hideHUDForView:self.view animated:YES];
@@ -1151,9 +1395,9 @@
             [myArray addObject:logoImage];
             [myArray addObject:licenseImage];
             [strongSelf deleteImages:myArray where:@"全部图片"];
-            
+
         } showInView:self.view];
-        
+
     }
     
 }

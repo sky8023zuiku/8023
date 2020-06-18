@@ -32,6 +32,8 @@
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>webo</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>wb662488503</string>
@@ -40,6 +42,8 @@
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>wechat</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>wxaaec29e7bfc06754</string>
@@ -48,6 +52,8 @@
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>qq</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>QQ42273A71</string>
@@ -56,9 +62,31 @@
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>tencent</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>tencent1109867121</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>wxwork</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>wwauth5e96ba6ddfb8841d000004</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>facebook</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb708358196633797</string>
 			</array>
 		</dict>
 	</array>
@@ -72,6 +100,7 @@
 		<string>comgooglemaps</string>
 		<string>weixin</string>
 		<string>wechat</string>
+		<string>wxwork</string>
 		<string>mqq</string>
 		<string>sinaweibohdsso</string>
 		<string>sinaweibosso</string>
@@ -86,6 +115,17 @@
 		<string>mqqwpa</string>
 		<string>mqqbrowser</string>
 		<string>mqzone</string>
+		<string>whatsapp</string>
+		<string>fbauth2</string>
+		<string>fbauth</string>
+		<string>fbapi20130214</string>
+		<string>fbapi</string>
+		<string>fbshareextension</string>
+		<string>fbapi20160328</string>
+		<string>fbapi20150629</string>
+		<string>instagram</string>
+		<string>fb-messenger</string>
+		<string>fb-messenger-share-api</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

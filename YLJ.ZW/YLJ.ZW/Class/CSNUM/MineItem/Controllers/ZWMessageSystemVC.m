@@ -7,16 +7,18 @@
 //
 
 #import "ZWMessageSystemVC.h"
-
+#import "ZWAuditMessageModel.h"
 @interface ZWMessageSystemVC ()<UITableViewDelegate,UITableViewDataSource>
-@property(nonatomic, strong)UITableView *tableView;
+@property(nonatomic, strong)ZWBaseEmptyTableView *tableView;
+@property(nonatomic, strong)NSMutableArray *dataArray;
+@property(nonatomic, assign)NSInteger page;
 @end
 
 @implementation ZWMessageSystemVC
 
--(UITableView *)tableView {
+-(ZWBaseEmptyTableView *)tableView {
     if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
+        _tableView = [[ZWBaseEmptyTableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
     }
     _tableView.dataSource = self;
     _tableView.delegate = self;
@@ -26,10 +28,20 @@
     [_tableView setSeparatorColor:zwDarkGrayColor];
     return _tableView;
 }
+
+-(NSMutableArray *)dataArray {
+    if (!_dataArray) {
+        _dataArray = [NSMutableArray array];
+    }
+    return _dataArray;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self createUI];
     [self createNavigationBar];
+    
+    [self createRequest];
 }
 
 - (void)createNavigationBar {
@@ -47,7 +59,7 @@
     return 1;
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 4;
+    return self.dataArray.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -67,42 +79,199 @@
 
 - (void)createTableViewCell:(UITableViewCell *)cell cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
+    ZWAuditMessageModel *model = self.dataArray[indexPath.row];
+    
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     
     UIImageView *titleImage = [[UIImageView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0.025*kScreenWidth, 0.15*kScreenWidth, 0.15*kScreenWidth)];
     titleImage.backgroundColor = zwDarkGrayColor;
+    if ([model.status isEqualToString:@"3"]) {
+        titleImage.image = [UIImage imageNamed:@"audit_failure_image"];
+    }
+    if ([model.status isEqualToString:@"2"]) {
+        titleImage.image = [UIImage imageNamed:@"review_successful_image"];
+    }
     titleImage.layer.cornerRadius = 0.075*kScreenWidth;
     titleImage.layer.masksToBounds = YES;
     [cell.contentView addSubview:titleImage];
     
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(titleImage.frame)+5, CGRectGetMinY(titleImage.frame), 0.2*kScreenWidth, CGRectGetHeight(titleImage.frame)/3)];
-    titleLabel.text = @"审核结果";
+    titleLabel.text = model.title;
     titleLabel.font = boldNormalFont;
     [cell.contentView addSubview:titleLabel];
     
     UILabel *deteLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.45*kScreenWidth, CGRectGetMinY(titleLabel.frame), 0.5*kScreenWidth, CGRectGetHeight(titleLabel.frame))];
     deteLabel.font = smallFont;
     deteLabel.textColor = [UIColor grayColor];
-    deteLabel.text = @"2018-08-08 22:22";
+    deteLabel.text = [[ZWToolActon shareAction]getTimeFromTimestamp:model.create withDataStr:@"YYYY-MM-dd HH:mm:ss"];
     deteLabel.textAlignment = NSTextAlignmentRight;
     [cell.contentView addSubview:deteLabel];
     
     UILabel *detailLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(titleLabel.frame), CGRectGetMaxY(titleLabel.frame), 0.75*kScreenWidth-5, CGRectGetHeight(titleImage.frame)/3*2)];
-    detailLabel.text = @"审核不通过或是通过的原因审核不通过审核不通过或是通过的原因审核不通过或是通过的原因";
+    detailLabel.text = model.myDescription;
     detailLabel.numberOfLines = 2;
     detailLabel.textColor = [UIColor grayColor];
     detailLabel.font = smallMediumFont;
     [cell.contentView addSubview:detailLabel];
+    
+    if ([model.readStatus isEqualToString:@"0"]) {
+        
+        UILabel *redLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.06*kScreenWidth, 0.03*kScreenWidth, 10, 10)];
+        redLabel.backgroundColor = [UIColor redColor];
+        redLabel.layer.cornerRadius = 5;
+        redLabel.layer.masksToBounds = YES;
+        [cell.contentView addSubview:redLabel];
+        
+    }
     
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return 0.2*kScreenWidth;
 }
+
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     return 0.01;
 }
+
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     return 0.01;
 }
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+
+    ZWAuditMessageModel *model = self.dataArray[indexPath.row];
+    if ([model.readStatus isEqualToString:@"0"]) {
+        model.readStatus = @"1";
+        [self.tableView reloadData];
+        [self setMessageIsRead:model.listId];
+    }
+}
+
+- (void)setMessageIsRead:(NSString *)listId {
+    [[ZWDataAction sharedAction]postReqeustWithURL:zwSetMessageIsRead parametes:@{@"idList":@[listId]} successBlock:^(NSDictionary * _Nonnull data) {
+        if (zw_issuccess) {
+            NSLog(@"成功设置为已读");
+            [[ZWMessageNumAction shareAction]takeMessageNumber];
+        }
+    } failureBlock:^(NSError * _Nonnull error) {
+        
+    }];
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    return YES;
+}
+//2
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    return UITableViewCellEditingStyleDelete;
+}
+//3
+//修改编辑按钮文字
+- (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return @"删除";
+}
+//4
+//点击删除
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    //在这里实现删除操作
+    
+    //删除数据，和删除动画
+//    [self.myarray removeObjectAtIndex:deleteRow];
+//    [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:[NSIndexPath indexPathForRow:deleteRow inSection:0]] withRowAnimation:UITableViewRowAnimationTop];
+}
+//5
+- (NSArray *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
+    //删除
+    UITableViewRowAction *deleteRowAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"删除" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        __weak typeof (self) weakSelf = self;
+        [[ZWAlertAction sharedAction]showTwoAlertTitle:@"提示" message:@"是否确认删除" cancelTitle:@"否" confirmTitle:@"是" actionOne:^(UIAlertAction * _Nonnull actionOne) {
+            __strong typeof (weakSelf) strongSelf = weakSelf;
+            [strongSelf deleteCardWithIndex:indexPath];
+        } actionCancel:^(UIAlertAction * _Nonnull actionCancel) {
+            
+        } showInView:self];
+
+    }];
+    return @[deleteRowAction];
+}
+- (void)deleteCardWithIndex:(NSIndexPath *)indexPath {
+    ZWAuditMessageModel *model = self.dataArray[indexPath.row];
+    __weak typeof (self) weakSelf = self;
+    [[ZWDataAction sharedAction]postReqeustWithURL:zwDeleteMessage parametes:@{@"idList":@[model.listId]} successBlock:^(NSDictionary * _Nonnull data) {
+        __strong typeof (weakSelf) strongSelf = weakSelf;
+        if (zw_issuccess) {
+            [strongSelf createRequest];
+        }else {
+            [strongSelf showOneAlertWithMessage:@"删除失败，请稍后再试或者联系客服"];
+        }
+    } failureBlock:^(NSError * _Nonnull error) {
+        
+    } showInView:self.view];
+}
+
+- (void)showOneAlertWithMessage:(NSString *)message {
+    [[ZWAlertAction sharedAction]showOneAlertTitle:@"提示" message:message confirmTitle:@"我知道了" actionOne:^(UIAlertAction * _Nonnull actionOne) {
+        
+    } showInView:self];
+}
+
+
+- (void)createRequest {
+    self.page = 1;
+    [self dataRequestWithPage:self.page];
+    [self refreshHeader];
+    [self refreshFooter];
+}
+
+
+//刷新
+- (void)refreshHeader {
+    __weak typeof (self) weakSelf = self;
+    self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        __strong typeof (weakSelf) strongSelf = weakSelf;
+        strongSelf.page = 1;
+        [strongSelf dataRequestWithPage:self.page];
+    }];
+}
+
+//加载
+- (void)refreshFooter {
+    __weak typeof (self) weakSelf = self;
+    self.tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
+        __strong typeof (weakSelf) strongSelf = weakSelf;
+        strongSelf.page += 1;
+        [strongSelf dataRequestWithPage:self.page];
+    }];
+}
+
+- (void)dataRequestWithPage:(NSInteger)page {
+    
+    __weak typeof (self) weakSelf = self;
+    [[ZWDataAction sharedAction]postReqeustWithURL:zwGetSystemMessageList parametes:@{@"pageNo":[NSString stringWithFormat:@"%ld",(long)page],@"pageSize":@"10"} successBlock:^(NSDictionary * _Nonnull data) {
+        __strong typeof (weakSelf) strongSelf = weakSelf;
+        [strongSelf.tableView.mj_header endRefreshing];
+        [strongSelf.tableView.mj_footer endRefreshing];
+        if (zw_issuccess) {
+            if (page == 1) {
+                [strongSelf.dataArray removeAllObjects];
+            }
+            NSArray *myData = data[@"data"][@"auditList"];
+            NSMutableArray *myArray = [NSMutableArray array];
+            for (NSDictionary *myDic in myData) {
+                ZWAuditMessageModel *model = [ZWAuditMessageModel parseJSON:myDic];
+                [myArray addObject:model];
+            }
+            [strongSelf.dataArray addObjectsFromArray:myArray];
+            [strongSelf.tableView reloadData];
+        }
+    } failureBlock:^(NSError * _Nonnull error) {
+        __strong typeof (weakSelf) strongSelf = weakSelf;
+        [strongSelf.tableView.mj_header endRefreshing];
+        [strongSelf.tableView.mj_footer endRefreshing];
+    }];
+    
+}
+
 @end

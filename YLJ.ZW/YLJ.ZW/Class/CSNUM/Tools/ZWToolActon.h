@@ -55,6 +55,17 @@ NS_ASSUME_NONNULL_BEGIN
  *  字符串转数组
 */
 - (NSArray *)strTurnArrayWithString:(NSString *)string;
+/**
+ *  字符串转数组
+*/
+- (void)dialTheNumber:(NSString *)number;//拨打电话号码
+/**
+ *  修改图片的颜色
+*/
+- (UIImage *)modifyTheColorWithImageName:(NSString *)imageName imageColor:(UIColor *)imageColor;
+
+- (id)arrayOrDicWithObject:(id)origin;//模型转字典或数组
+- (NSDictionary *)dicFromObject:(NSObject *)object;//模型转字典
 @end
 
 NS_ASSUME_NONNULL_END

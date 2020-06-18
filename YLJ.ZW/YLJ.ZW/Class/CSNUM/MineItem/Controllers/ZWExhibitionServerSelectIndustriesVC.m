@@ -149,13 +149,54 @@
 
 
 - (void)right1ItemClcik:(UIBarButtonItem *)item {
-    if (self.industriesArray.count == 0) {
-        [self showOneAlertWithMessage:@"请选择您所涉及到的行业"];
-        return;
+    
+    if (self.type == 1) {
+        if (self.industriesArray.count == 0) {
+            [self showOneAlertWithMessage:@"请选择您所涉及到的行业"];
+            return;
+        }
+        [[NSNotificationCenter defaultCenter]postNotificationName:@"certTakeIndustryList" object:self.industriesArray];
+        [self.navigationController popViewControllerAnimated:YES];
+    }else {
+        NSLog(@"%@",self.industriesIds);
+        if (self.industriesIds.count == 0) {
+            [self showOneAlertWithMessage:@"您所涉及到的行业不能为空，请选择后提交"];
+            return;
+        }
+        __weak typeof (self) weakSelf = self;
+        [[ZWAlertAction sharedAction]showTwoAlertTitle:@"提示" message:@"是否确提交所选择的行业" cancelTitle:@"否" confirmTitle:@"是" actionOne:^(UIAlertAction * _Nonnull actionOne) {
+            __strong typeof (weakSelf) strongSelf = weakSelf;
+            [strongSelf submitIndustriesInformation];
+        } actionCancel:^(UIAlertAction * _Nonnull actionCancel) {
+            
+        } showInView:self];
     }
-    [[NSNotificationCenter defaultCenter]postNotificationName:@"certTakeIndustryList" object:self.industriesArray];
-    [self.navigationController popViewControllerAnimated:YES];
+    
 }
+
+- (void)submitIndustriesInformation {
+    NSDictionary *parametes;
+    if (self.industriesIds) {
+        parametes = @{@"industryList":self.industriesIds,
+                      @"defaultIndustryId":self.industriesIds[0]};
+    }
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    __weak typeof (self) weakSelf = self;
+    [[ZWDataAction sharedAction]postReqeustWithURL:zwUpdateMyIndustriesList parametes:parametes successBlock:^(NSDictionary * _Nonnull data) {
+        __strong typeof (weakSelf) strongSelf = weakSelf;
+        if (zw_issuccess) {
+            [[ZWAlertAction sharedAction]showOneAlertTitle:@"提示" message:@"行业变更成功" confirmTitle:@"我知道了" actionOne:^(UIAlertAction * _Nonnull actionOne) {
+                __strong typeof (weakSelf) strongSelf = weakSelf;
+                [strongSelf.navigationController popViewControllerAnimated:YES];
+            } showInView:strongSelf];
+        }
+    } failureBlock:^(NSError * _Nonnull error) {
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
+    }];
+}
+
+
+
 - (void)createUI {
     
     self.view.backgroundColor = [UIColor whiteColor];

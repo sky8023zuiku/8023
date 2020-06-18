@@ -142,6 +142,7 @@
                                                     @"+86" , @"pretel", nil]];
     
 }
+
 - (void)tapBtnClick:(UIButton *)btn {
     ZWAgreementVC *VC = [[ZWAgreementVC alloc]init];
     [self.navigationController pushViewController:VC animated:YES];
@@ -171,6 +172,7 @@
     ZWAreaCodeVC *areaVC = [[ZWAreaCodeVC alloc]init];
     areaVC.delegate = self;
     [self.navigationController pushViewController:areaVC animated:YES];
+    
 }
 
 - (void)ZWAreaCodeViewControllerDelegate:(ZWAreaCodeModels*)pres {

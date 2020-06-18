@@ -9,8 +9,6 @@
 #import "CSSearchSuggestionVC.h"
 #import "ZWMineRqust.h"
 #import "ZWMineResponse.h"
-#import "ZWServiceRequst.h"
-#import "ZWServiceResponse.h"
 #import "ZWMerchantSearchRequst.h"
 #import "ZWExExhibitorsFuzzySearchModel.h"
 #import "ZWPlanExhibitionFuzzyModel.h"
@@ -61,29 +59,6 @@
 }
 //服务商搜索
 - (void)createExhibitorAssociationListRequst:(NSString *)text {
-//    ZWServiceProvidersListRequst *requst = [[ZWServiceProvidersListRequst alloc]init];
-//    requst.status = 2;
-//    requst.merchantName = text;
-//    requst.city = self.city;
-//    requst.type = self.parameterType;
-//    requst.pageNo = 1;
-//    requst.pageSize = 50;
-//    __weak typeof(self) weakSelf = self;
-//    [requst postRequestCompleted:^(YHBaseRespense *respense) {
-//
-//        __strong typeof (self) strongSelf = weakSelf;
-//        if (respense.isFinished) {
-//            NSLog(@"%@",[[ZWToolActon shareAction]transformDic:respense.data[@"result"]]);
-//            NSArray *array = respense.data[@"result"];
-//            NSMutableArray *myArr = [NSMutableArray array];
-//            for (NSDictionary *myDic in array) {
-//                ZWServiceProvidersListModel *model = [ZWServiceProvidersListModel parseJSON:myDic];
-//                [myArr addObject:model];
-//            }
-//            strongSelf.dataSource = myArr;
-//            [strongSelf.contentView reloadData];
-//        }
-//    }];
     __weak typeof(self) weakSelf = self;
     [[ZWDataAction sharedAction]getReqeustWithURL:zwServiceProviderSearchList parametes:@{@"name":text} successBlock:^(NSDictionary * _Nonnull data) {
         __strong typeof (self) strongSelf = weakSelf;
@@ -99,31 +74,6 @@
 }
 //拼单列表搜索名称
 - (void)createSpellListVCRequst:(NSString *)text {
-//   ZWServiceSpellListRequst *requst = [[ZWServiceSpellListRequst alloc]init];
-//    requst.status = 2;
-//    requst.merchantName = text;
-//    requst.city = self.city;
-//    requst.type = self.parameterType;
-//    requst.pageNo = 1;
-//    requst.pageSize = 20;
-//    __weak typeof (self) weakSelf = self;
-//    [requst postRequestCompleted:^(YHBaseRespense *respense) {
-//        __strong typeof (weakSelf) strongSelf = weakSelf;
-//        if (respense.isFinished) {
-//            NSLog(@"%@",respense.data[@"result"]);
-//            NSArray *arry = respense.data[@"result"];
-//            NSMutableArray *myArray = [NSMutableArray array];
-//            for (NSDictionary *myDic in arry) {
-//                ZWServiceSpellListModel *model= [ZWServiceSpellListModel parseJSON:myDic];
-//                [myArray addObject:model];
-//            }
-//            self.dataSource =myArray;
-//            [strongSelf.contentView reloadData];
-//        }else {
-//
-//        }
-//    }];
-    
     __weak typeof (self) weakSelf = self;
     [[ZWDataAction sharedAction]postReqeustWithURL:zwGetExhibitionServerSpellSearchList parametes:@{@"name":text,@"city":self.city} successBlock:^(NSDictionary * _Nonnull data) {
         __strong typeof (weakSelf) strongSelf = weakSelf;

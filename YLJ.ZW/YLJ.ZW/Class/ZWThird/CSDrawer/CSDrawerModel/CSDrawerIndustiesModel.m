@@ -9,12 +9,15 @@
 #import "CSDrawerIndustiesModel.h"
 
 @implementation CSDrawerIndustiesModel
+
 /**
  * 获取城市模型
  */
+
 + (id)parseJSON:(NSDictionary *)jsonDic {
     return [[self alloc]initWithJSON:jsonDic];
 }
+
 - (id)initWithJSON:(NSDictionary *)myDic {
     if (self = [super init]) {
         self.name = myDic[@"name"];
@@ -23,4 +26,5 @@
     }
     return self;
 }
+
 @end

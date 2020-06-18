@@ -96,6 +96,7 @@
     self.codeViewText.Spacing = 0;//每个格子间距属性
     [self.scrollView addSubview:self.codeViewText];
     
+    
     self.countdownBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     self.countdownBtn.frame = CGRectMake(0.35*kScreenWidth, CGRectGetMaxY(self.codeViewText.frame), 0.3*kScreenWidth, 0.1*kScreenWidth);
     [self.countdownBtn setTitleColor:[UIColor colorWithRed:239/255.0 green:143/255.0 blue:15/255.0 alpha:1.0] forState:UIControlStateNormal];

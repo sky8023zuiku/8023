@@ -17,14 +17,14 @@
 #import "CSSearchBarStyle.h"
 #import "ZWMineResponse.h"
 #import "ZWMineRqust.h"
-#import "ZWServiceRequst.h"
-#import "ZWServiceResponse.h"
 #import <MJRefresh.h>
 #import "ZWMerchantSearchView.h"
 #import "ZWExhExhibitorsResultSearchView.h"
 #import "ZWPlanExhibitionSearchView.h"
 #import "ZWExhibitionHallSearchView.h"
+
 @interface CSSearchResultVC ()<UISearchBarDelegate>
+
 //@property (nonatomic, strong) CSSearchBarStyle *searchBar;
 @property (nonatomic, strong) UIView *titleView;
 @property (nonatomic, strong) UIView *backView;
@@ -40,13 +40,11 @@
 @property (nonatomic, strong) ZWPlanExhibitionSearchView *planExhibitionSearchView;//计划展会页面
 @property (nonatomic, strong) ZWExhibitionHallSearchView *exhibitionHallSearchView;//计划展会页面
 
-
 @property (nonatomic, strong) CSSearchView *searchView;
 @property (nonatomic, strong) CSSearchSuggestionVC *searchSuggestVC;
 @property (nonatomic, strong) NSMutableArray<ZWMyCatalogueModel *> *dataSource;
 
 @property (nonatomic, assign) NSInteger page;//页面
-
 @property (nonatomic, strong) ZWSearchBar *searchBar;
 @end
 

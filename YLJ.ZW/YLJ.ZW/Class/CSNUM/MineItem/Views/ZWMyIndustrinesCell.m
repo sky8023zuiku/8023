@@ -22,7 +22,7 @@
         
         CGFloat labelW = [[ZWToolActon shareAction]adaptiveTextWidth:@"默认" labelFont:smallFont]+10;
         self.defaultLabel = [[UILabel alloc]initWithFrame:CGRectMake(width-labelW, 0, labelW, 0.13*height)];
-        self.defaultLabel.text = @"默认";
+        self.defaultLabel.text = @"";
         self.defaultLabel.font = smallFont;
         self.defaultLabel.textAlignment = NSTextAlignmentCenter;
         self.defaultLabel.textColor = [UIColor whiteColor];

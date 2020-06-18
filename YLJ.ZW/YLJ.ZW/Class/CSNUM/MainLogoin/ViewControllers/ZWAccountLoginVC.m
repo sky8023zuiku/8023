@@ -138,8 +138,8 @@
     [self.navigationController pushViewController:areaCodeVC animated:YES];
 }
 - (void)loginBtnClick:(UIButton *)btn {
-    if (self.phoneText.text.length<11) {
-        [self showOneAlertWithMessage:@"请输入正确的手机号码"];
+    if (self.phoneText.text.length == 0) {
+        [self showOneAlertWithMessage:@"请输入手机号码"];
         return;
     }
     if ([self.phoneText.text isEqualToString:@""]) {

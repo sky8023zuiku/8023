@@ -103,6 +103,7 @@
 
 -(void)layoutSubviews {
     [super layoutSubviews];
+    
     CGSize size = self.frame.size;
     
     self.titleImage.frame = CGRectMake(10, 10, size.height-20, size.height-20);
@@ -195,13 +196,19 @@
     }else {
         self.latestLabel.text = [NSString stringWithFormat:@"最新：%@-%@",newStartTime,newEndTime];
     }
+
+    if ([model.price isEqualToString:@"0"]) {
+        self.priceLabel.text = @"限时免费";
+    }else {
+        self.priceLabel.text = [NSString stringWithFormat:@"%@0会展币",model.price];
+    }
     
     self.priceLabel.text = [NSString stringWithFormat:@"%@0会展币",model.price];
     self.numberLabel.text = [NSString stringWithFormat:@"%@",model.merchantCount];
     
     NSLog(@"---%@",model.collection);
     
-    if ([model.collection isEqualToNumber: @1]) {
+    if ([model.collection isEqualToString:@"1"]) {
         self.collectionBtnBackImageName = @"zhanlist_icon_xin_xuan";
     }else {
         self.collectionBtnBackImageName = @"zhanlist_icon_xin_wei";

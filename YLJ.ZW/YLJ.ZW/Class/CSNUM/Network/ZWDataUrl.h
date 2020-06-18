@@ -8,13 +8,20 @@
 
 #ifndef ZWDataUrl_h
 #define ZWDataUrl_h
+#import "ZWExhibitionServerUrl.h"
+
+#define JPushBool YES
+
+//#define JPushBool NO
 
 //#define share_url @"http://www.csnum.com/share"//测试分享
+
 #define share_url @"http://www.enet720.com/share/share_merchant/share"//正式分享
 /**
  *  正式环境
  */
 #define API_HOST @"http://www.enet720.com:9000"//网络请求域名
+//#define API_HOST @"http://www.enet720.com:9001"//网络请求域名
 /**
  *  本地环境1
  */
@@ -29,6 +36,7 @@
 #define PATH(_path) [NSString stringWithFormat:_path, API_HOST]
 
 //*********************************个人相关**************************************************/
+
 /**
  *  获取个人中心的个人信息
  */
@@ -37,7 +45,22 @@
  *  获取用户详细信息
 */
 #define zwTakeMoreUserInfo PATH(@"%@/zwkj/user/details.json")
-
+/**
+ *  我的名片
+*/
+#define zwMyBusinessCardList PATH(@"%@/zwkj/user/card/list.json")
+/**
+ *  添加名片
+*/
+#define zwAddBusinessCard PATH(@"%@/zwkj/user/card/insert_updated.json")
+/**
+ *  删除名片
+*/
+#define zwDeleteBusinessCard PATH(@"%@/zwkj/user/card/delete.json")
+/**
+ *  名片投递
+*/
+#define zwSendBusinessCard PATH(@"%@/zwkj/user/card/send_card.json")
 //*********************************在线展会**************************************************/
 /**
  *  获取在线展会列表
@@ -403,6 +426,106 @@
  *      查询服务商行业
 */
 #define zwGetExhibitionServerIndustriesList PATH(@"%@/zwkj/industry/get_service_industry.json")
+
+//**********************************************************消息中心**********************************************************/
+
+/**
+ *      系统消息列表
+*/
+#define zwGetSystemMessageList PATH(@"%@/zwkj/user/message/get_audit_message.json")
+/**
+ *      活动消息列表
+*/
+#define zwGetActivitiesMessageList PATH(@"%@/zwkj/user/message/get_system_message.json")
+/**
+ *      接收名片列表
+*/
+#define zwGetBusinessCardList PATH(@"%@/zwkj/user/message/get_card_message.json")
+
+/**
+ *      删除消息
+*/
+#define zwDeleteMessage PATH(@"%@/zwkj/user/message/delete_message.json")
+/**
+ *      删除消息
+*/
+#define zwDeleteMessage PATH(@"%@/zwkj/user/message/delete_message.json")
+/**
+ *      设置已读
+*/
+#define zwSetMessageIsRead PATH(@"%@/zwkj/user/message/update_message_status.json")
+/**
+ *      一键已读
+*/
+#define zwSetAllMessageIsRead PATH(@"%@/zwkj/user/message/update_all_message_status.json")
+/**
+ *      系统消息设置已读
+*/
+#define zwSetSystemMessageIsRead PATH(@"%@/zwkj/user/message/update_system_message_status.json")
+/**
+ *      获取所有消息
+*/
+#define zwGetMessageNum PATH(@"%@/zwkj/user/message/unread_count.json")
+
+//**********************************************************我得行业**********************************************************/
+/**
+ *      获取我涉及的行业列表
+*/
+#define zwGetInvolveIndustresList PATH(@"%@/zwkj/merchant/get_merchant_industry.json")
+/**
+ *      获取我涉及的行业列表
+*/
+#define zwGetInvolveIndustresList PATH(@"%@/zwkj/merchant/get_merchant_industry.json")
+
+/**
+ *      我能查看的展会行业
+*/
+#define zwCanCheckOutTheExhibitionIndustriesList PATH(@"%@/zwkj/user/get_exhibition_view_industry.json")
+/**
+ *      修改我能查看的展会行业
+*/
+#define zwUpdateExhibitionIndustriesList PATH(@"%@/zwkj/user/update_exhibition_view_industry.json")
+/**
+ *      获取我感兴趣的行业列表
+*/
+#define zwGetInterestIndustriesList PATH(@"%@/zwkj/user/get_industry_list.json")
+/**
+ *      变更感兴趣的行业列表
+ */
+#define zwUpdateMyInterestIndustriesList PATH(@"%@/zwkj/user/insert_update_industry.json")
+
+//**********************************************************拼单相关**********************************************************/
+/**
+ *      我的拼单列表
+ */
+#define zwMySpellList PATH(@"%@/zwkj/spell/list/user_spell_list.json")
+/**
+ *      上传拼单
+ */
+#define zwUploadMySpellList PATH(@"%@/zwkj/spell/list/insert.json")
+/**
+ *      删除拼单
+ */
+#define zwDeleteMySpellList PATH(@"%@/zwkj/spell/list/delete_spell.json")
+/**
+ *      拼单成功
+ */
+#define zwSuccessfulMySpellList PATH(@"%@/zwkj/spell/list/updated_spell_status.json")
+/**
+ *      置顶
+ */
+#define zwSetTopMySpellList PATH(@"%@/zwkj/spell/list/set_top.json")
+/**
+ *      修改拼单
+ */
+#define zwUpDateMySpellList PATH(@"%@/zwkj/spell/list/update.json")
+/**
+ *      展会展商配对
+ */
+#define zwExExhibitoersPairList PATH(@"%@/zwkj/exhibitor/get_recommend_exhibitor.json")
+
+
+
 
 
 #endif /* ZWDataUrl_h */

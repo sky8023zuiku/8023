@@ -98,8 +98,31 @@ static ZWSaveDataAction *shareAction = nil;
     [unarchiver finishDecoding];
     return cityName;
 }
+/**
+ *   保存和获取消息数量
+ */
+- (void)saveMessageNum:(NSDictionary *)messageNum {
+    
+    NSMutableData *messageNumInfo = [[NSMutableData alloc]init];
+    NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:messageNumInfo];
+    [archiver encodeObject:messageNum forKey:@"messageNum"];
+    [archiver finishEncoding];
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:messageNumInfo forKey:@"messageNum"];
+    [userDefaults synchronize];
+}
+- (NSDictionary *)takeMessageNum {
+    
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSData *messageNumInfo = [userDefaults dataForKey:@"messageNum"];
+    NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:messageNumInfo];
+    NSDictionary *messageNum = [unarchiver decodeObjectForKey:@"messageNum"];
+    [unarchiver finishDecoding];
+    return messageNum;
+}
 
 - (void)removeLocation {
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"messageNum"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"userInfoData"];
 }
 

@@ -147,12 +147,11 @@
     [cell.contentView addSubview:phoneLabel];
     
     UILabel *dateLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(nameLabel.frame), CGRectGetMinY(nameLabel.frame), 0.3*kScreenWidth, CGRectGetHeight(nameLabel.frame))];
-    dateLabel.text = model.recommendTime;
+    dateLabel.text = [NSString stringWithFormat:@"%@",[[ZWToolActon shareAction]getTimeFromTimestamp:model.recommendTime withDataStr:@"YYYY-MM-dd HH:mm:ss"]];
     dateLabel.textColor = [UIColor grayColor];
     dateLabel.font = smallFont;
     dateLabel.textAlignment = NSTextAlignmentCenter;
     [cell.contentView addSubview:dateLabel];
-    
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {

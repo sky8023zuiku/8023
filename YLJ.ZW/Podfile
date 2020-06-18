@@ -46,4 +46,15 @@ pod 'LBXScan/UI','~> 2.3'
 
 pod 'DZNEmptyDataSet'
 
+pod 'DZNEmptyDataSet'
+
+pod 'JPush'
+
+pod 'mob_sharesdk/ShareSDKPlatforms/WeWork'#企业微信
+pod 'mob_sharesdk/ShareSDKPlatforms/LinkedIn'#领英
+pod 'mob_sharesdk/ShareSDKPlatforms/WhatsApp'#WhatsApp
+pod 'mob_sharesdk/ShareSDKPlatforms/Facebook'#Facebook
+pod 'mob_sharesdk/ShareSDKPlatforms/Instagram'#Instagram
+pod 'mob_sharesdk/ShareSDKPlatforms/Messenger'#Messenger
+
 end

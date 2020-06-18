@@ -7,11 +7,9 @@
 //
 
 #import "ZWShareManager.h"
-#import "JhScrollActionSheetView.h"
-#import "JhPageItemModel.h"
+#import "UIViewController+YCPopover.h"
+#import "ZWShareViewController.h"
 
-#import "JhScrollActionSheetView.h"
-#import "JhPageItemModel.h"
 #import <ShareSDK/ShareSDK.h>
 #import <ShareSDKUI/ShareSDK+SSUI.h>
 
@@ -21,7 +19,6 @@
 @end
 
 @implementation ZWShareManager
-
 static ZWShareManager *shareManager = nil;
 
 + (instancetype)shareManager{
@@ -32,158 +29,46 @@ static ZWShareManager *shareManager = nil;
     return shareManager;
 }
 
--(NSMutableArray *)shareArray{
-    if (!_shareArray) {
-        _shareArray = [NSMutableArray new];
-        
-        NSArray *data = @[
-                          @{
-                              @"text" : @"微信",
-                              @"img" : @"weixing",
-                              },
-                          @{
-                              @"text" : @"朋友圈",
-                              @"img" : @"friends",
-                              },
-                          @{
-                              @"text" : @"微博",
-                              @"img" : @"sina",
-                              },
-                          @{
-                              @"text" : @"QQ",
-                              @"img" : @"qq",
-                              },
-                          @{
-                              @"text" : @"QQ空间",
-                              @"img" : @"kongjian",
-                              }];
-        
-        for (NSDictionary *mydic in data) {
-            JhPageItemModel *model = [JhPageItemModel parseJSON:mydic];
-            [self.shareArray addObject:model];
-        }
-    }
-    return _shareArray;
-}
-
--(NSMutableArray *)otherArray {
-    if (!_otherArray) {
-        _otherArray = [NSMutableArray new];
-        
-        NSArray *data = @[
-                          @{
-                              @"text" : @"二维码",
-                              @"img" : @"QrCode_icon",
-                          }];
-        
-        for (NSDictionary *mydic in data) {
-            JhPageItemModel *model = [JhPageItemModel parseJSON:mydic];
-            [self.otherArray addObject:model];
-        }
-    }
-    return _otherArray;
-}
-
-- (void)shareWithData:(ZWShareModel *)model {
+//配置分享
+- (void)configurationShare {
     
-    __weak typeof (self) weakSelf = self;
-    [JhScrollActionSheetView showShareActionSheetWithTitle:@"分享" shareDataArray:self.shareArray handler:^(JhScrollActionSheetView *actionSheet, NSInteger index) {
-        __strong typeof (weakSelf) strongSelf = weakSelf;
-        NSLog(@" 点击分享 index %ld ",(long)index);
-        switch (index) {
-            case 0:
-                [strongSelf createShare:SSDKPlatformTypeWechat withData:model];
-                break;
-            case 1:
-                [strongSelf createShare:SSDKPlatformSubTypeWechatTimeline withData:model];
-                break;
-            case 2:
-                [strongSelf createShare:SSDKPlatformTypeSinaWeibo withData:model];
-                break;
-            case 3:
-                [strongSelf createShare:SSDKPlatformSubTypeQQFriend withData:model];
-                break;
-            case 4:
-                [strongSelf createShare:SSDKPlatformSubTypeQZone withData:model];
-                break;
-            default:
-                break;
-        }
+    [ShareSDK registPlatforms:^(SSDKRegister *platformsRegister) {
+        //qq
+        [platformsRegister setupQQWithAppId:@"1109867121" appkey:@"DNGpOAanS53E9fcn"];
+        //wechat
+        [platformsRegister setupWeChatWithAppId:@"wxaaec29e7bfc06754" appSecret:@"Z0myRYwq1RRPyyvz2x4Kt6yz67CD0HNZ"];
+        //新浪
+        [platformsRegister setupSinaWeiboWithAppkey:@"662488503" appSecret:@"a2ec413365b4d170fdc245235be8e3cf" redirectUrl:@"http://open.weibo.com/apps/662488503/privilege/oauth"];
+        //wework
+        [platformsRegister setupWeWorkByAppKey:@"wwauth5e96ba6ddfb8841d000004" corpId:@"ww5e96ba6ddfb8841d" agentId:@"1000004" appSecret:@"X1W9bX-yq99_MwDzMps6lzpQZmlZyL3N_c25KFnablM"];
+        //Facebook
+        [platformsRegister setupFacebookWithAppkey:@"708358196633797" appSecret:@"39f65f525708046cb51c5d2b5758051a" displayName:@"csnum"];
+        //Twitter
+        [platformsRegister setupTwitterWithKey:@"" secret:@"" redirectUrl:@"http://mob.com"];
+        //领英
+        [platformsRegister setupLinkedInByApiKey:@"866n7sb1zgy8nl" secretKey:@"5vRwRZ2ncdSjwGhK" redirectUrl:@"http://www.csnum.com/auth/linkedin/callback"];
+        //Instagram
+        [platformsRegister setupInstagramWithClientId:@"708358196633797" clientSecret:@"39f65f525708046cb51c5d2b5758051a" redirectUrl:@""];
     }];
-    
 }
 
-
-- (void)shareTwoActionSheetWithData:(ZWShareModel *)model {
+- (void)showShareAlertWithViewController:(UIViewController *)viewController
+                           withDataModel:(ZWShareModel *)model
+                           withExtension:(id)extension
+                                withType:(NSInteger)type {
     
-    JhScrollActionSheetView *actionSheet = [[JhScrollActionSheetView alloc]initWithTitle:@"分享" shareDataArray:self.shareArray otherDataArray:self.otherArray];
-    __weak typeof (self) weakSelf = self;
-    actionSheet.clickShareBlock = ^(JhScrollActionSheetView *actionSheet, NSInteger index) {
-        __strong typeof (weakSelf) strongSelf = weakSelf;
-        NSLog(@" 点击分享 index %ld ",(long)index);
-        switch (index) {
-            case 0:
-                [strongSelf createShare:SSDKPlatformTypeWechat withData:model];
-                break;
-            case 1:
-                [strongSelf createShare:SSDKPlatformSubTypeWechatTimeline withData:model];
-                break;
-            case 2:
-                [strongSelf createShare:SSDKPlatformTypeSinaWeibo withData:model];
-                break;
-            case 3:
-                [strongSelf createShare:SSDKPlatformSubTypeQQFriend withData:model];
-                break;
-            case 4:
-                [strongSelf createShare:SSDKPlatformSubTypeQZone withData:model];
-                break;
-            default:
-                break;
-        }
-    };
+    NSDictionary *myDic = (NSDictionary *)extension;
+    NSLog(@"-------%@",myDic);
+    NSLog(@"=======%@",extension);
     
-    actionSheet.clickOtherBlock = ^(JhScrollActionSheetView *actionSheet, NSInteger index) {
-        __strong typeof (weakSelf) strongSelf = weakSelf;
-        if ([strongSelf.delegate respondsToSelector:@selector(clickItemWithIndex:)]) {
-            [strongSelf.delegate clickItemWithIndex:index];
-        }
-    };
-    [actionSheet show];
-}
-
-
-- (void)createShare:(SSDKPlatformType)type withData:(ZWShareModel *)model {
     
-    NSMutableDictionary *shareParams = [NSMutableDictionary dictionary];
-    NSString *text;
-    if (type == SSDKPlatformTypeSinaWeibo) {
-        text = model.shareUrl;
-    }else {
-        text = model.shareDetail;
-    }
-    [shareParams SSDKSetupShareParamsByText:text
-                                     images:model.shareTitleImage
-                                        url:[NSURL URLWithString:model.shareUrl]
-                                      title:model.shareName
-                                       type:SSDKContentTypeAuto];
-    
-    [ShareSDK share:type parameters:shareParams onStateChanged:^(SSDKResponseState state, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error) {
-        switch (state) {
-            case SSDKResponseStateSuccess:
-            {
-                NSLog(@"分享成功");
-                break;
-            }
-            case SSDKResponseStateFail:
-            {
-                NSLog(@"分享失败");
-                break;
-            }
-            default:
-                break;
-        }
+    ZWShareViewController *shareVC = [[ZWShareViewController alloc]init];
+    shareVC.model = model;
+    shareVC.type = type;
+    shareVC.extension = extension;
+    [viewController yc_bottomPresentController:shareVC presentedHeight:0.3*kScreenWidth+zwTabBarHeight completeHandle:^(BOOL presented) {
+        
     }];
-    
 }
 
 @end

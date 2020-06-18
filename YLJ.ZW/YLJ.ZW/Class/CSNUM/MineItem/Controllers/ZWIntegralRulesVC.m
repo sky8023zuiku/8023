@@ -7,8 +7,11 @@
 //
 
 #import "ZWIntegralRulesVC.h"
+#import <WebKit/WebKit.h>
 
-@interface ZWIntegralRulesVC ()
+@interface ZWIntegralRulesVC ()<WKUIDelegate,WKNavigationDelegate>
+
+@property(nonatomic, strong)WKWebView *webView;
 
 @end
 
@@ -38,14 +41,20 @@
 - (void)createUI {
     
     self.view.backgroundColor = [UIColor whiteColor];
+    
+    WKWebViewConfiguration *conf = [[WKWebViewConfiguration alloc]init];
+    conf.preferences = [[WKPreferences alloc]init];
+    conf.preferences.minimumFontSize = 10;
+    conf.preferences.javaScriptEnabled = YES;
+    conf.userContentController = [[WKUserContentController alloc]init];
+    conf.processPool = [[WKProcessPool alloc]init];
 
-    UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(10, 0, kScreenWidth-20, 0.35*kScreenWidth)];
-    NSMutableAttributedString * tncString = [[NSMutableAttributedString alloc]initWithString:@"1、用户邀请新用户注册后，可获得50会展币\n2、会展币可在该平台产生消费时可用做抵扣\n3、会展币永不清零。\n4、该规则最终解释权归上海展网网络科技有限公司所有。"];
-    myLabel.font = normalFont;
-    myLabel.lineBreakMode = NSLineBreakByWordWrapping;
-    myLabel.attributedText = tncString;
-    myLabel.numberOfLines = 0;
-    [self.view addSubview:myLabel];
+    self.webView = [[WKWebView alloc]initWithFrame:CGRectMake(0.01*kScreenWidth, 0, 0.98*kScreenWidth, kScreenHeight-zwNavBarHeight) configuration:conf];
+    self.webView.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:self.webView];
+    
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"rules_ex_coin.html" ofType:nil];
+    [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:path]]];
     
 
 }

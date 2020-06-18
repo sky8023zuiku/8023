@@ -10,8 +10,10 @@
 #import "ZWHomeVC.h"
 #import "ZWMineVC.h"
 
+#import "ZWMineVC02.h"
 
-#import "ZWServiceVC.h"//v0
+
+//#import "ZWServiceVC.h"//v0
 #import "ZWExhibitionServerVC.h"//v1
 
 
@@ -23,6 +25,11 @@
 #import <UIView+MJExtension.h>
 
 #import "ZWLogOutRequest.h"
+
+#import <JPUSHService.h>
+
+#import "ZWMessageNumAction.h"
+#import "ZWMineSaveSpellListAction.h"
 
 @interface ZWMainTabBarController ()<UITabBarDelegate,UITabBarControllerDelegate,ZWHomeVCDelegate>
 @property(nonatomic, assign)NSInteger oldSelectIndex;
@@ -43,7 +50,11 @@
     [self createTabBar];
     [self requestScreeningData];
     [self createNotice];
+    [self createJPush];
+    
+    [[ZWMessageNumAction shareAction]takeMessageNumber];
 }
+
 - (void)createNotice {
     //退出登陆时接收通知
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(logout:) name:@"beBroughtUp" object:nil];
@@ -68,6 +79,16 @@
 -(void)logOutRequest {
     //删除本地数据
     [self clearAllUserDefaultsData];
+    //退出登陆时删除设备别名
+    [JPUSHService deleteAlias:^(NSInteger iResCode, NSString *iAlias, NSInteger seq) {
+               
+    } seq:120];
+    //推出登陆时删除标记
+    [JPUSHService deleteTags:[self takeTag] completion:^(NSInteger iResCode, NSSet *iTags, NSInteger seq) {
+        
+    } seq:130];
+    //删除本地所有拼单数据
+    [[ZWMineSaveSpellListAction shareAction]removeAllSpellList];
 }
 
 - (void)clearAllUserDefaultsData{
@@ -154,7 +175,8 @@
     navThree.navigationBar.translucent = NO;
     [navThree.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
     
-    ZWMineVC *fourVC = [[ZWMineVC alloc]init];
+//    ZWMineVC *fourVC = [[ZWMineVC alloc]init];
+    ZWMineVC02 *fourVC = [[ZWMineVC02 alloc]init];
     fourVC.title = @"个人中心";
     [self createVC:fourVC Title:@"个人中心" imageName:@"zai_icon_dibu_geren_no" selectImage:@"zai_icon_dibu_geren_click"];
     UINavigationController *navFour = [[UINavigationController alloc]initWithRootViewController:fourVC];
@@ -209,7 +231,7 @@
 }
 
 - (void)postNoticeWithType:(NSInteger)type {
-    [[NSNotificationCenter defaultCenter]postNotificationName:@"rollingTableView" object:[NSString stringWithFormat:@"%ld",type]];
+    [[NSNotificationCenter defaultCenter]postNotificationName:@"rollingTableView" object:[NSString stringWithFormat:@"%ld",(long)type]];
 }
 
 
@@ -314,6 +336,7 @@
     }];
     
 }
+
 - (void)requestIndustriesList {
     NSDictionary *mydic = @{@"level":@"2"};
 //    NSDictionary *mydic = @{};
@@ -326,14 +349,16 @@
     }];
 }
 
-
 - (void)requestUserInfo {
     
+    __weak typeof (self) weakSelf = self;
     [[ZWDataAction sharedAction]getReqeustWithURL:zwTakeUserInfo parametes:@{} successBlock:^(NSDictionary * _Nonnull data) {
+        __strong typeof (weakSelf) strongSelf = weakSelf;
         if (zw_issuccess) {
             NSDictionary *myDic = data[@"data"];
             if (myDic) {
                 [[ZWSaveDataAction shareAction]saveUserInfoData:myDic];
+                [strongSelf createJPush];
             }
         }
     } failureBlock:^(NSError * _Nonnull error) {
@@ -342,6 +367,57 @@
     
 }
 
+//设置推送
+- (void)createJPush {
+    
+    NSDictionary *userInfo = [[ZWSaveDataAction shareAction]takeUserInfoData];
+
+    NSLog(@"我的用户信息是什么 == %@",userInfo[@"roleId"]);
+    //设置设备别名
+    [JPUSHService setAlias:userInfo[@"phone"] completion:^(NSInteger iResCode, NSString *iAlias, NSInteger seq) {
+        
+        NSLog(@"%ld",(long)iResCode);
+        NSLog(@"%@",iAlias);
+        NSLog(@"%ld",(long)seq);
+        
+    } seq:120];
+    //标记设备
+    [JPUSHService setTags:[self takeTag] completion:^(NSInteger iResCode, NSSet *iTags, NSInteger seq) {
+        
+    } seq:130];
+}
+
+
+-(NSSet *)takeTag {
+    NSDictionary *userInfo = [[ZWSaveDataAction shareAction]takeUserInfoData];
+    NSInteger roleId = [userInfo[@"roleId"] integerValue];
+    NSString *tagStr;
+    if (roleId == 1) {
+        tagStr = @"ROLE1";
+    }else if (roleId == 2) {
+        tagStr = @"ROLE2";
+    }else if (roleId == 3) {
+        tagStr = @"ROLE3";
+    }else if (roleId == 4) {
+        tagStr = @"ROLE4";
+    }else if (roleId == 5) {
+        tagStr = @"ROLE5";
+    }else if (roleId == 6) {
+        tagStr = @"ROLE6";
+    }else if (roleId == 7) {
+        tagStr = @"ROLE7";
+    }else if (roleId == 8) {
+        tagStr = @"ROLE8";
+    }else if (roleId == 9) {
+        tagStr = @"ROLE9";
+    }else if (roleId == 10) {
+        tagStr = @"ROLE10";
+    }else {
+        tagStr = @"ROLE13";
+    }
+    NSSet *myTag = [NSSet setWithObject:tagStr];
+    return myTag;
+}
 
 
 @end

@@ -7,62 +7,25 @@
 //
 
 #import "ZWMyIndustriesVC.h"
-#import "ZWMyIndustrinesCell.h"
-#import "ZWCollectionViewAddCell.h"
-#import "ZWChosenIndustriesModel.h"
-#import "MPGestureLayout.h"
-#import "ZWSelectIndustriesVC.h"
-#import <MBProgressHUD.h>
+#import "ZWMyInvolveIndustesVC.h"
+#import "ZWMyExhibitionIndustriesVC.h"
+#import "ZWMyInterestIndustriesVC.h"
+#import "ZWSelectCertificationVC.h"
 
-@interface ZWMyIndustriesVC ()<UICollectionViewDataSource ,UICollectionViewDelegate,MPGestureLayout>
-@property(nonatomic, strong)UICollectionView *collectionView;
-@property(nonatomic, strong)MPGestureLayout *layout;
-@property(nonatomic, assign)NSInteger itemNum;
-@property(nonatomic, strong)NSMutableArray *dataArray;
-@property (strong, nonatomic)UIView *deleteView;
-@property(nonatomic, strong)ZWChosenIndustriesModel *compareModel;
+@interface ZWMyIndustriesVC ()<UITableViewDelegate,UITableViewDataSource>
+@property(nonatomic, strong)UITableView *tableView;
 @end
 
 @implementation ZWMyIndustriesVC
--(UICollectionView *)collectionView {
-    if (!_collectionView) {
-        _collectionView = [[UICollectionView alloc]initWithFrame:CGRectMake(0, 0.1*kScreenWidth, kScreenWidth, kScreenHeight) collectionViewLayout:_layout];
-        _collectionView.delegate=self;
-        _collectionView.dataSource=self;
-        _collectionView.backgroundColor = [UIColor whiteColor];
-        [_collectionView registerClass:[ZWMyIndustrinesCell class] forCellWithReuseIdentifier:@"ZWMyIndustrinesCell"];
-        [_collectionView registerClass:[ZWCollectionViewAddCell class] forCellWithReuseIdentifier:@"ZWCollectionViewAddCell"];
-        _collectionView.showsVerticalScrollIndicator=NO;
-        _collectionView.showsHorizontalScrollIndicator=NO;
-        _collectionView.showsVerticalScrollIndicator = NO;
-        _collectionView.backgroundColor = zwGrayColor;
+-(UITableView *)tableView {
+    if (!_tableView) {
+        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
     }
-    return _collectionView;
-}
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    [self takeIndustriesList];
-}
-
-- (void)takeIndustriesList {
-    
-    NSDictionary *userInfo = [[ZWSaveDataAction shareAction]takeUserInfoData];
-    NSArray *myData = userInfo[@"industryVoList"];
-    NSMutableArray *myArray = [NSMutableArray array];
-    for (NSDictionary *myDic in myData) {
-        ZWChosenIndustriesModel *model = [[ZWChosenIndustriesModel alloc]init];
-        model.industries2Id = myDic[@"secondIndustryId"];
-        model.industries2Name = myDic[@"secondIndustryName"];
-        model.industries3Id = myDic[@"thirdIndustryId"];
-        model.industries3Name = myDic[@"thirdIndustryName"];
-        [myArray addObject:model];
-    }
-    self.dataArray = myArray;
-    if (self.dataArray.count != 0 ) {
-        self.compareModel = self.dataArray[0];
-    }
-    [self.collectionView reloadData];
-    
+    _tableView.delegate = self;
+    _tableView.dataSource = self;
+    _tableView.sectionHeaderHeight = 0;
+    _tableView.sectionFooterHeight = 0;
+    return _tableView;
 }
 
 - (void)viewDidLoad {
@@ -72,233 +35,115 @@
 }
 - (void)createNavigationBar {
     [[YNavigationBar sharedInstance]createLeftBarWithImage:[UIImage imageNamed:@"zai_dao_icon_left"] barItem:self.navigationItem target:self action:@selector(goBack:)];
-    [[YNavigationBar sharedInstance]createRightBarWithTitle:@"编辑" barItem:self.navigationItem target:self action:@selector(rightItemClick:)];
 }
 - (void)goBack:(UINavigationItem *)item {
     [self.navigationController popViewControllerAnimated:YES];
 }
-- (void)rightItemClick:(UINavigationItem *)item {
-    [self takeListOfIndustries];
+
+- (void)createUI {
+    self.view.backgroundColor = zwGrayColor;
+    
+    NSLog(@"------%@",self.roleId);
+    
+    
+    [self.view addSubview:self.tableView];
 }
-- (void)takeListOfIndustries {
-    __weak typeof(self) weakSelf = self;
-    [[ZWDataAction sharedAction]getReqeustWithURL:zwIndustriesList parametes:@{} successBlock:^(NSDictionary * _Nonnull data) {
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return 3;
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    static NSString *myCell = @"cell";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:myCell];
+    if (!cell) {
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:myCell];
+    }else {
+        for (UIView *view in cell.contentView.subviews) {
+            [view removeFromSuperview];
+        }
+    }
+    NSArray *titles = @[@"我感兴趣的行业",@"我涉及的行业",@"我查看的行业（展会）"];
+    NSArray *detailTexts = @[@"观众、展商、会展服务商",@"展商、会展服务商",@"展商vip"];
+    cell.textLabel.text = titles[indexPath.row];
+    cell.textLabel.font = normalFont;
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.detailTextLabel.text = detailTexts[indexPath.row];
+    cell.detailTextLabel.font = smallMediumFont;
+    cell.detailTextLabel.textColor = [UIColor grayColor];
+    return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 0.1*kScreenHeight;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    return 0.1;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    return 0.1;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.row == 0) {
+        
+        ZWMyInterestIndustriesVC *industriesVC = [[ZWMyInterestIndustriesVC alloc]init];
+        [self.navigationController pushViewController:industriesVC animated:YES];
+        
+    }else if (indexPath.row == 1) {
+        if ([self.roleId integerValue] == 1||[self.roleId integerValue] == 12||[self.roleId integerValue] == 13) {
+            __weak typeof (self) weakSelf = self;
+            [[ZWAlertAction sharedAction]showTwoAlertTitle:@"提示" message:@"您还不是未认证企业，是否前去认证？" cancelTitle:@"否" confirmTitle:@"是" actionOne:^(UIAlertAction * _Nonnull actionOne) {
+                __strong typeof (weakSelf) strongSelf = weakSelf;
+                [strongSelf goToTheCertification];
+            } actionCancel:^(UIAlertAction * _Nonnull actionCancel) {
+                
+            } showInView:self];
+        } else {
+            ZWMyInvolveIndustesVC *industesVC = [[ZWMyInvolveIndustesVC alloc]init];
+            industesVC.title = @"我涉及的行业";
+            industesVC.roleId = self.roleId;
+            [self.navigationController pushViewController:industesVC animated:YES];
+        }
+    }else {
+        if ([self.roleId integerValue] == 3) {
+            ZWMyExhibitionIndustriesVC *industesVC = [[ZWMyExhibitionIndustriesVC alloc]init];
+            industesVC.title = @"展会行业";
+            [self.navigationController pushViewController:industesVC animated:YES];
+        } else if ([self.roleId integerValue] == 4) {
+            [self showOneAlertWithMessage:@"尊敬的展商svip，您已经可以查看所有在线展会的信息了，所以无需设置能查看的展会行业"];
+        } else {
+            [self showOneAlertWithMessage:@"抱歉，该功能只对展商vip开放"];
+        }
+    }
+}
+- (void)goToTheCertification {
+    __weak typeof (self) weakSelf = self;
+    [[ZWDataAction sharedAction]getReqeustWithURL:zwCompanyCertification parametes:@{} successBlock:^(NSDictionary * _Nonnull data) {
         __strong typeof (weakSelf) strongSelf = weakSelf;
         if (zw_issuccess) {
-
-            ZWSelectIndustriesVC *industriesVC = [[ZWSelectIndustriesVC alloc]init];
-            industriesVC.myIndustries = data[@"data"];
-            industriesVC.title = @"选择您所涉及的行业";
-            industriesVC.industriesArr = strongSelf.dataArray;
-            industriesVC.type = 2;
-            [strongSelf.navigationController pushViewController:industriesVC animated:YES];
-            
+            NSDictionary *myData = data[@"data"];
+            ZWSelectCertificationVC *selectVC = [[ZWSelectCertificationVC alloc]init];
+            selectVC.title = @"选择企业类型";
+            selectVC.hidesBottomBarWhenPushed = YES;
+            selectVC.authenticationStatus = [myData[@"authenticationStatus"] integerValue];
+            selectVC.identityId = [myData[@"identityId"] integerValue];
+            [strongSelf.navigationController pushViewController:selectVC animated:YES];
         }
     } failureBlock:^(NSError * _Nonnull error) {
 
     } showInView:self.view];
 }
 
-
-- (void)createUI {
-    self.view.backgroundColor = zwGrayColor;
-    
-    _layout=[[MPGestureLayout alloc]init];
-    [_layout prepareLayout];
-    //设置每个cell与相邻的cell之间的间距
-    _layout.minimumInteritemSpacing = 1;
-    _layout.delegate = self;
-    _layout.sectionInset = UIEdgeInsetsMake(0, 0.03*kScreenWidth, 0.03*kScreenWidth, 0.03*kScreenWidth);
-    _layout.minimumLineSpacing=0.03*kScreenWidth;
-    _layout.scrollDirection = UICollectionViewScrollDirectionVertical;
-    
-    [self.view addSubview:self.collectionView];
-    
-    
-    CGRect deleteRect = CGRectMake(0, kScreenHeight-zwNavBarHeight, kScreenWidth, zwTabBarHeight);
-    UIView *view  = [[UIView alloc] initWithFrame:deleteRect];
-    view.backgroundColor = [UIColor redColor];
-    
-    self.deleteView = view;
-    [self.view addSubview:view];
-    
-    UILabel *noticeLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0, 0.9*kScreenWidth, 0.15*kScreenWidth)];
-    noticeLabel.text = @"注：将按钮拖拽到第一个位置可变更默认行业！";
-    noticeLabel.font = normalFont;
-    noticeLabel.textColor = [UIColor colorWithRed:200.0/255.0 green:200.0/255.0 blue:200.0/255.0 alpha:1];
-    [self.view addSubview:noticeLabel];
-    
+- (void)showOneAlertWithMessage:(NSString *)message {
+    [[ZWAlertAction sharedAction]showOneAlertTitle:@"提示" message:message confirmTitle:@"我知道了" actionOne:^(UIAlertAction * _Nonnull actionOne) {
+        
+    } showInView:self];
 }
-
-
-#pragma UICollectionView
-- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-    return 1;
-}
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.dataArray.count;
-}
-
-- (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    
-    ZWChosenIndustriesModel *model = self.dataArray[indexPath.row];
-    ZWMyIndustrinesCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"ZWMyIndustrinesCell" forIndexPath:indexPath];
-    cell.backgroundColor = [UIColor whiteColor];
-    cell.layer.cornerRadius = 5;
-    cell.secondLB.text = model.industries2Name;
-    cell.thirdLB.text = model.industries3Name;
-    cell.layer.masksToBounds = YES;
-    
-
-    CGFloat width = (kScreenWidth-0.12*kScreenWidth)/3;
-    CGFloat height = (kScreenWidth-0.12*kScreenWidth)/3;
-    
-    CGFloat labelW = [[ZWToolActon shareAction]adaptiveTextWidth:@"默认" labelFont:smallFont]+10;
-    UILabel*defaultLabel = [[UILabel alloc]initWithFrame:CGRectMake(width-labelW, 0, labelW, 0.13*height)];
-    defaultLabel.text = @"默认";
-    defaultLabel.font = smallFont;
-    defaultLabel.backgroundColor = skinColor;
-    defaultLabel.textAlignment = NSTextAlignmentCenter;
-    defaultLabel.textColor = [UIColor whiteColor];
-    [cell addSubview:defaultLabel];
-    
-    UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect: defaultLabel.bounds byRoundingCorners:UIRectCornerBottomLeft cornerRadii:CGSizeMake(5,5)];
-    //创建 layer
-    CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
-    maskLayer.frame = defaultLabel.bounds;
-    //赋值
-    maskLayer.path = maskPath.CGPath;
-    defaultLabel.layer.mask = maskLayer;
-    
-    if (indexPath.row == 0) {
-        cell.layer.borderColor = skinColor.CGColor;
-        cell.layer.borderWidth = 2;
-        defaultLabel.backgroundColor = skinColor;
-    }else {
-        cell.layer.borderColor = zwGrayColor.CGColor;
-        cell.layer.borderWidth = 0;
-        defaultLabel.backgroundColor = [UIColor whiteColor];
-    }
-    
-    return cell;
-            
-}
-
-//定义每一个cell的大小
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return CGSizeMake((kScreenWidth-0.12*kScreenWidth)/3, (kScreenWidth-0.12*kScreenWidth)/3);
-}
-
-//cell的点击事件
--(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    
-    NSLog(@"确认选择");
-    
-}
--(void)collectionView:(UICollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath {
-    
-    NSLog(@"取消选择");
-}
-
-- (BOOL)collectionView:(UICollectionView *)collectionView shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    NSLog(@"彻底取消");
-    return true;
-}
-
--(CGSize)collectionView:(UICollectionView*)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section
-{
-    CGSize size = CGSizeMake(kScreenWidth, 0.03*kScreenWidth);
-    return size;
-}
-
-- (void)mp_moveDataItem:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-    [self.dataArray exchangeObjectAtIndex:fromIndexPath.row withObjectAtIndex:toIndexPath.row];
-    
-}
-
-- (void)mp_removeDataObjectAtIndex:(NSIndexPath *)index {
-
-      [self.dataArray removeObjectAtIndex:index.row];
-}
-
-- (CGRect)mp_RectForDelete {
-
-    return  CGRectMake(0, self.view.frame.size.height-50, YScreenWidth, 50);
-
-}
-
-//- (NSArray<NSIndexPath *> *)mp_disableMoveItemArray {
-//    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.dataArray.count-1 inSection:0];
-//    return @[indexPath];
-//
-//}
-
-- (void)mp_didMoveToDeleteArea {
-    
-}
-
-- (void)mp_didLeaveToDeleteArea {
-
-    
-}
-
-- (void)mp_willBeginGesture {
-    
-}
-
-- (void)mp_didEndGesture {
-    ZWChosenIndustriesModel *model = self.dataArray[0];
-    if (![self.compareModel.industries3Id isEqualToNumber:model.industries3Id]) {
-        [self updateMyMainIndustries];
-    }
-}
-- (void)updateMyMainIndustries {
-    NSMutableArray *myArray = [NSMutableArray array];
-    for (ZWChosenIndustriesModel *model in self.dataArray) {
-        [myArray addObject:model.industries3Id];
-    }
-    
-    NSDictionary *parametes;
-    if (myArray) {
-        parametes = @{@"industryList":myArray,
-                      @"defaultIndustryId":myArray[0]};
-    }
-    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    __weak typeof (self) weakSelf = self;
-    [[ZWDataAction sharedAction]postReqeustWithURL:zwUpdateMyIndustriesList parametes:parametes successBlock:^(NSDictionary * _Nonnull data) {
-        __strong typeof (weakSelf) strongSelf = weakSelf;
-        if (zw_issuccess) {
-            [[NSNotificationCenter defaultCenter]postNotificationName:@"refreshExhibitorsPageData" object:nil];
-            [strongSelf updateUserInfo];
-        }
-    } failureBlock:^(NSError * _Nonnull error) {
-        [MBProgressHUD hideHUDForView:self.view animated:YES];
-    }];
-}
-
-- (void)updateUserInfo {
-    __weak typeof (self) weakSelf = self;
-    [[ZWDataAction sharedAction]getReqeustWithURL:zwTakeUserInfo parametes:@{} successBlock:^(NSDictionary * _Nonnull data) {
-        __strong typeof (weakSelf) strongSelf = weakSelf;
-        [MBProgressHUD hideHUDForView:self.view animated:YES];
-        if (zw_issuccess) {
-            
-            NSDictionary *myDic = data[@"data"];
-            if (myDic) {
-                [[ZWSaveDataAction shareAction]saveUserInfoData:myDic];
-            }
-            [strongSelf takeIndustriesList];
-        }
-    } failureBlock:^(NSError * _Nonnull error) {
-       [MBProgressHUD hideHUDForView:self.view animated:YES];
-    }];
-}
-
-
-
-- (UIView *)mp_moveMainView{
-    return self.view;
-}
-
 
 @end

@@ -203,17 +203,10 @@
     if (indexPath.section == 0) {
         if (indexPath.row == 2) {
             if (self.model.telephone) {
-                [self takeCallWithValue:self.model.telephone];
+                [[ZWToolActon shareAction]dialTheNumber:self.model.telephone];
             }
         }
     }
-}
-- (void)takeCallWithValue:(NSString *)value {
-    NSLog(@"我的值是什么%@",value);
-    NSMutableString * str=[[NSMutableString alloc] initWithFormat:@"tel:%@",value];
-    UIApplication *application = [UIApplication sharedApplication];
-    NSURL *URL = [NSURL URLWithString:str];
-    [application openURL:URL];
 }
 
 //点击图片的代理

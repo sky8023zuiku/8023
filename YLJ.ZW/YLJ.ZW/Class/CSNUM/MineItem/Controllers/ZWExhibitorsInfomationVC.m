@@ -15,8 +15,9 @@
 #import "MBProgressHUD.h"
 #import <QuickLook/QuickLook.h>
 #import "ZWDeliverMessageVC.h"
+#import "ZWPdfManager.h"
 
-@interface ZWExhibitorsInfomationVC ()<IQActionSheetPickerViewDelegate,UITableViewDelegate,UITableViewDataSource,QLPreviewControllerDataSource>
+@interface ZWExhibitorsInfomationVC ()<IQActionSheetPickerViewDelegate,UITableViewDelegate,UITableViewDataSource>
 
 //@property (nonatomic,strong) ZWNavExhibitorModel *ExhibitorModel;
 @property (strong, nonatomic) QLPreviewController *previewController;
@@ -67,7 +68,7 @@
             NSLog(@"%@",respense.data);
             NSDictionary *dataDic = respense.data[@"exhibitor"];
             NSMutableArray *array = [NSMutableArray array];
-            ZWExhibitorDetailsModel *model = [ZWExhibitorDetailsModel  parseJSON:dataDic];
+            ZWExhibitorDetailsModel *model = [ZWExhibitorDetailsModel  mj_objectWithKeyValues:dataDic];
             [array addObject:model];
             strongSelf.dataSource = array;
         }else {
@@ -76,25 +77,12 @@
         [strongSelf.tableView reloadData];
     }];
     
-//    [[ZWDataAction sharedAction]postReqeustWithURL:zwExhibitionExhibitorDetails parametes:@{@"exhibitorId":self.exhibitorId} successBlock:^(NSDictionary * _Nonnull data) {
-//
-//    } failureBlock:^(NSError * _Nonnull error) {
-//
-//    }];
-    
 }
 
 
 - (void)createUI {
-    self.view.backgroundColor = [UIColor redColor];
-    if (self.dataSource) {
-        
-    }
-    
+    self.view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.tableView];
-    
-    self.previewController  =  [[QLPreviewController alloc]  init];
-    self.previewController.dataSource  = self;
 }
 
 #pragma UITableViewDataSource
@@ -302,98 +290,21 @@
     messageVC.title = @"投递消息";
     [self.navigationController pushViewController:messageVC animated:YES];
     
-//    ZWDeliveryInforViewController *VC = [[ZWDeliveryInforViewController alloc] init];
-//    VC.merchantId = model.merchantId;
-//    [self.navigationController pushViewController:VC animated:YES];
-    
 }
 
 
 - (void)browseBtnClick:(UIButton *)btn {
+    
     ZWExhibitorDetailsModel *model = self.dataSource[0];
     if (! model.productUrl||[model.productUrl isEqualToString:@""]) {
         [self showOneAlertWithMessage:@"暂无产品手册"];
         return;
     }
-    [self downloadWithUrl:model.productUrl];
-}
-//下载文件
-- (void)downloadWithUrl:(NSString *)URLStr{
-    
-    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-    
-    AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
-
-    NSArray *array = [URLStr componentsSeparatedByString:@","];
+    NSArray *array = [model.productUrl componentsSeparatedByString:@","];
     NSString *urlStr = [NSString stringWithFormat:@"%@%@",httpImageUrl,[array objectAtIndex:1]];
     NSString *fileName = [NSString stringWithFormat:@"%@",[array objectAtIndex:0]]; //获取文件名称
-    NSURL *URL = [NSURL URLWithString:urlStr];
-    NSURLRequest *request = [NSURLRequest requestWithURL:URL];
+    [[ZWPdfManager shareManager]createPdfBreview:self withUrl:urlStr withFileName:fileName];
     
-    //判断是否存在
-    if([self isFileExist:fileName]) {
-        NSURL *documentsDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
-        NSURL *url = [documentsDirectoryURL URLByAppendingPathComponent:fileName];
-        self.fileURL = url;
-        [self presentViewController:self.previewController animated:YES completion:nil];
-    }else {
-        [MBProgressHUD showHUDAddedTo:[self getCurrentVC].view animated:YES];
-        NSURLSessionDownloadTask *downloadTask = [manager downloadTaskWithRequest:request progress:^(NSProgress *downloadProgress){
-            
-        } destination:^NSURL *(NSURL *targetPath, NSURLResponse *response) {
-            NSURL *documentsDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
-            NSURL *url = [documentsDirectoryURL URLByAppendingPathComponent:fileName];
-            return url;
-        } completionHandler:^(NSURLResponse *response, NSURL *filePath, NSError *error) {
-            [MBProgressHUD hideHUDForView:[self getCurrentVC].view animated:YES];
-            self.fileURL = filePath;
-            [self presentViewController:self.previewController animated:YES completion:nil];
-        }];
-        [downloadTask resume];
-    }
-    
-}
-
-#pragma mark - QLPreviewControllerDataSource
--(id<QLPreviewItem>)previewController:(QLPreviewController *)controller previewItemAtIndex:(NSInteger)index {
-    return self.fileURL;
-}
-
-- (NSInteger)numberOfPreviewItemsInPreviewController:(QLPreviewController *)previewController{
-    return 1;
-}
-
-//判断文件是否已经在沙盒中存在
--(BOOL) isFileExist:(NSString *)fileName
-{
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *path = [paths objectAtIndex:0];
-    NSString *filePath = [path stringByAppendingPathComponent:fileName];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    BOOL result = [fileManager fileExistsAtPath:filePath];
-    return result;
-}
-
-- (UIViewController *)getCurrentVC {
-    UIViewController *result = nil;
-    UIWindow * window = [[UIApplication sharedApplication] keyWindow];
-    if (window.windowLevel != UIWindowLevelNormal) {
-        NSArray *windows = [[UIApplication sharedApplication] windows];
-        for(UIWindow * tmpWin in windows) {
-            if (tmpWin.windowLevel == UIWindowLevelNormal) {
-                window = tmpWin;
-                break;
-            }
-        }
-    }
-    UIView *frontView = [[window subviews] objectAtIndex:0];
-    id nextResponder = [frontView nextResponder];
-    if ([nextResponder isKindOfClass:[UIViewController class]]) {
-        result = nextResponder;
-    } else {
-        result = window.rootViewController;
-    }
-    return result;
 }
 
 - (void)showOneAlertWithMessage:(NSString *)message {

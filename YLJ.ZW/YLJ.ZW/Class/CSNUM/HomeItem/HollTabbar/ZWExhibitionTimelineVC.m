@@ -11,6 +11,7 @@
 #import "ZWAnnouncementVC.h"
 #import <YYLabel.h>
 #import <YYText.h>
+#import "ZWPlansDetailVC.h"
 @interface ZWExhibitionTimelineVC ()<UITableViewDataSource,UITableViewDelegate>
 @property(nonatomic, strong)ZWBaseEmptyTableView *tableView;
 @property(nonatomic, assign)NSInteger page;
@@ -91,6 +92,7 @@
     UIImageView *titleImage = [[UIImageView alloc]initWithFrame:CGRectMake(0.025*kScreenWidth, 0.025*kScreenWidth, rowHeight-0.05*kScreenWidth, rowHeight-0.05*kScreenWidth)];
     [titleImage sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",httpImageUrl,model.url]] placeholderImage:[UIImage imageNamed:@"zw_zfzw_icon"]];
     titleImage.layer.cornerRadius = 3;
+    titleImage.contentMode = UIViewContentModeScaleAspectFit;
     titleImage.layer.masksToBounds = YES;
     [cell.contentView addSubview:titleImage];
     
@@ -165,6 +167,14 @@
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     return 0.01;
+}
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    ZWExhibitionTimelineModel *model = self.dataArray[indexPath.row];
+    ZWPlansDetailVC *detailVC = [[ZWPlansDetailVC alloc]init];
+    detailVC.ID = model.listID;
+    detailVC.title = @"计划展会详情";
+    detailVC.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:detailVC animated:YES];
 }
 
 

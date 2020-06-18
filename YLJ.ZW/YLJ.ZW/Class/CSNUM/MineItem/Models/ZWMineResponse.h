@@ -124,13 +124,12 @@ NS_ASSUME_NONNULL_BEGIN
  * 我收藏的展会列表
  */
 @interface ZWExhibitionListModel : ZWMineResponse
-
 @property(nonatomic, copy)NSString *listId;//展会id
 @property(nonatomic, copy)NSString *imageUrl;//标题图
 @property(nonatomic, copy)NSString *name;//标题
 @property(nonatomic, copy)NSString *country;//国家
 @property(nonatomic, copy)NSString *city;//城市
-@property(nonatomic, copy)NSNumber *collection;//
+@property(nonatomic, copy)NSString *collection;//
 @property(nonatomic, copy)NSString *endTime;//结束时间
 @property(nonatomic, copy)NSString *merchantCount;//收藏数量
 @property(nonatomic, copy)NSString *price;//价格
@@ -139,8 +138,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy)NSString *announcementImages;//公告
 @property(nonatomic, copy)NSString *myNewStartTime;//最新的开始时间
 @property(nonatomic, copy)NSString *myNewEndTime;//最新的结束时间
-
-+ (id)parseJSON:(NSDictionary *)jsonDic;
 @end
 /**
  * 我收藏的展会展商列表
@@ -217,7 +214,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy)NSString *productId;//产品id
 @property(nonatomic, copy)NSString *name;//产品名称
 @property(nonatomic, copy)NSString *url;//产品名称
-+ (id)parseJSON:(NSDictionary *)jsonDic;
 @end
 /**
  * 产品详情
@@ -282,7 +278,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy)NSString *url;
 @property(nonatomic, copy)NSString *created;//创建时间
 @property(nonatomic, copy)NSString *count;//数量
-+ (id)parseJSON:(NSDictionary *)jsonDic;
 @end
 
 /**

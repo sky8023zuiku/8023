@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ZWMyIndustriesVC : UIViewController
-
+@property(nonatomic, strong)NSNumber *roleId;
 @end
 
 NS_ASSUME_NONNULL_END

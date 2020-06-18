@@ -7,10 +7,7 @@
 //
 
 #import "ZWServiceProviderSearchResultsView.h"
-#import "ZWServiceRequst.h"
-#import "ZWServiceResponse.h"
 #import <MJRefresh.h>
-#import "ZWCompanyDetailVC.h"
 #import "ZWExhibitionServerDetailVC.h"
 #import "ZWExhServiceListCell.h"
 
@@ -103,7 +100,7 @@
     NSDictionary *myDic = @{
         @"merchantName":text,
         @"pageQuery":@{
-                @"pageNo":[NSString stringWithFormat:@"%ld",page],
+                @"pageNo":[NSString stringWithFormat:@"%ld",(long)page],
                 @"pageSize":@"10"
         }
     };
@@ -121,7 +118,8 @@
                 NSArray *array = data[@"data"][@"providerList"];
                 NSMutableArray *myArr = [NSMutableArray array];
                 for (NSDictionary *myDic in array) {
-                    ZWServiceProvidersListModel *model = [ZWServiceProvidersListModel parseJSON:myDic];
+//                    ZWServiceProvidersListModel *model = [ZWServiceProvidersListModel parseJSON:myDic];
+                    ZWExhibitionServerListModel *model = [ZWExhibitionServerListModel mj_objectWithKeyValues:myDic];
                     [myArr addObject:model];
                 }
                 [strongSelf.dataArray addObjectsFromArray:myArr];
@@ -150,9 +148,11 @@
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
 }
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.dataArray.count;
 }
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *myCell = @"cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:myCell];
@@ -168,82 +168,36 @@
 
     return cell;
 }
+
 - (void)createTableViewCell:(UITableViewCell *)cell cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    ZWServiceProvidersListModel *model = self.dataArray[indexPath.row];
-     
-//     UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0.045*kScreenWidth, 15, 0.28*kScreenWidth, 0.23*kScreenWidth)];
-//     imageView.image = [UIImage imageNamed:@"h1.jpg"];
-//     [imageView sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",httpImageUrl,model.imagesUrl]] placeholderImage:[UIImage imageNamed:@"fu_img_no_02"]];
-//     [cell.contentView addSubview:imageView];
-//
-//     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(imageView.frame)+5, CGRectGetMinY(imageView.frame), 0.4*kScreenHeight, 20)];
-//     titleLabel.text = model.name;
-//     titleLabel.font = boldNormalFont;
-//     titleLabel.textColor = [UIColor colorWithRed:240/255.0 green:150/255.0 blue:31/255.0 alpha:1.0];
-//     [cell.contentView addSubview:titleLabel];
-//
-//
-//     NSArray *labels = [NSArray arrayWithObjects:@"展台设计",@"展台搭建",@"展会相关", nil];
-//     NSArray *bgColors = @[[UIColor colorWithRed:200.0/255.0 green:227.0/255.0 blue:255.0/255.0 alpha:1],[UIColor colorWithRed:255/255.0 green:227/255.0 blue:200/255.0 alpha:1.0],[UIColor colorWithRed:255/255.0 green:200/255.0 blue:200/255.0 alpha:1.0]];
-//     NSArray *textColors = @[[UIColor colorWithRed:24/255.0 green:136/255.0 blue:255/255.0 alpha:1.0],[UIColor colorWithRed:240/255.0 green:150/255.0 blue:31/255.0 alpha:1.0],[UIColor colorWithRed:255/255.0 green:56/255.0 blue:56/255.0 alpha:1.0]];
-//
-//     for (int i = 0; i<labels.count ; i++) {
-//         UILabel *ywLabel = [[UILabel alloc]init];
-//         ywLabel.frame = CGRectMake(CGRectGetMinX(titleLabel.frame)+60*i, CGRectGetMaxY(titleLabel.frame)+18, 50, 20);
-//         ywLabel.backgroundColor = bgColors[i];
-//         ywLabel.textColor = textColors[i];
-//         ywLabel.text = labels[i];
-//         ywLabel.font = smallFont;
-//         ywLabel.textAlignment = NSTextAlignmentCenter;
-//         ywLabel.layer.cornerRadius = 2.5;
-//         ywLabel.layer.masksToBounds = YES;
-//         [cell.contentView addSubview:ywLabel];
-//     }
-//
-//     UILabel *detailLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(titleLabel.frame), CGRectGetMaxY(imageView.frame)-20, 0.8*kScreenWidth, 20)];
-//     detailLabel.text = model.speciality;
-//     detailLabel.font = normalFont;
-//     [cell.contentView addSubview:detailLabel];
-//
-//
-//     UIView *lineView = [[UIView alloc]initWithFrame:CGRectMake(0.045*kScreenWidth, 0.35*kScreenWidth-1, 0.91*kScreenWidth, 1)];
-//     lineView.backgroundColor = [UIColor colorWithRed:235/255.0 green:236/255.0 blue:237/255.0 alpha:1.0];
-//     [cell.contentView addSubview:lineView];
-    
-    
-//    ZWServiceProvidersListModel *model = self.dataArray[indexPath.row];
+    ZWExhibitionServerListModel *model = self.dataArray[indexPath.row];
     ZWExhServiceListCell *showCell = [[ZWExhServiceListCell alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 0.3*kScreenWidth)];
     showCell.model = model;
     [cell.contentView addSubview:showCell];
     UIView *lineView = [[UIView alloc]initWithFrame:CGRectMake(0.045*kScreenWidth, 0.3*kScreenWidth-1, 0.91*kScreenWidth, 1)];
     lineView.backgroundColor = [UIColor colorWithRed:235/255.0 green:236/255.0 blue:237/255.0 alpha:1.0];
     [cell.contentView addSubview:lineView];
-    
-    
-    
 }
 
 #pragma UITableViewDelegate
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return 0.3*kScreenWidth;
 }
+
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     return 0.1;
 }
+
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     return 0.1;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-//    ZWServiceProvidersListModel *model = self.dataArray[indexPath.row];
-//    ZWCompanyDetailVC *companyDetailVC = [[ZWCompanyDetailVC alloc]init];
-//    companyDetailVC.serviceId = [NSString stringWithFormat:@"%@",model.providersId];
-//    [self.ff_navViewController pushViewController:companyDetailVC animated:YES];
-    
-    
-    ZWServiceProvidersListModel *model = self.dataArray[indexPath.row];
+    ZWExhibitionServerListModel *model = self.dataArray[indexPath.row];
     ZWExhibitionServerDetailVC *VC = [[ZWExhibitionServerDetailVC alloc]init];
+    VC.hidesBottomBarWhenPushed = YES;
+    VC.shareModel = model;
     VC.merchantId = [NSString stringWithFormat:@"%@",model.providersId];
     [self.ff_navViewController pushViewController:VC animated:YES];
 }

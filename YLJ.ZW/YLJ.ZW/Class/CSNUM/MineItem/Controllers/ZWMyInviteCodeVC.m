@@ -37,7 +37,6 @@
     self.view.layer.cornerRadius = 5;
     self.view.layer.masksToBounds = YES;
     
-    
     UIImageView *headImage = [[UIImageView alloc]initWithFrame:CGRectMake(0.05*kScreenWidth, 0.05*kScreenWidth, 0.15*kScreenWidth, 0.15*kScreenWidth)];
     headImage.image = [UIImage imageNamed:@"h1.jpg"];
     headImage.layer.cornerRadius = 0.075*kScreenWidth;
@@ -93,99 +92,16 @@
     [ZWImageBrowser showImageV_img:self.QRimageView];
 }
 
-
-
--(NSMutableArray *)shareArray{
-    if (!_shareArray) {
-        _shareArray = [NSMutableArray new];
-        
-        NSArray *data = @[
-                          @{
-                              @"text" : @"微信",
-                              @"img" : @"weixing",
-                              },
-                          @{
-                              @"text" : @"朋友圈",
-                              @"img" : @"friends",
-                              },
-                          @{
-                              @"text" : @"微博",
-                              @"img" : @"sina",
-                              },
-                          @{
-                              @"text" : @"QQ",
-                              @"img" : @"qq",
-                              },
-                          @{
-                              @"text" : @"QQ空间",
-                              @"img" : @"kongjian",
-                              }];
-        
-        for (NSDictionary *mydic in data) {
-            JhPageItemModel *model = [JhPageItemModel parseJSON:mydic];
-            [self.shareArray addObject:model];
-        }
-    }
-    return _shareArray;
-}
-
 - (void)shareBtnClick:(UIButton *)btn {
-    [JhScrollActionSheetView showShareActionSheetWithTitle:@"分享" shareDataArray:self.shareArray handler:^(JhScrollActionSheetView *actionSheet, NSInteger index) {
-        NSLog(@" 点击分享 index %ld ",(long)index);
-        switch (index) {
-            case 0:
-                [self createShare:SSDKPlatformTypeWechat];
-                break;
-            case 1:
-                [self createShare:SSDKPlatformSubTypeWechatTimeline];
-                break;
-            case 2:
-                [self createShare:SSDKPlatformTypeSinaWeibo];
-                break;
-            case 3:
-                [self createShare:SSDKPlatformSubTypeQQFriend];
-                break;
-            case 4:
-                [self createShare:SSDKPlatformSubTypeQZone];
-                break;
-            default:
-                break;
-        }
-        
-    }];
+    [self createShare];
 }
-
-
-- (void)createShare:(SSDKPlatformType)type {
-        
-    NSMutableDictionary *shareParams = [NSMutableDictionary dictionary];
-    NSString *text;
-    if (type == SSDKPlatformTypeSinaWeibo) {
-        text = @"http://www.enet720.com/share/html/share.html";
-    }else {
-        text = @"app下载";
-    }
-    [shareParams SSDKSetupShareParamsByText:text
-                                     images:[UIImage imageNamed:@"app_store"]
-                                        url:[NSURL URLWithString:@"http://www.enet720.com/share/html/share.html"]
-                                      title:@"展网"
-                                       type:SSDKContentTypeAuto];
-    [ShareSDK share:type parameters:shareParams onStateChanged:^(SSDKResponseState state, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error) {
-        switch (state) {
-            case SSDKResponseStateSuccess:
-            {
-                NSLog(@"分享成功");
-                break;
-            }
-            case SSDKResponseStateFail:
-            {
-                NSLog(@"分享失败%@",error.userInfo);
-                break;
-            }
-            default:
-                break;
-        }
-    }];
+- (void)createShare {
+    ZWShareModel *model = [[ZWShareModel alloc]init];
+    model.shareName = @"app下载";
+    model.shareTitleImage = @"http://zhanwang.oss-cn-shanghai.aliyuncs.com/zwmds/2019_09_18_ios/app_store_zhanlogo.jpg";
+    model.shareUrl = @"http://www.enet720.com/share/html/share.html";
+    model.shareDetail = @"展网";
+    [[ZWShareManager shareManager]showShareAlertWithViewController:self withDataModel:model withExtension:@{} withType:0];
 }
 
 - (NSString *)dictionaryToJson:(NSDictionary *)dic
@@ -205,31 +121,7 @@
         __weak typeof (self) weakSelf = self;
         UIAlertAction *camera = [UIAlertAction actionWithTitle:@"发送给好友" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
             __strong typeof (weakSelf) strongSelf = weakSelf;
-            
-            [JhScrollActionSheetView showShareActionSheetWithTitle:@"分享" shareDataArray:self.shareArray handler:^(JhScrollActionSheetView *actionSheet, NSInteger index) {
-                NSLog(@" 点击分享 index %ld ",(long)index);
-                switch (index) {
-                    case 0:
-                        [strongSelf createImageShare:SSDKPlatformTypeWechat];
-                        break;
-                    case 1:
-                        [strongSelf createImageShare:SSDKPlatformSubTypeWechatTimeline];
-                        break;
-                    case 2:
-                        [strongSelf createImageShare:SSDKPlatformTypeSinaWeibo];
-                        break;
-                    case 3:
-                        [strongSelf createImageShare:SSDKPlatformSubTypeQQFriend];
-                        break;
-                    case 4:
-                        [strongSelf createImageShare:SSDKPlatformSubTypeQZone];
-                        break;
-                    default:
-                        break;
-                }
-                
-            }];
-            
+            [strongSelf createImageShare];
         }];
         UIAlertAction *share = [UIAlertAction actionWithTitle:@"保存到相册" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                     __strong typeof (weakSelf) strongSelf = weakSelf;
@@ -242,25 +134,13 @@
     }
 }
 
-- (void)createImageShare:(SSDKPlatformType)type {
-    NSMutableDictionary *shareParams = [NSMutableDictionary dictionary];
-    [shareParams SSDKSetupShareParamsByText:nil images:self.QRimageView.image url:nil title:nil type:SSDKContentTypeImage];
-    [ShareSDK share:type parameters:shareParams onStateChanged:^(SSDKResponseState state, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error) {
-        switch (state) {
-            case SSDKResponseStateSuccess:
-            {
-                NSLog(@"分享成功");
-                break;
-            }
-            case SSDKResponseStateFail:
-            {
-                NSLog(@"分享失败%@",error.userInfo);
-                break;
-            }
-            default:
-                break;
-        }
-    }];
+- (void)createImageShare {
+    ZWShareModel *model = [[ZWShareModel alloc]init];
+    model.shareName = @"";
+    model.shareTitleImage = @"";
+    model.shareUrl = @"";
+    model.shareDetail = @"";
+    [[ZWShareManager shareManager]showShareAlertWithViewController:self withDataModel:model withExtension:self.QRimageView.image withType:0];
 }
 
 - (void)imageSavedToPhotosAlbum:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo

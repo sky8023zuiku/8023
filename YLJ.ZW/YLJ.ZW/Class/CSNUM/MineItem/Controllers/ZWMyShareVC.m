@@ -23,6 +23,7 @@
 #import <ShareSDKUI/ShareSDK+SSUI.h>
 
 @interface ZWMyShareVC ()<UITableViewDelegate,UITableViewDataSource>
+
 @property(nonatomic, strong)ZWBaseEmptyTableView *tableView;
 @property(nonatomic, strong)NSArray *dataArray;
 @property(nonatomic, assign)NSInteger page;

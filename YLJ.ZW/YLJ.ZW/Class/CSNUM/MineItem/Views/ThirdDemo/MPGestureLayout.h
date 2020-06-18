@@ -34,6 +34,10 @@
 
 @property (nonatomic, assign) id<MPGestureLayout> delegate;
 
+@property (nonatomic, strong) UILongPressGestureRecognizer * longPress;
+
+@property (nonatomic, assign) NSInteger collectionIndex;
+
 @end
 
 

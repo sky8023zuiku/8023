@@ -287,7 +287,7 @@
                 NSArray *dataArr = respense.data;
                 NSMutableArray *myArray = [NSMutableArray array];
                 for (NSDictionary *myDic in dataArr) {
-                    ZWExhibitionListModel *model = [ZWExhibitionListModel parseJSON:myDic];
+                    ZWExhibitionListModel *model = [ZWExhibitionListModel mj_objectWithKeyValues:myDic];
                     [myArray addObject:model];
                 }
                 [strongSelf.exhibitionDataSource addObjectsFromArray:myArray];

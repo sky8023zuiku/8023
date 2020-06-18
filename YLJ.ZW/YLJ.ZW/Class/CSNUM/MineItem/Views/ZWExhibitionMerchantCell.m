@@ -30,8 +30,10 @@
         [self addSubview:self.titleLabel];
         
         UIImageView *titleImage = [[UIImageView alloc]init];
-        titleImage.image = [UIImage imageNamed:@"h1.jpg"];
+        titleImage.image = [UIImage imageNamed:@"zw_zfzw_icon"];
         titleImage.contentMode = UIViewContentModeScaleAspectFit;
+        titleImage.layer.cornerRadius = 3;
+        titleImage.layer.masksToBounds = YES;
         self.titleImage = titleImage;
         [self addSubview:titleImage];
         
@@ -97,7 +99,7 @@
     self.boothNumber.frame = CGRectMake(CGRectGetMinX(self.demandLabel.frame), CGRectGetMaxY(self.titleImage.frame)-15, 0.5*size.width, 15);
     
     CGFloat width = [[ZWToolActon shareAction]adaptiveTextWidth:@"查看展位图" labelFont:smallFont]+10;
-    self.locationBtn.frame = CGRectMake(size.width-width-20, CGRectGetMaxY(self.titleImage.frame)-0.07*size.width, width, 0.07*size.width);
+    self.locationBtn.frame = CGRectMake(size.width-width-20, CGRectGetMaxY(self.titleImage.frame)-0.07*size.width, width, 20);
         
     self.collectionBtn.frame = CGRectMake(size.width-0.05*kScreenWidth-10, 15, 0.05*kScreenWidth, 0.05*kScreenWidth);
 }

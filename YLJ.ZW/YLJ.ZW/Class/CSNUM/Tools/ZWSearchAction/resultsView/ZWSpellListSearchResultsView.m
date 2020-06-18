@@ -8,15 +8,9 @@
 
 #import "ZWSpellListSearchResultsView.h"
 #import "ZWSpellListCell.h"
-#import "ZWServiceRequst.h"
-#import "ZWServiceResponse.h"
 #import <MJRefresh.h>
-
 #import "ZWSpellListModel.h"
-#import "ZWSpellListType01Cell.h"
-#import "ZWSpellListType02Cell.h"
-#import "ZWSpellListType03Cell.h"
-#import "ZWSpellListType04Cell.h"
+#import "ZWServerSpellListDetailVC.h"
 
 @interface ZWSpellListSearchResultsView ()<UITableViewDelegate, UITableViewDataSource>
 
@@ -76,43 +70,13 @@
 }
 
 - (void)createRequst:(NSString *)text withPage:(NSInteger)page{
-//    ZWServiceSpellListRequst *requst = [[ZWServiceSpellListRequst alloc]init];
-//    requst.status = 2;
-//    requst.merchantName = text;
-//    requst.city = self.city;
-//    requst.type = self.parameterType;
-//    requst.pageNo = (int)page;
-//    requst.pageSize = 5;
-//    __weak typeof (self) weakSelf = self;
-//    [requst postRequestCompleted:^(YHBaseRespense *respense) {
-//        __strong typeof (weakSelf) strongSelf = weakSelf;
-//        [strongSelf.contentTableView.mj_header endRefreshing];
-//        [strongSelf.contentTableView.mj_footer endRefreshing];
-//        if (respense.isFinished) {
-//            if (page == 1) {
-//                [strongSelf.dataArray removeAllObjects];
-//            }
-//            NSLog(@"%@",respense.data[@"result"]);
-//            NSArray *arry = respense.data[@"result"];
-//            NSMutableArray *myArray = [NSMutableArray array];
-//            for (NSDictionary *myDic in arry) {
-//                ZWSpellListModel *model= [ZWSpellListModel parseJSON:myDic];
-//                [myArray addObject:model];
-//            }
-//            [self.dataArray addObjectsFromArray:myArray];
-//            [strongSelf.contentTableView reloadData];
-//        }else {
-//
-//        }
-//    }];
-    
     NSDictionary *parameters = @{
         @"city":self.self.city,
         @"merchantName":text,
         @"type":@"",
         @"status":@"2",
         @"pageQuery":@{
-                @"pageNo":[NSString stringWithFormat:@"%ld",page],
+                @"pageNo":[NSString stringWithFormat:@"%ld",(long)page],
                 @"pageSize":@"5"
         }
     };
@@ -129,7 +93,8 @@
                         NSArray *arry = data[@"data"][@"result"];
                         NSMutableArray *myArray = [NSMutableArray array];
                         for (NSDictionary *myDic in arry) {
-                            ZWSpellListModel *model = [ZWSpellListModel parseJSON:myDic];
+//                            ZWSpellListModel *model = [ZWSpellListModel parseJSON:myDic];
+                            ZWSpellListModel *model = [ZWSpellListModel mj_objectWithKeyValues:myDic];
                             [myArray addObject:model];
                         }
                         [self.dataArray addObjectsFromArray:myArray];
@@ -150,18 +115,20 @@
         _contentTableView.dataSource = self;
         _contentTableView.sectionHeaderHeight = 0;
         _contentTableView.sectionFooterHeight = 0;
-//        _contentTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+        _contentTableView.backgroundColor = [UIColor whiteColor];
+        _contentTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     }
     return _contentTableView;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.dataArray.count;
 }
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return 1;
+}
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
     static NSString *myCell = @"cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:myCell];
     if (!cell) {
@@ -173,57 +140,42 @@
     }
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     [self createTableViewCell:cell cellForRowAtIndexPath:indexPath];
-
     return cell;
+    
 }
 - (void)createTableViewCell:(UITableViewCell *)cell cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     ZWSpellListModel *model = self.dataArray[indexPath.row];
-    if ([model.type isEqualToString:@"4"]) {
-        ZWSpellListType02Cell *T02Cell = [[ZWSpellListType02Cell alloc]initWithFrame:CGRectMake(10, 10, kScreenWidth-20, 0.6*kScreenWidth-10) withFont:smallMediumFont];
-        T02Cell.backgroundColor = [UIColor whiteColor];
-        T02Cell.model = model;
-        [cell.contentView addSubview:T02Cell];
-    }else if ([model.type isEqualToString:@"5"]) {
-        ZWSpellListType03Cell *T03Cell = [[ZWSpellListType03Cell alloc]initWithFrame:CGRectMake(10, 10, kScreenWidth-20, 0.55*kScreenWidth-10) withFont:smallMediumFont];
-        T03Cell.backgroundColor = [UIColor whiteColor];
-        T03Cell.model = model;
-        [cell.contentView addSubview:T03Cell];
-    }else if ([model.type isEqualToString:@"6"]) {
-        ZWSpellListType04Cell *T04Cell = [[ZWSpellListType04Cell alloc]initWithFrame:CGRectMake(10, 10, kScreenWidth-20, 0.6*kScreenWidth-10) withFont:smallMediumFont];
-        T04Cell.backgroundColor = [UIColor whiteColor];
-        T04Cell.model = model;
-        [cell.contentView addSubview:T04Cell];
-    } else {
-        ZWSpellListType01Cell *T01Cell = [[ZWSpellListType01Cell alloc]initWithFrame:CGRectMake(10, 10, kScreenWidth-20, 0.7*kScreenWidth-10) withFont:smallMediumFont];
-        T01Cell.backgroundColor = [UIColor whiteColor];
-        T01Cell.model = model;
-        [cell.contentView addSubview:T01Cell];
-    }
+    ZWSpellListCell *listCell = [[ZWSpellListCell alloc]initWithFrame:CGRectMake(10, 0, kScreenWidth-20, 0.25*kScreenWidth) withFont:smallMediumFont];
+    listCell.backgroundColor = [UIColor whiteColor];
+    listCell.model = model;
+    listCell.layer.cornerRadius = 3;
+    listCell.layer.masksToBounds = NO;
+    listCell.layer.shadowOpacity=1;///不透明度
+    listCell.layer.shadowColor = [UIColor colorWithRed:220.0/255.0 green:220.0/255.0 blue:220.0/255.0 alpha:1].CGColor;//阴影颜色
+    listCell.layer.shadowOffset = CGSizeMake(0, 0);//投影偏移
+    listCell.layer.shadowRadius = 4;//半径大小
+    [cell.contentView addSubview:listCell];
+    
 }
 
 #pragma UITableViewDelegate
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    ZWSpellListModel *model = self.dataArray[indexPath.row];
-    if ([model.type isEqualToString:@"4"]) {
-        return 0.6*kScreenWidth;
-    }else if ([model.type isEqualToString:@"5"]) {
-        return 0.55*kScreenWidth;
-    }else if ([model.type isEqualToString:@"6"]) {
-        return 0.6*kScreenWidth;
-    }else {
-        return 0.7*kScreenWidth;
-    }
+    return 0.25*kScreenWidth;
 }
+
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 0.1;
+    return 0.03*kScreenWidth;
 }
+
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     return 10;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    ZWSpellListModel *model = self.dataArray[indexPath.section];
+    ZWServerSpellListDetailVC *spellDetailVC = [[ZWServerSpellListDetailVC alloc]init];
+    spellDetailVC.model = model;
+    [self.ff_navViewController pushViewController:spellDetailVC animated:YES];
 }
 @end

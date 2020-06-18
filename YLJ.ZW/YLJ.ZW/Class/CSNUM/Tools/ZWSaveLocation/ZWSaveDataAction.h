@@ -33,6 +33,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)saveCityName:(NSDictionary *)cityName;
 - (NSDictionary *)takeCityName;
 /**
+ *   保存和获取消息数量
+ */
+- (void)saveMessageNum:(NSDictionary *)messageNum;
+- (NSDictionary *)takeMessageNum;
+/**
  *   删除本地信息
  */
 - (void)removeLocation;

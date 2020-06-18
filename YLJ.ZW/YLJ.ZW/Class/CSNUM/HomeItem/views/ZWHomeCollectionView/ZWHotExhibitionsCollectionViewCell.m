@@ -83,7 +83,7 @@
     self.priceLabel.text = [NSString stringWithFormat:@"%@0会展币",model.price];
     [self.numBtn setTitle:[NSString stringWithFormat:@"%@",model.merchantCount] forState:UIControlStateNormal];
     
-    if ([model.collection isEqualToNumber:@1]) {
+    if ([model.collection isEqualToString:@"1"]) {
         self.collectionBtnBackImageName = @"zhanlist_icon_xin_xuan";
     }else {
         self.collectionBtnBackImageName = @"zhanlist_icon_xin_wei";

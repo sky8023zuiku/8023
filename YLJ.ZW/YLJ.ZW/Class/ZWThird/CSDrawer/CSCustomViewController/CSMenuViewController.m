@@ -12,32 +12,39 @@
 
 #import "ZWExhibitorsMenu.h"
 #import "ZWExhibitionMenu.h"
+#import "ZWPlanExhibitionMenu.h"
 
 @interface CSMenuViewController ()
 
 @property(nonatomic, strong)UICollectionViewFlowLayout *layout;
-
 @property(nonatomic, strong)ZWExhibitorsMenu *exhibitorsMenu;
 @property(nonatomic, strong)ZWExhibitionMenu *exhibitionMenu;
+@property(nonatomic, strong)ZWPlanExhibitionMenu *planExhibitionMenu;
 
 @end
 
 @implementation CSMenuViewController
-
+//展商筛选
 - (ZWExhibitorsMenu *)exhibitorsMenu {
     if (!_exhibitorsMenu) {
         _exhibitorsMenu = [[ZWExhibitorsMenu alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width/3*2, kScreenHeight-zwTabBarHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
     }
     return _exhibitorsMenu;
 }
-
+//展会筛选
 - (ZWExhibitionMenu *)exhibitionMenu {
     if (!_exhibitionMenu) {
         _exhibitionMenu = [[ZWExhibitionMenu alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width/3*2, kScreenHeight-zwTabBarHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
     }
     return _exhibitionMenu;
 }
-
+//计划展会筛选
+- (ZWPlanExhibitionMenu *)planExhibitionMenu {
+    if (!_planExhibitionMenu) {
+        _planExhibitionMenu = [[ZWPlanExhibitionMenu alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width/3*2, kScreenHeight-zwTabBarHeight-zwNavBarHeight) style:UITableViewStyleGrouped];
+    }
+    return _planExhibitionMenu;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -85,9 +92,9 @@
         
     } else {
         
-        self.exhibitionMenu.selectData = [NSMutableArray array];
-        [self.exhibitionMenu.selectData addObjectsFromArray:self.screenValues];
-        [self.view addSubview:self.exhibitionMenu];
+        self.planExhibitionMenu.selectData = [NSMutableArray array];
+        [self.planExhibitionMenu.selectData addObjectsFromArray:self.screenValues];
+        [self.view addSubview:self.planExhibitionMenu];
         
     }
     
@@ -120,41 +127,42 @@
 }
 
 - (void)bottomBtnClick:(UIButton *)btn {
+
     NSDictionary *myDic = @{@"myId":@"",@"name":@""};
     if (btn.tag == 0) {
         if (self.screenType == 1) {
-    
+
             for (int i = 0; i<self.exhibitorsMenu.selectData.count; i++) {
                 [self.exhibitorsMenu.selectData replaceObjectAtIndex:i withObject:myDic];
             }
             [self.exhibitorsMenu reloadData];
             [[NSNotificationCenter defaultCenter]postNotificationName:@"takeExhibitorsDrawerValue" object:self.exhibitorsMenu.selectData];
-            
+
         } else if (self.screenType == 2) {
             for (int i = 0; i<self.exhibitionMenu.selectData.count; i++) {
                 [self.exhibitionMenu.selectData replaceObjectAtIndex:i withObject:myDic];
             }
             [self.exhibitionMenu reloadData];
             [[NSNotificationCenter defaultCenter]postNotificationName:@"takeExhibitionDrawerValue" object:self.exhibitionMenu.selectData];
-            
+
         } else if (self.screenType == 3) {
-            
+
             for (int i = 0; i<self.exhibitionMenu.selectData.count; i++) {
                 [self.exhibitionMenu.selectData replaceObjectAtIndex:i withObject:myDic];
             }
             [self.exhibitionMenu reloadData];
             [[NSNotificationCenter defaultCenter]postNotificationName:@"takeMyExhibitionDrawerValue" object:self.exhibitionMenu.selectData];
-        
+
         } else {
-            
-            for (int i = 0; i<self.exhibitionMenu.selectData.count; i++) {
-                [self.exhibitionMenu.selectData replaceObjectAtIndex:i withObject:myDic];
+
+            for (int i = 0; i<self.planExhibitionMenu.selectData.count; i++) {
+                [self.planExhibitionMenu.selectData replaceObjectAtIndex:i withObject:myDic];
             }
-            [self.exhibitionMenu reloadData];
-            [[NSNotificationCenter defaultCenter]postNotificationName:@"takePlanScreenDrawerValue" object:self.exhibitionMenu.selectData];
-            
+            [self.planExhibitionMenu reloadData];
+            [[NSNotificationCenter defaultCenter]postNotificationName:@"takePlanScreenDrawerValue" object:self.planExhibitionMenu.selectData];
+
         }
-        
+
     }else {
         if (self.screenType == 1) {
             [[NSNotificationCenter defaultCenter]postNotificationName:@"takeExhibitorsDrawerValue" object:self.exhibitorsMenu.selectData];
@@ -163,7 +171,7 @@
         } else if (self.screenType == 3) {
             [[NSNotificationCenter defaultCenter]postNotificationName:@"takeMyExhibitionDrawerValue" object:self.exhibitionMenu.selectData];
         } else {
-            [[NSNotificationCenter defaultCenter]postNotificationName:@"takePlanScreenDrawerValue" object:self.exhibitionMenu.selectData];
+            [[NSNotificationCenter defaultCenter]postNotificationName:@"takePlanScreenDrawerValue" object:self.planExhibitionMenu.selectData];
         }
         [self.frostedViewController hideMenuViewController];
     }

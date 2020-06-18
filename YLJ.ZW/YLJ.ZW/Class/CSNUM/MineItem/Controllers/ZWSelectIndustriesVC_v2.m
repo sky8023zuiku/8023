@@ -143,7 +143,6 @@
         leftOne.tintColor = [UIColor whiteColor];
         self.navigationItem.leftBarButtonItems = @[leftOne];
         [[YNavigationBar sharedInstance]createRightBarWithTitle:@"提交" barItem:self.navigationItem target:self action:@selector(right2ItemClcik:)];
-        
     }
 }
 - (void)go1Back:(UINavigationItem *)item {
@@ -151,28 +150,13 @@
 }
 
 - (void)right1ItemClcik:(UIBarButtonItem *)item {
-    
     if (self.industriesArray.count == 0) {
         [self showOneAlertWithMessage:@"请选择您所涉及到的行业"];
         return;
     }
-    
     [[NSNotificationCenter defaultCenter]postNotificationName:@"certTakeIndustryList" object:self.industriesArray];
     [self.navigationController popViewControllerAnimated:YES];
-    
     NSLog(@"%@",self.industriesArray);
-    
-    
-//    ZWEditCompanyIntroductionVC *introductionVC = [[ZWEditCompanyIntroductionVC alloc]init];
-//    introductionVC.title = @"公司简介上传";
-//    introductionVC.model = self.model;
-//    introductionVC.coverImage = self.coverImage;
-//    introductionVC.merchantStatus = self.merchantStatus;
-//    if (self.merchantStatus == 3) {
-//        introductionVC.parameter = self.parameter;
-//    }
-//    [self.navigationController pushViewController:introductionVC animated:YES];
-    
 }
 
 - (void)right2ItemClcik:(UINavigationItem *)item {
@@ -365,6 +349,7 @@
 {
     return self.GroupTempArray;
 }
+
 - (NSInteger) tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index
 {
     return index;

@@ -21,7 +21,9 @@
 #import "CSMenuViewController.h"
 #import "ZWExhibitionDelayCell.h"
 
-@interface ZWMyCatalogueVC ()<UITableViewDelegate,UITableViewDataSource,ZWExhibitionListsCellDelegate,ZWExhibitionDelayCellDelegate>
+#import "CSFilterManager.h"
+
+@interface ZWMyCatalogueVC ()<UITableViewDelegate,UITableViewDataSource,ZWExhibitionListsCellDelegate,ZWExhibitionDelayCellDelegate,ZspMenuDelegate,ZspMenuDataSource,CSFilterManagerDelegate>
 
 @property (nonatomic, strong) ZspMenu *menu;
 @property (nonatomic, strong) UISearchBar *searchBar;
@@ -46,6 +48,8 @@
 
 @property(nonatomic, strong)NSMutableDictionary *parametersDic;
 
+@property(nonatomic, strong)NSDictionary *selectedDictionary;
+
 @end
 
 @implementation ZWMyCatalogueVC
@@ -60,6 +64,64 @@
     _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     return _tableView;
 }
+
+
+- (ZspMenu *)menu {
+    if (!_menu) {
+        _menu = [[ZspMenu alloc]initWithOrigin:CGPointMake(0, 40) andHeight:40];
+    }
+    _menu.delegate = self;
+    _menu.dataSource = self;
+    return _menu;
+}
+
+//每个column有多少行
+- (NSInteger)menu:(ZspMenu *)menu numberOfRowsInColumn:(NSInteger)column {
+    return 90;
+}
+//每个column中每行的title
+- (NSString *)menu:(ZspMenu *)menu titleForRowAtIndexPath:(ZspIndexPath *)indexPath {
+    NSArray *array = @[@"城市",@"年份",@"月份",@"二级",@"三级"];
+    return array[indexPath.column];
+}
+
+//有多少个column，默认为1列
+- (NSInteger)numberOfColumnsInMenu:(ZspMenu *)menu {
+    return 5;
+}
+//第column列，没行的image
+- (NSString *)menu:(ZspMenu *)menu imageNameForRowAtIndexPath:(ZspIndexPath *)indexPath {
+    return nil;
+}
+////detail text
+//- (NSString *)menu:(ZspMenu *)menu detailTextForRowAtIndexPath:(ZspIndexPath *)indexPath {
+//    return @"详情";
+//}
+//某列的某行item的数量，如果有，则说明有二级菜单，反之亦然
+- (NSInteger)menu:(ZspMenu *)menu numberOfItemsInRow:(NSInteger)row inColumn:(NSInteger)column {
+    if (column == 0) {
+        return 10;
+    }else {
+        return 0;;
+    }
+}
+//如果有二级菜单，则实现下列协议
+//二级菜单的标题
+- (NSString *)menu:(ZspMenu *)menu titleForItemsInRowAtIndexPath:(ZspIndexPath *)indexPath {
+    return @"城市";
+}
+//二级菜单的image
+- (NSString *)menu:(ZspMenu *)menu imageForItemsInRowAtIndexPath:(ZspIndexPath *)indexPath {
+    return nil;
+}
+//二级菜单的detail text
+//- (NSString *)menu:(ZspMenu *)menu detailTextForItemsInRowAtIndexPath:(ZspIndexPath *)indexPath {
+//    return @"1111";
+//}
+
+
+
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
@@ -147,6 +209,8 @@
     self.view.backgroundColor = [UIColor whiteColor];
     self.dataSource = [NSMutableArray array];
     [self.view addSubview:self.tableView];
+    
+//    [self.view addSubview:self.menu];
 }
 
 #pragma UITableViewDataSource
@@ -307,22 +371,36 @@
 
 - (void)rightItemClick:(UIBarButtonItem *)item {
 
-    CSMenuViewController *menuVC = [[CSMenuViewController alloc]init];
-    menuVC.screenType = 3;
-    menuVC.screenValues = self.screenValues;
-    UINavigationController *navC = [[UINavigationController alloc]initWithRootViewController:menuVC];
-    REFrostedViewController *frostedVC= [[REFrostedViewController alloc] initWithContentViewController:self.tabBarController menuViewController:navC];
-    frostedVC.direction = REFrostedViewControllerDirectionRight;
-    frostedVC.limitMenuViewSize = kScreenWidth/3*2;
-    frostedVC.animationDuration = 0.2;
-    frostedVC.liveBlurBackgroundStyle = REFrostedViewControllerLiveBackgroundStyleLight;
-    self.view.window.rootViewController = frostedVC;
-    [self.frostedViewController presentMenuViewController];
+//    CSMenuViewController *menuVC = [[CSMenuViewController alloc]init];
+//    menuVC.screenType = 3;
+//    menuVC.screenValues = self.screenValues;
+//    UINavigationController *navC = [[UINavigationController alloc]initWithRootViewController:menuVC];
+//    REFrostedViewController *frostedVC= [[REFrostedViewController alloc] initWithContentViewController:self.tabBarController menuViewController:navC];
+//    frostedVC.direction = REFrostedViewControllerDirectionRight;
+//    frostedVC.limitMenuViewSize = kScreenWidth/3*2;
+//    frostedVC.animationDuration = 0.2;
+//    frostedVC.liveBlurBackgroundStyle = REFrostedViewControllerLiveBackgroundStyleLight;
+//    self.view.window.rootViewController = frostedVC;
+//    [self.frostedViewController presentMenuViewController];
+//
     
+    [[CSFilterManager shareManager]showFilterMenu:self setSelectedData:self.selectedDictionary];
+    [CSFilterManager shareManager].delegate = self;
     self.tabBarController.tabBar.hidden = YES;
-    
+        
 }
-
+- (void)takeFilterData:(NSDictionary *)data {
+    NSLog(@"%@",data);
+    self.selectedDictionary = data;
+    NSMutableDictionary *dic = [NSMutableDictionary dictionaryWithCapacity:0];
+    [dic setValue:data[@"country"][@"name"] forKey:@"country"];
+    [dic setValue:data[@"city"][@"name"] forKey:@"city"];
+    [dic setValue:data[@"industry"][@"id"] forKey:@"industryId"];
+    [dic setValue:data[@"year"][@"name"] forKey:@"yearTime"];
+    [dic setValue:data[@"month"][@"name"] forKey:@"monthTime"];
+    self.page = 1;
+    [self createArequestWithPage:self.page withParameter:dic];
+}
 
 - (void)createArequestWithPage:(NSInteger)page withParameter:(NSDictionary *)dic {
     NSLog(@"我的页数%ld",(long)page);
@@ -347,7 +425,7 @@
             NSArray *dataArr = respense.data;
             NSMutableArray *myArray =[NSMutableArray array];
             for (NSDictionary *myDic in dataArr) {
-                ZWExhibitionListModel *model = [ZWExhibitionListModel parseJSON:myDic];
+                ZWExhibitionListModel *model = [ZWExhibitionListModel mj_objectWithKeyValues:myDic];
                 [myArray addObject:model];
             }
             [strongSelf.dataSource addObjectsFromArray:myArray];

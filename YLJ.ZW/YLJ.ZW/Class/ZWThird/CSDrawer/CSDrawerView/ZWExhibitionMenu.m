@@ -355,7 +355,7 @@
     if (collectionView.tag == 0) {
         
         CSDrawerCountriesModel *model = myArray[indexPath.item];
-        NSDictionary *myDic = @{@"myId":model.countriesId,@"name":model.name};
+        NSDictionary *myDic = @{@"id":model.countriesId,@"name":model.name};
         [self.selectData replaceObjectAtIndex:0 withObject:myDic];
         
         if ([model.name isEqualToString:@"中国"]) {
@@ -366,17 +366,17 @@
         
     }else if (collectionView.tag == 1) {
         CSDrawerCitiesModel *model = myArray[indexPath.item];
-        NSDictionary *myDic = @{@"myId":model.citiesId,@"name":model.name};
+        NSDictionary *myDic = @{@"id":model.citiesId,@"name":model.name};
         [self.selectData replaceObjectAtIndex:1 withObject:myDic];
     } else if (collectionView.tag == 2) {
         CSDrawerIndustiesModel *model = myArray[indexPath.item];
-        NSDictionary *myDic = @{@"myId":model.industriesId,@"name":model.name};
+        NSDictionary *myDic = @{@"id":model.industriesId,@"name":model.name};
         [self.selectData replaceObjectAtIndex:2 withObject:myDic];
     } else if (collectionView.tag == 3) {
-        NSDictionary *myDic = @{@"myId":@"",@"name":myArray[indexPath.item]};
+        NSDictionary *myDic = @{@"id":@"",@"name":myArray[indexPath.item]};
         [self.selectData replaceObjectAtIndex:3 withObject:myDic];
     } else {
-        NSDictionary *myDic = @{@"myId":@"",@"name":myArray[indexPath.item]};
+        NSDictionary *myDic = @{@"id":@"",@"name":myArray[indexPath.item]};
         [self.selectData replaceObjectAtIndex:4 withObject:myDic];
     }
     [self refreshCellWithIndex:collectionView.tag];
@@ -396,7 +396,7 @@
         NSIndexPath *myIndex = [NSIndexPath indexPathForRow:1 inSection:1];
         [self reloadRowsAtIndexPaths:@[myIndex] withRowAnimation:UITableViewRowAnimationNone];
     }else {
-        NSDictionary *myDic = @{@"myId":@"",@"name":@""};
+        NSDictionary *myDic = @{@"id":@"",@"name":@""};
         [self.selectData replaceObjectAtIndex:1 withObject:myDic];
         [self refreshCellWithIndex:2];
         
@@ -416,7 +416,7 @@
 - (BOOL)collectionView:(UICollectionView *)collectionView shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath {
 //    NSLog(@"彻底取消");
     if([collectionView cellForItemAtIndexPath:indexPath].selected) {
-        NSDictionary *myDic = @{@"myId":@"",@"name":@""};
+        NSDictionary *myDic = @{@"id":@"",@"name":@""};
         if (collectionView.tag == 0) {
             [self.selectData replaceObjectAtIndex:0 withObject:myDic];
         }else if (collectionView.tag == 1) {

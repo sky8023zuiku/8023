@@ -32,6 +32,7 @@
 #import "UButton.h"
 
 #import "ZWMyIndustriesVC.h"
+#import "ZWMyInvolveIndustesVC.h"
 
 #import "ZWMyInvitationVC.h"
 
@@ -43,6 +44,8 @@
 #import "ZWSelectCertificationVC.h"
 
 #import "ZWMineResponse.h"
+
+#import "ZWMyBusinessCardListVC.h"
 
 #define IMAGE_HEIGHT 0.01*kScreenWidth
 #define SCROLL_DOWN_LIMIT 100
@@ -83,7 +86,7 @@
     self.tabBarController.tabBar.hidden = NO;
     [self createNavigationBar];
     [self requestUserInfoData];
-    [[YNavigationBar sharedInstance]createNavigationBarWithStatusBarStyle:UIStatusBarStyleLightContent withType:0];
+//    [[YNavigationBar sharedInstance]createNavigationBarWithStatusBarStyle:UIStatusBarStyleLightContent withType:0];
 }
 
 - (void)requestUserInfoData {
@@ -108,25 +111,40 @@
     [self createNotice];
 }
 - (void)createNotice {
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(requestUserInfoData) name:@"refreshPersonalCenter" object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self
+                                            selector:@selector(requestUserInfoData)
+                                                name:@"refreshPersonalCenter"
+                                              object:nil];
 }
 -(void)dealloc {
-    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"refreshPersonalCenter" object:nil];
+    [[NSNotificationCenter defaultCenter]removeObserver:self
+                                                   name:@"refreshPersonalCenter"
+                                                 object:nil];
 }
 
 - (void)createNavigationBar {
-    [[YNavigationBar sharedInstance]createRightBarWithImage:[UIImage imageNamed:@"main_message_icon"] barItem:self.navigationItem target:self action:@selector(rightItemClick:)];
+    NSDictionary *messageNum = [[ZWSaveDataAction shareAction]takeMessageNum];
+    NSInteger number = [messageNum[@"total"] integerValue];
+    if (number>=99) {
+        number = 99;
+    }
+    [[ZWBadgeAction shareAction]createBadge:number
+                               withImageStr:@"main_message_icon"
+                         withNavigationItem:self.navigationItem
+                                     target:self
+                                     action:@selector(rightItemClick:)];
 }
-- (void)rightItemClick:(UINavigationItem *)item {
-    ZWMessageCenterVC *messageCenterVC = [[ZWMessageCenterVC alloc]init];
-    messageCenterVC.title = @"消息中心";
-    messageCenterVC.hidesBottomBarWhenPushed = YES;
-    [self.navigationController pushViewController:messageCenterVC animated:YES];
-    
-//    ZWMessageCenterV2VC *messageCenterV2VC = [[ZWMessageCenterV2VC alloc]init];
-//    messageCenterV2VC.title = @"消息中心";
-//    messageCenterV2VC.hidesBottomBarWhenPushed = YES;
-//    [self.navigationController pushViewController:messageCenterV2VC animated:YES];
+
+- (void)rightItemClick:(UIButton *)btn {
+//    ZWMessageCenterVC *messageCenterVC = [[ZWMessageCenterVC alloc]init];
+//    messageCenterVC.title = @"消息中心";
+//    messageCenterVC.hidesBottomBarWhenPushed = YES;
+//    [self.navigationController pushViewController:messageCenterVC animated:YES];
+
+    ZWMessageCenterV2VC *messageCenterV2VC = [[ZWMessageCenterV2VC alloc]init];
+    messageCenterV2VC.title = @"消息中心";
+    messageCenterV2VC.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:messageCenterV2VC animated:YES];
     
 }
 
@@ -152,11 +170,11 @@
         NSDictionary *myDic = [[ZWSaveDataAction shareAction]takeUserInfoData];
         int roleId = [myDic[@"roleId"] intValue];
         if (roleId == 1||roleId == 5||roleId == 6||roleId == 7||roleId == 8||roleId == 12||roleId == 13) {
-            return 4;
+            return 6;
         } else if(roleId ==2||roleId==3 ||roleId ==4) {
-            return 7;
+            return 8;
         }else {
-            return 5;
+            return 7;
         }
     } else {
         return 1;
@@ -188,23 +206,24 @@
                 cell.textLabel.text = @"企业入驻";
                 cell.imageView.image = [UIImage imageNamed:@"mine_enterprises_icon"];
             }else if (indexPath.row == 1) {
+                cell.textLabel.text = @"我的名片";
+                cell.imageView.image = [UIImage imageNamed:@"My_business_card_icon"];
+            }else if (indexPath.row == 2) {
                 cell.textLabel.text = @"我的订单";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_dingdan"];
-            }else if (indexPath.row == 2) {
+            }else if (indexPath.row == 3) {
                 cell.textLabel.text = @"我的收藏";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_shouc"];
-            }else if (indexPath.row == 3) {
+            }else if (indexPath.row == 4) {
                 cell.textLabel.text = @"我的发布";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_fabu"];
-            }else if (indexPath.row == 4) {
+            }else if (indexPath.row == 5) {
                 cell.textLabel.text = @"我的行业";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_zi"];
-            }
-            else if (indexPath.row == 5) {
+            }else if (indexPath.row == 6) {
                 cell.textLabel.text = @"我的分享";
                 cell.imageView.image = [UIImage imageNamed:@"my_share_icon"];
-            }
-            else {
+            }else {
                 cell.textLabel.text = @"我的邀请";
                 cell.imageView.image = [UIImage imageNamed:@"my_invitation_icon"];
             }
@@ -215,12 +234,18 @@
                 cell.textLabel.text = @"企业入驻";
                 cell.imageView.image = [UIImage imageNamed:@"mine_enterprises_icon"];
             }else if (indexPath.row == 1) {
+                cell.textLabel.text = @"我的名片";
+                cell.imageView.image = [UIImage imageNamed:@"My_business_card_icon"];
+            }else if (indexPath.row == 2) {
                 cell.textLabel.text = @"我的订单";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_dingdan"];
-            }else if (indexPath.row == 2) {
+            }else if (indexPath.row == 3) {
                 cell.textLabel.text = @"我的收藏";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_shouc"];
-            }else if (indexPath.row == 3) {
+            }else if (indexPath.row == 4) {
+                cell.textLabel.text = @"我的行业";
+                cell.imageView.image = [UIImage imageNamed:@"ren_icon_shouc"];
+            }else if (indexPath.row == 5) {
                 cell.textLabel.text = @"子用户管理";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_shouc"];
             }else {
@@ -234,10 +259,16 @@
                 cell.textLabel.text = @"企业入驻";
                 cell.imageView.image = [UIImage imageNamed:@"mine_enterprises_icon"];
             }else if (indexPath.row == 1) {
+                cell.textLabel.text = @"我的名片";
+                cell.imageView.image = [UIImage imageNamed:@"My_business_card_icon"];
+            }else if (indexPath.row == 2) {
                 cell.textLabel.text = @"我的订单";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_dingdan"];
-            }else if (indexPath.row == 2) {
+            }else if (indexPath.row == 3) {
                 cell.textLabel.text = @"我的收藏";
+                cell.imageView.image = [UIImage imageNamed:@"ren_icon_shouc"];
+            }else if (indexPath.row == 4) {
+                cell.textLabel.text = @"我的行业";
                 cell.imageView.image = [UIImage imageNamed:@"ren_icon_shouc"];
             } else {
                 cell.textLabel.text = @"我的邀请";
@@ -430,21 +461,20 @@
             if (indexPath.row == 0) {
                 [self zwGoToEnterprisesVC];
             }else if (indexPath.row == 1) {
-                [self gotoMyOrderVC];
+                [self zwGoToBusinessCardListVC];
             }else if (indexPath.row == 2) {
-                [self gotoMyCollectionVC];
+                [self gotoMyOrderVC];
             }else if (indexPath.row == 3) {
+                [self gotoMyCollectionVC];
+            }else if (indexPath.row == 4) {
                 ZWMyReleaseVC *ReleaseVC = [[ZWMyReleaseVC alloc]init];
                 ReleaseVC.title = @"我的发布";
                 ReleaseVC.hidesBottomBarWhenPushed = YES;
                 [self.navigationController pushViewController:ReleaseVC animated:YES];
-            }else if (indexPath.row == 4) {
-                ZWMyIndustriesVC *industriesVC = [[ZWMyIndustriesVC alloc]init];
-                industriesVC.title = @"我的行业";
-                industriesVC.hidesBottomBarWhenPushed = YES;
-                [self.navigationController pushViewController:industriesVC animated:YES];
+            }else if (indexPath.row == 5) {
+                [self gotoMyIndustriesVC];
             }
-            else if (indexPath.row == 5) {
+            else if (indexPath.row == 6) {
                 ZWMyShareVC *shareVC = [[ZWMyShareVC alloc]init];
                 shareVC.title = @"我的分享";
                 shareVC.userId = myDic[@"userId"];
@@ -458,10 +488,14 @@
             if (indexPath.row == 0) {
                 [self zwGoToEnterprisesVC];
             }else if (indexPath.row == 1) {
-                [self gotoMyOrderVC];
+                [self zwGoToBusinessCardListVC];
             }else if (indexPath.row == 2) {
-                [self gotoMyCollectionVC];
+                [self gotoMyOrderVC];
             }else if (indexPath.row == 3) {
+                [self gotoMyCollectionVC];
+            }else if (indexPath.row == 4) {
+                [self gotoMyIndustriesVC];
+            }else if (indexPath.row == 5) {
                 ZWChildUserManagerVC *userManagerVC = [[ZWChildUserManagerVC alloc]init];
                 userManagerVC.title = @"子用户管理";
                 userManagerVC.hidesBottomBarWhenPushed = YES;
@@ -473,9 +507,13 @@
             if (indexPath.row == 0) {
                 [self zwGoToEnterprisesVC];
             }else if (indexPath.row == 1) {
-                [self gotoMyOrderVC];
+                [self zwGoToBusinessCardListVC];
             }else if (indexPath.row == 2) {
+                [self gotoMyOrderVC];
+            }else if (indexPath.row == 3) {
                 [self gotoMyCollectionVC];
+            }else if (indexPath.row == 4) {
+                [self gotoMyIndustriesVC];
             }else{
                 [self gotoMyInvitationVC];
             }
@@ -500,12 +538,44 @@
     collectionVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:collectionVC animated:YES];
 }
+- (void)gotoMyIndustriesVC {
+    
+    
+    __weak typeof (self) weakSelf = self;
+       [[ZWDataAction sharedAction]getReqeustWithURL:zwTakeUserInfo parametes:@{} successBlock:^(NSDictionary * _Nonnull data) {
+           __strong typeof (weakSelf) strongSelf = weakSelf;
+           if (zw_issuccess) {
+               NSDictionary *myDic = data[@"data"];
+               if (myDic) {
+                   [[ZWSaveDataAction shareAction]saveUserInfoData:myDic];
+//                   ZWMyInvolveIndustesVC *industriesVC = [[ZWMyInvolveIndustesVC alloc]init];
+                   ZWMyIndustriesVC *industriesVC = [[ZWMyIndustriesVC alloc]init];
+                   industriesVC.title = @"我的行业";
+                   industriesVC.hidesBottomBarWhenPushed = YES;
+                   industriesVC.roleId = (NSNumber *)myDic[@"roleId"];
+                   [strongSelf.navigationController pushViewController:industriesVC animated:YES];
+               }
+           }else {
+               [strongSelf showAlretWithMessage:@"获取身份失败，请稍后再试或联系客服"];
+           }
+       } failureBlock:^(NSError * _Nonnull error) {
+           
+       } showInView:self.view];
+}
 
 - (void)gotoMyInvitationVC {
     ZWMyInvitationVC *invitationVC = [[ZWMyInvitationVC alloc]init];
     invitationVC.title = @"我的邀请";
     invitationVC.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:invitationVC animated:YES];
+}
+
+- (void)zwGoToBusinessCardListVC {
+    ZWMyBusinessCardListVC *cardListVC = [[ZWMyBusinessCardListVC alloc]init];
+    cardListVC.title = @"我的名片";
+    cardListVC.type = 1;
+    cardListVC.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:cardListVC animated:YES];
 }
 
 - (void)editorBtnClick:(UIButton *)btn {
@@ -550,7 +620,8 @@
             NSArray *myData = data[@"data"];
             NSMutableArray *myArray = [NSMutableArray array];
             for (NSDictionary *myDic in myData) {
-                ZWTopUpModel *model = [ZWTopUpModel parseJSON:myDic];
+//                ZWTopUpModel *model = [ZWTopUpModel parseJSON:myDic];
+                ZWTopUpModel *model = [ZWTopUpModel mj_objectWithKeyValues:myDic];
                 [myArray addObject:model];
             }
             ZWMyAccountVC *accountVC = [[ZWMyAccountVC alloc]init];

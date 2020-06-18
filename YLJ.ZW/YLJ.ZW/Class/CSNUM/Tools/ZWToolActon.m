@@ -9,6 +9,7 @@
 #import "ZWToolActon.h"
 
 @implementation ZWToolActon
+
 static ZWToolActon *shareAction = nil;
 + (instancetype)shareAction{
     static dispatch_once_t onceToken;
@@ -70,7 +71,6 @@ static ZWToolActon *shareAction = nil;
     return str;
     
 }
-
 
 - (NSString *)transformDic:(NSDictionary *)dic {
     if (![dic count]) {
@@ -173,6 +173,7 @@ static ZWToolActon *shareAction = nil;
     NSString *timeStr=[formatter stringFromDate:myDate];
     return timeStr;
 }
+
 /**
  *  设置两端对齐
 */
@@ -204,5 +205,123 @@ static ZWToolActon *shareAction = nil;
     return array;
 }
 
+- (void)dialTheNumber:(NSString *)number {
+    NSLog(@"我的电话号码 = %@",number);
+    NSString *subNumber = [self removeSpaceAndNewline:number];
+    NSMutableString * str=[[NSMutableString alloc] initWithFormat:@"tel:%@",subNumber];
+    UIApplication *application = [UIApplication sharedApplication];
+    NSURL *URL = [NSURL URLWithString:str];
+    if (@available(iOS 10.0, *)) {
+        [application openURL:URL options:@{} completionHandler:^(BOOL success) {
+            NSLog(@"OpenSuccess=%d",success);
+        }];
+    } else {
+        [application openURL:URL];
+    }
+}
+//去掉所有空格和字符串
+- (NSString *)removeSpaceAndNewline:(NSString *)str{
+    NSString *temp = [str stringByReplacingOccurrencesOfString:@" " withString:@""];
+    temp = [temp stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+    temp = [temp stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+    return temp;
+}
+
+//改变图片的颜色
+- (UIImage *)modifyTheColorWithImageName:(NSString *)imageName imageColor:(UIColor *)imageColor {
+    
+    UIImage *image = [UIImage imageNamed:imageName];
+    UIGraphicsBeginImageContextWithOptions(image.size, NO, 0.0f);
+    [imageColor setFill];
+    CGRect bounds = CGRectMake(0, 0, image.size.width, image.size.height);
+    UIRectFill(bounds);
+    [image drawInRect:bounds blendMode:kCGBlendModeDestinationIn alpha:1.0f];
+    UIImage *tintedImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return tintedImage;
+    
+}
+
+- (id)arrayOrDicWithObject:(id)origin {
+   if ([origin isKindOfClass:[NSArray class]]) {
+       //数组
+       NSMutableArray *array = [NSMutableArray array];
+       for (NSObject *object in origin) {
+           if ([object isKindOfClass:[NSString class]] || [object isKindOfClass:[NSNumber class]]) {
+               //string , bool, int ,NSinteger
+               [array addObject:object];
+
+           } else if ([object isKindOfClass:[NSArray class]] || [object isKindOfClass:[NSDictionary class]]) {
+               //数组或字典
+               [array addObject:[self arrayOrDicWithObject:(NSArray *)object]];
+
+           } else {
+               //model
+               [array addObject:[self dicFromObject:object]];
+           }
+       }
+
+       return [array copy];
+
+   } else if ([origin isKindOfClass:[NSDictionary class]]) {
+       //字典
+       NSDictionary *originDic = (NSDictionary *)origin;
+       NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+       for (NSString *key in originDic.allKeys) {
+           id object = [originDic objectForKey:key];
+
+           if ([object isKindOfClass:[NSString class]] || [object isKindOfClass:[NSNumber class]]) {
+               //string , bool, int ,NSinteger
+               [dic setObject:object forKey:key];
+
+           } else if ([object isKindOfClass:[NSArray class]] || [object isKindOfClass:[NSDictionary class]]) {
+               //数组或字典
+               [dic setObject:[self arrayOrDicWithObject:object] forKey:key];
+
+           } else {
+               //model
+               [dic setObject:[self dicFromObject:object] forKey:key];
+           }
+       }
+
+       return [dic copy];
+   }
+
+   return [NSNull null];
+}
+
+
+//model转化为字典
+- (NSDictionary *)dicFromObject:(NSObject *)object {
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    unsigned int count;
+    objc_property_t *propertyList = class_copyPropertyList([object class], &count);
+ 
+    for (int i = 0; i < count; i++) {
+        objc_property_t property = propertyList[i];
+        const char *cName = property_getName(property);
+        NSString *name = [NSString stringWithUTF8String:cName];
+        NSObject *value = [object valueForKey:name];//valueForKey返回的数字和字符串都是对象
+ 
+        if ([value isKindOfClass:[NSString class]] || [value isKindOfClass:[NSNumber class]]) {
+            //string , bool, int ,NSinteger
+            [dic setObject:value forKey:name];
+ 
+        } else if ([value isKindOfClass:[NSArray class]] || [value isKindOfClass:[NSDictionary class]]) {
+            //字典或字典
+            [dic setObject:[self arrayOrDicWithObject:(NSArray*)value] forKey:name];
+ 
+        } else if (value == nil) {
+            //null
+            //[dic setObject:[NSNull null] forKey:name];//这行可以注释掉?????
+ 
+        } else {
+            //model
+            [dic setObject:[self dicFromObject:value] forKey:name];
+        }
+        
+    }
+    return [dic copy];
+}
 
 @end

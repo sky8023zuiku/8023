@@ -161,32 +161,14 @@
 }
 @end
 /**
- * 我收藏的展会列表
+ * 展会列表
  */
 @implementation ZWExhibitionListModel
-+ (id)parseJSON:(NSDictionary *)jsonDic {
-    return [[self alloc]initWithJSON:jsonDic];
+
++(NSDictionary *)mj_replacedKeyFromPropertyName {
+    return @{@"listId":@"id"};
 }
-- (id)initWithJSON:(NSDictionary *)myDic {
-    if (self = [super init]) {
-        
-        self.listId = myDic[@"id"];
-        self.imageUrl = myDic[@"imageUrl"];
-        self.name = myDic[@"name"];
-        self.country = myDic[@"country"];
-        self.city = myDic[@"city"];
-        self.collection = myDic[@"collection"];
-        self.endTime = myDic[@"endTime"];
-        self.merchantCount = myDic[@"merchantCount"];
-        self.price = myDic[@"price"];
-        self.startTime = myDic[@"startTime"];
-        self.developingState = myDic[@"developingState"];
-        self.announcementImages = myDic[@"announcementImages"];
-        self.myNewStartTime = myDic[@"newStartTime"];
-        self.myNewEndTime = myDic[@"newEndTime"];
-    }
-    return self;
-}
+
 @end
 /**
  * 我收藏的展会展商列表
@@ -324,17 +306,7 @@
  * 产品列表
  */
 @implementation ZWProductListModel
-+ (id)parseJSON:(NSDictionary *)jsonDic {
-    return [[self alloc]initWithJSON:jsonDic];
-}
-- (id)initWithJSON:(NSDictionary *)myDic {
-    if (self = [super init]) {
-        self.productId = myDic[@"productId"];
-        self.name = myDic[@"name"];
-        self.url = myDic[@"url"];
-    }
-    return self;
-}
+
 @end
 /**
  * 产品列表
@@ -400,21 +372,8 @@
  * 创建订单生成模型
  */
 @implementation ZWCreateOrderModel
-+ (id)parseJSON:(NSDictionary *)jsonDic {
-    return [[self alloc]initWithJSON:jsonDic];
-}
-- (id)initWithJSON:(NSDictionary *)myDic {
-    if (self = [super init]) {
-        self.url = myDic[@"url"];
-        self.name = myDic[@"name"];
-        self.created = myDic[@"created"];
-        self.orderId = myDic[@"id"];
-        self.orderNum = myDic[@"orderNum"];
-        self.type = myDic[@"type"];
-        self.count = myDic[@"count"];
-        self.price = myDic[@"price"];
-    }
-    return self;
++(NSDictionary *)mj_replacedKeyFromPropertyName {
+    return @{@"orderId":@"id"};
 }
 @end
 /**
@@ -442,4 +401,9 @@
     }
     return self;
 }
+
++(NSDictionary *)mj_replacedKeyFromPropertyName {
+    return @{@"exhibitorId":@"id"};
+}
+
 @end

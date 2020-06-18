@@ -14,7 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy)NSString *score;//用户id
 @property(nonatomic, copy)NSString *phonePrice;//银行卡名称
 @property(nonatomic, copy)NSString *ID;//列表id
-+ (id)parseJSON:(NSDictionary *)jsonDic;
 @end
 
 NS_ASSUME_NONNULL_END

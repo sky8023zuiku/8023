@@ -24,6 +24,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ZWLeftImageBtn : UIButton
 
 @end
+//图片在右边的BTN
+@interface ZWSelectBtn : UIButton
+
+@end
 
 //图片为圆形
 @interface UCButton : UIButton
